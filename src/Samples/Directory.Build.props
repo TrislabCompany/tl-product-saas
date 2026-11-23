@@ -1,0 +1,10 @@
+<Project>
+	<!-- The samples Catalog, Tickets and Chat show how a module is built. They are not part of the
+	     framework: they are never packed, and no framework module or building block may reference them.
+	     tl-product-saas takes them over (factory step 8). -->
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+	<PropertyGroup>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+</Project>

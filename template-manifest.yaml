@@ -1,0 +1,99 @@
+# Every path of this template and its ownership (docs/template-releases.md).
+# update-from-template reads this file at the template release it updates to:
+#   platform       copied over the product's file on every update; the product never edits it
+#   shared         the template's change is 3-way merged into the product's file; conflicts are listed
+#   product        never touched; the template's change is shown as a suggestion
+#   template-only  never copied to a product repository; scripts/init-product.ps1 deletes it
+#   sample         the template's sample content, shown in the template, deleted by init-product, never copied to a product
+# The first rule whose pattern matches a path wins. `*` matches within one folder, `**` across folders.
+# So the rules of a narrower class come before `.github/workflows/*`, `scripts/**`, `src/**` and the others.
+# scripts/check-template-manifest.ps1 (run by ci / ci) fails when a tracked file matches no rule.
+#
+# The samples Catalog, Tickets and Chat (src/Samples/**) are `product`: init-product removes the ones a product does
+# not keep, and a product that keeps one owns it from then on. Each rule is written on one line:
+# scripts/init-product.ps1 reads the template-only rules from here.
+template: template-saas
+
+# The template's skills, in .agents/skills/<name>/. Any other folder there is a project skill,
+# which an update never reads, changes or deletes. Each skill's front matter repeats its ownership.
+# Each skill also has a pointer, .claude/skills/<name>/SKILL.md, with the same front matter:
+# Claude Code finds skills only there. It has the skill's ownership.
+skills:
+  release: platform
+  update-from-template: platform
+  release-template: template-only
+  init-product: template-only
+  add-entity: shared
+  add-feature: shared
+  add-full-slice: shared
+  add-integration-event: shared
+  add-module: shared
+  add-permission: shared
+  add-react-page: shared
+  create-migration: shared
+  mediator-reference: shared
+  query-patterns: shared
+  testing-guide: shared
+
+paths:
+  # Maintaining the template itself, and making a product from it
+  - { path: template-manifest.yaml, ownership: template-only }
+  - { path: scripts/init-product.ps1, ownership: template-only }
+  - { path: .agents/skills/init-product/**, ownership: template-only }
+  - { path: .claude/skills/init-product/**, ownership: template-only }
+  - { path: .agents/skills/release-template/**, ownership: template-only }
+  - { path: .claude/skills/release-template/**, ownership: template-only }
+  - { path: docs/template-releases.md, ownership: template-only }
+  - { path: docs/upgrading/template-*.md, ownership: template-only }
+  - { path: .github/workflows/template-release.yml, ownership: template-only }
+
+  # The platform's part: the same in every product repository, never edited there.
+  # The workflows call the platform's reusable workflows; the release process rests on them.
+  - { path: .github/workflows/*, ownership: platform }
+  - { path: .agents/skills/release/**, ownership: platform }
+  - { path: .agents/skills/update-from-template/**, ownership: platform }
+  - { path: .claude/skills/release/**, ownership: platform }
+  - { path: .claude/skills/update-from-template/**, ownership: platform }
+  - { path: docs/upgrading/README.md, ownership: platform }
+  - { path: CLAUDE.md, ownership: platform }
+  - { path: renovate.json, ownership: platform }
+  - { path: platform.schema.json, ownership: platform }
+  - { path: scripts/check-template-manifest.ps1, ownership: platform }
+
+  # The product's own from the first day
+  - { path: README.md, ownership: product }
+  - { path: .github/CODEOWNERS, ownership: product }
+  - { path: .template-version, ownership: product }
+  - { path: platform.yaml, ownership: product }
+  - { path: .trivyignore, ownership: product }
+  - { path: .env.example, ownership: product }
+  - { path: clients/*/package.json, ownership: product }
+  - { path: clients/*/package-lock.json, ownership: product }
+  - { path: src/Samples/**, ownership: product }
+  - { path: src/Modules/**, ownership: product }
+  - { path: LICENSE, ownership: product }
+  - { path: THIRD-PARTY-NOTICES.md, ownership: product }
+
+  # Shared: the template's starting point, which the product adapts.
+  # src/Directory.Packages.props holds TrislabFrameworkVersion: a framework release is a template release.
+  - { path: AGENTS.md, ownership: shared }
+  - { path: .claude/rules/**, ownership: shared }
+  - { path: .claude/agents/**, ownership: shared }
+  - { path: .claude/settings.json, ownership: shared }
+  - { path: .claude/skills/**, ownership: shared }
+  - { path: .agents/skills/**, ownership: shared }
+  - { path: .github/pull_request_template.md, ownership: shared }
+  - { path: docs/**, ownership: shared }
+  - { path: scripts/**, ownership: shared }
+  - { path: src/**, ownership: shared }
+  - { path: clients/**, ownership: shared }
+  - { path: nuget.config, ownership: shared }
+  - { path: global.json, ownership: shared }
+  - { path: docker-compose.yml, ownership: shared }
+  - { path: coverage.runsettings, ownership: shared }
+  - { path: .config/**, ownership: shared }
+  - { path: .vscode/**, ownership: shared }
+  - { path: .editorconfig, ownership: shared }
+  - { path: .gitattributes, ownership: shared }
+  - { path: .gitignore, ownership: shared }
+  - { path: .dockerignore, ownership: shared }

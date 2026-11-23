@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Trislab.Modules.Chat.Contracts</RootNamespace>
+		<AssemblyName>Trislab.Modules.Chat.Contracts</AssemblyName>
+		<NoWarn>$(NoWarn);S2094</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Mediator.Abstractions" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Trislab.Framework.Shared" />
+		<PackageReference Include="Trislab.Framework.Eventing.Abstractions" />
+	</ItemGroup>
+
+</Project>

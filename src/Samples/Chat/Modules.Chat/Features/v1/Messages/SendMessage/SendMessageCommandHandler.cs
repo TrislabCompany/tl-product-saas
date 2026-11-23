@@ -1,0 +1,158 @@
+using System.Diagnostics;
+using System.Net;
+using Trislab.Framework.Core.Context;
+using Trislab.Framework.Core.Exceptions;
+using Trislab.Framework.Eventing.Abstractions;
+using Trislab.Framework.Web.Realtime;
+using Trislab.Modules.Chat.Contracts.v1.Commands;
+using Trislab.Modules.Chat.Contracts.v1.DTOs;
+using Trislab.Modules.Chat.Data;
+using Trislab.Modules.Chat.Domain;
+using Trislab.Modules.Chat.Features.v1.Internal;
+using Trislab.Modules.Chat.Localization;
+using Trislab.Modules.Chat.Services;
+using Trislab.Modules.Notifications.Contracts.Events;
+using Mediator;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+
+namespace Trislab.Modules.Chat.Features.v1.Messages.SendMessage;
+
+public sealed class SendMessageCommandHandler(
+    ChatDbContext db,
+    ICurrentUser currentUser,
+    IHubContext<AppHub> hub,
+    IMentionResolver mentionResolver,
+    IEventBus eventBus)
+    : ICommandHandler<SendMessageCommand, MessageDto>
+{
+    public async ValueTask<MessageDto> Handle(SendMessageCommand cmd, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(cmd);
+        var userId = currentUser.GetUserId();
+        if (userId == Guid.Empty) throw new UnauthorizedException("no current user").Localized("Error.NoCurrentUser");
+        var currentUserId = userId.ToString();
+
+        var channel = await db.Channels.FirstOrDefaultAsync(c => c.Id == cmd.ChannelId, cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new NotFoundException("Channel not found.").Localized<ChatResources>("Chat.ChannelNotFound");
+
+        channel.RequireMember(currentUserId);
+
+        Message? parent = null;
+        if (cmd.ParentMessageId is { } parentId)
+        {
+            parent = await db.Messages.FirstOrDefaultAsync(m => m.Id == parentId, cancellationToken)
+                .ConfigureAwait(false)
+                ?? throw new NotFoundException("Parent message not found.")
+                    .Localized<ChatResources>("Chat.ParentMessageNotFound");
+            if (parent.ChannelId != channel.Id)
+            {
+                throw new CustomException("Parent message belongs to a different channel.", (IEnumerable<string>?)null, HttpStatusCode.BadRequest)
+                    .Localized<ChatResources>("Chat.ParentMessageDifferentChannel");
+            }
+            if (parent.ParentMessageId.HasValue)
+            {
+                // 1-level deep only per spec.
+                throw new CustomException("Cannot reply to a reply — threads are single-level only.", (IEnumerable<string>?)null, HttpStatusCode.BadRequest)
+                    .Localized<ChatResources>("Chat.CannotReplyToReply");
+            }
+        }
+
+        // Parse @username tokens to user ids; self-mentions and unresolved tokens are dropped silently.
+        // Only resolved *other* users attach as MessageMention rows + fire an event. Body may be empty.
+        var rawMatches = MentionParser.Parse(cmd.Body ?? string.Empty);
+        var distinctNames = rawMatches.Select(m => m.Username)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        var resolved = distinctNames.Length == 0
+            ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            : (Dictionary<string, string>)await mentionResolver
+                .ResolveUserIdsAsync(distinctNames, cancellationToken)
+                .ConfigureAwait(false);
+
+        var parsedMentions = new List<Message.ParsedMention>();
+        var notifyUserIds = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var match in rawMatches)
+        {
+            if (!resolved.TryGetValue(match.Username, out var mentionedUserId)) continue;
+            if (string.Equals(mentionedUserId, currentUserId, StringComparison.Ordinal)) continue;
+            parsedMentions.Add(new Message.ParsedMention(mentionedUserId, match.StartIndex, match.Length));
+            notifyUserIds.Add(mentionedUserId);
+        }
+
+        var message = Message.Create(channel.Id, currentUserId, cmd.Body, parent?.Id, parsedMentions);
+        foreach (var att in cmd.Attachments ?? Array.Empty<SendMessageAttachmentInput>())
+        {
+            message.AddAttachment(att.FileAssetId, att.Url, att.ContentType, att.FileName, att.SizeBytes);
+        }
+
+        db.Messages.Add(message);
+
+        if (parent is not null)
+        {
+            parent.IncrementReplyCount();
+        }
+        channel.TouchLastMessage(DateTime.UtcNow);
+
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        var dto = message.ToDto();
+        await hub.Clients.Group($"channel:{channel.Id}")
+            .SendAsync("ChatMessageCreated", dto, cancellationToken)
+            .ConfigureAwait(false);
+
+        // One notification request per distinct mentioned user; the Notifications module writes it to the
+        // user's inbox. Chat owns the wording and the link, so Notifications never depends on Chat.
+        //
+        // Deliberately still on the bus, not the outbox (the documented exception to
+        // .agents/rules/eventing.md): the Notifications handler writes the row AND pushes it over
+        // SignalR, and a mention that lands in the bell up to OutboxDispatchIntervalSeconds after
+        // the message appears in the channel reads as broken. Durability matters less here than
+        // anywhere else in the kit — the message itself is already persisted and visible, so a lost
+        // notification costs a badge, not data. Every other publish in the kit goes via the outbox.
+        if (notifyUserIds.Count > 0)
+        {
+            var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
+            var tenantId = currentUser.GetTenant();
+            var preview = MakePreview(message.Body ?? string.Empty);
+            foreach (var mentionedUserId in notifyUserIds)
+            {
+                await eventBus.PublishAsync(
+                    new UserNotificationRequestedIntegrationEvent(
+                        Id: Guid.NewGuid(),
+                        OccurredOnUtc: DateTime.UtcNow,
+                        TenantId: tenantId,
+                        CorrelationId: correlationId,
+                        Source: "Chat",
+                        UserId: mentionedUserId,
+                        Type: "chat.mention",
+                        Title: string.IsNullOrEmpty(channel.Name)
+                            ? "You were mentioned in a conversation"
+                            : $"You were mentioned in #{channel.Name}",
+                        Body: preview,
+                        Link: $"/chat/{channel.Id}?messageId={message.Id}",
+                        Metadata: new Dictionary<string, string?>
+                        {
+                            ["channelId"] = channel.Id.ToString(),
+                            ["channelName"] = channel.Name,
+                            ["messageId"] = message.Id.ToString(),
+                            ["authorUserId"] = currentUserId,
+                        }),
+                    cancellationToken)
+                    .ConfigureAwait(false);
+            }
+        }
+
+        return dto;
+    }
+
+    /// <summary>Truncate the body for inbox display. Keeps things to a single line, &lt;= 140 chars.</summary>
+    private static string MakePreview(string body)
+    {
+        var collapsed = body.Replace('\r', ' ').Replace('\n', ' ').Trim();
+        const int max = 140;
+        if (collapsed.Length <= max) return collapsed;
+        return string.Concat(collapsed.AsSpan(0, max - 1), "…"); // … ellipsis
+    }
+}

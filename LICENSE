@@ -1,0 +1,40 @@
+Trislab Proprietary License
+
+Copyright (c) 2026 Trislab. All rights reserved.
+
+This repository, its source code, its documentation and every package built from it
+(together, "the Software") belong to Trislab. The Software is not open source. That its
+source code can be read publicly grants no licence to it.
+
+1. Permitted use. Only Trislab, and the employees and contractors Trislab authorises,
+   may use, copy and modify the Software, and only to build, run and maintain Trislab's
+   own products and the applications Trislab delivers.
+
+2. Delivered applications. A client of Trislab may run an application that Trislab built
+   on the Software, together with the parts of the Software that application contains,
+   only as a written agreement with Trislab allows, and only while it does.
+
+3. Everything else is prohibited. Except as sections 1 and 2 allow, no one may use, copy,
+   modify, merge, publish, distribute, sublicense, sell, rent or lend the Software or any
+   part of it; make it available to anyone else, in source or compiled form, as packages
+   or as a hosted service; create works derived from it; or remove or change this notice.
+
+4. Public hosting. Where the Software is hosted publicly, viewing it, and forking it within
+   the hosting service as that service's terms require, grant no right beyond those terms.
+   A copy or fork may not be used, built, deployed or distributed.
+
+5. Third-party software. Parts of the Software are derived from open-source software
+   listed, with its licence, in THIRD-PARTY-NOTICES.md. This licence covers Trislab's own
+   work and changes; it does not limit the rights anyone has in the original third-party
+   software under that software's own licence.
+
+6. Termination. Any use that breaks this licence ends, at once and without notice, every
+   right to use the Software.
+
+7. No warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL TRISLAB BE LIABLE FOR ANY
+   CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+   SOFTWARE OR THE USE OF IT.
+
+For a licence, contact Trislab through https://github.com/TrislabCompany.

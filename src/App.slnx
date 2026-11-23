@@ -1,0 +1,41 @@
+<Solution>
+  <Folder Name="/Samples/" /> <!-- [module:Samples] -->
+  <!-- [module:Catalog:begin] -->
+  <Folder Name="/Samples/Catalog/">
+    <Project Path="Samples/Catalog/Modules.Catalog.Contracts/Modules.Catalog.Contracts.csproj" />
+    <Project Path="Samples/Catalog/Modules.Catalog/Modules.Catalog.csproj" />
+    <Project Path="Samples/Catalog/Catalog.Tests/Catalog.Tests.csproj" />
+  </Folder>
+  <!-- [module:Catalog:end] -->
+  <!-- [module:Chat:begin] -->
+  <Folder Name="/Samples/Chat/">
+    <Project Path="Samples/Chat/Modules.Chat.Contracts/Modules.Chat.Contracts.csproj" />
+    <Project Path="Samples/Chat/Modules.Chat/Modules.Chat.csproj" />
+    <Project Path="Samples/Chat/Chat.Tests/Chat.Tests.csproj" />
+  </Folder>
+  <!-- [module:Chat:end] -->
+  <!-- [module:Tickets:begin] -->
+  <Folder Name="/Samples/Tickets/">
+    <Project Path="Samples/Tickets/Modules.Tickets.Contracts/Modules.Tickets.Contracts.csproj" />
+    <Project Path="Samples/Tickets/Modules.Tickets/Modules.Tickets.csproj" />
+    <Project Path="Samples/Tickets/Tickets.Tests/Tickets.Tests.csproj" />
+  </Folder>
+  <!-- [module:Tickets:end] -->
+  <Folder Name="/Host/">
+    <Project Path="Host/App.Api/App.Api.csproj" Id="187ce245-0a57-469c-96c2-a88902f2d40d" />
+    <Project Path="Host/App.DbMigrator/App.DbMigrator.csproj" />
+  </Folder>
+  <Folder Name="/Host/AppHost/">
+    <Project Path="Host/App.AppHost/App.AppHost.csproj" Id="86bd02ee-f1b5-472c-b5bd-bc607fe084de" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Architecture.Tests/Architecture.Tests.csproj" />
+    <Project Path="Tests/Integration.Tests/Integration.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.gitignore" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+</Solution>

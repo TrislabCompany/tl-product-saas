@@ -1,0 +1,38 @@
+name: ci
+
+# Builds the four images in platform.yaml, runs the tests, scans the images
+# with Trivy and checks platform.yaml, on every PR and every push to main.
+# Pushes nothing. All steps live in the reusable workflow in tl-platform,
+# pinned by tag; the job is named ci like the one it calls, so the required
+# check is `ci / ci`. Change only the test command here.
+#
+# The Trislab framework packages come from GitHub Packages. The workflow's token
+# reads them (permission packages: read), and the reusable workflow hands it to
+# the test command and to every image build as PACKAGES_TOKEN. The packages are
+# owned by tl-framework, so this repository must be allowed to read each of them
+# (docs/getting-started.md, "Packages access").
+#
+# The test command, in order:
+#  1. the template manifest check (passes at once in a product repository);
+#  2. dotnet test: the unit tests, Architecture.Tests and the integration tests,
+#     which start their own throw-away containers;
+#  3. lint of each React app (its build runs in the image build);
+#  4. the smoke test: the app starts, migrates and seeds in multi-tenant mode.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  ci:
+    permissions:
+      contents: read
+      packages: read
+    uses: TrislabCompany/tl-platform/.github/workflows/app-ci.yml@app-workflows/v0.2.0
+    secrets:
+      packages-token: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      test-command: pwsh scripts/check-template-manifest.ps1 && dotnet test src/App.slnx && for dir in clients/admin clients/dashboard; do (cd "$dir" && npm ci && npm run lint) || exit 1; done && bash scripts/smoke-test.sh

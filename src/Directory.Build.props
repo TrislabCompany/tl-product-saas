@@ -1,0 +1,44 @@
+<Project>
+	<PropertyGroup>
+		<!-- Target framework -->
+		<TargetFramework>net10.0</TargetFramework>
+
+		<!-- Enable latest C# features and diagnostics -->
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- Code quality & analysis. Warnings are errors, locally and in ci / ci alike. -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+
+		<!-- Docs -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);CS1591;MSG0005;CA1054;CA1056</NoWarn>
+		<!-- AV0029/AV0030 (Asp.Versioning 10.2+): advisories toward AddApiVersioning().AddOpenApi(). Trislab deliberately registers one
+		     AddOpenApi(groupName) document per version (Web/OpenApi/Extensions.cs); also fires inside the OpenApi source-generated file. -->
+		<NoWarn>$(NoWarn);AV0029;AV0030</NoWarn>
+		<!-- Suppress warning about missing XML docs -->
+
+		<!-- Prevent MSBuild from excluding common folders (optional) -->
+		<NoDefaultExcludes>true</NoDefaultExcludes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Sonar Analyzer for deep static analysis -->
+		<PackageReference Include="SonarAnalyzer.CSharp">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<!-- The version of this build, shown by GET /api/health/info. A release passes the tag's version
+		     (-p:Version=X.Y.Z); this is the version of an untagged build. -->
+		<Version>0.1.0</Version>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+</Project>

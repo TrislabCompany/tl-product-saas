@@ -1,0 +1,23 @@
+{
+  "title": "Pregled",
+  "greeting": ", {{name}}",
+  "description": "Upravljajte vse najemnike na tej instanci – identiteto, večnajemništvo, obračun in preostali del sistema.",
+  "stat.tenants": "Najemniki",
+  "stat.tenantsHint": "registrirani na tej instanci",
+  "stat.plans": "Paketi",
+  "stat.plansActive": "{{count, number}} aktivnih",
+  "stat.invoices": "Računi",
+  "stat.invoicesHint": "skupaj {{count, number}} v knjigi",
+  "stat.invoicesLoading": "nalaganje …",
+  "stat.outstanding": "Neplačano",
+  "stat.outstandingHint": "izdano, čaka na plačilo",
+  "entryPoints": "Vstopne točke",
+  "pivot.tenants.title": "Najemniki",
+  "pivot.tenants.description": "Ustvarjajte, začasno ustavite in preglejte najemnike.",
+  "pivot.users.title": "Uporabniki",
+  "pivot.users.description": "Operaterji korenskega najemnika in upravljanje vlog.",
+  "pivot.billing.title": "Obračun",
+  "pivot.billing.description": "Paketi, naročnine, računi in cenik.",
+  "pivot.invoices.title": "Računi",
+  "pivot.invoices.description": "Knjiga računov med najemniki. Izdajte, označite kot plačano, razveljavite."
+}

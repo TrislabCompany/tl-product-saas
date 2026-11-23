@@ -1,0 +1,46 @@
+# Updates from the template
+
+This repository was made from a Trislab template. The template keeps improving: its workflows' callers, skills, docs and build files. Those improvements reach this repository only as a pull request, opened by the `update-from-template` skill, one template release at a time. Nothing changes here without a PR that a person reviews and merges.
+
+This page is owned by the platform and is the same in every template.
+
+## Which release this repository is on
+
+`.template-version`, at the repository root, records it:
+
+```yaml
+template: template-saas
+version: v0.1.0
+commit: <the full SHA of the template's tag>
+```
+
+The template's releases are tags `template-<type>/vX.Y.Z` in its repository (for `template-saas`, `tl-product-saas`), never `v*`, which would release this app. Each release has notes in the template repository, `docs/upgrading/template-vX.Y.Z.md`: whether it is breaking, what it requires, what it changes, and the upgrade steps.
+
+## Who owns which file
+
+The template's `template-manifest.yaml` gives every path one ownership. An update treats each path by it:
+
+| Ownership | For example | What an update does | You |
+| --- | --- | --- | --- |
+| `platform` | `.github/workflows/*`, `renovate.json`, `CLAUDE.md`, `platform.schema.json`, `scripts/check-template-manifest.ps1`, the skills `release` and `update-from-template`, this page | Replaces the file with the template's | Don't edit it; ask the platform team for a change in the template |
+| `shared` | `AGENTS.md` outside its template block, `.claude/rules/`, the other skills, the rest of `docs/`, `src/Host/`, `src/Directory.*.props` (the framework version), `src/Tests/`, `clients/` | Merges the template's change into your file and lists every conflict | Adapt it as you need; resolve the listed conflicts in the PR |
+| `product` | `src/Modules/`, a kept sample in `src/Samples/`, `README.md`, `CODEOWNERS`, `platform.yaml`, the clients' `package.json` and lockfiles | Nothing; the template's change is shown in the PR as a suggestion | Yours |
+| `template-only` | The template's release skill and notes, `init-product` and `template-manifest.yaml` | Never copied | — |
+
+## Your own skills
+
+A folder in `.agents/skills/` that the template's manifest doesn't list is a **project skill**. An update never reads, changes or deletes it. Give it `metadata.owner: project` in its front matter and list it in the "Project skills" table of `AGENTS.md`. So that Claude Code lists it, add a pointer `.claude/skills/<name>/SKILL.md` with the same front matter and one line: read `.agents/skills/<name>/SKILL.md` and follow it. The "Template skills" block of `AGENTS.md`, between `<!-- template-skills:start -->` and `<!-- template-skills:end -->`, is rewritten by every update.
+
+When a template release adds a skill with the name of one of yours, the update stops and asks you to rename yours first.
+
+## An update PR
+
+- Titled `chore(template): template-<type>/vX.Y.Z`. It brings one minor version (with its patches) and bumps `.template-version`.
+- Its body lists the changes by ownership, the conflicts, the suggestions for your files, and the upgrade steps done or left to you.
+- `ci / ci` must pass, as on every PR. Review it like any other change; the merge deploys to dev, and the change reaches production with the next release and promotion.
+- The canary repository takes each release first. Other repositories follow once the canary's update is merged and deployed.
+- From roadmap phase 15, Renovate opens these PRs from `.template-version`. Until then the platform team opens them, or you run the skill: ask your coding agent to "update from the template".
+
+## The framework version is separate
+
+The packages of `tl-framework` that this repository uses are pinned by one property, `TrislabFrameworkVersion` in `src/Directory.Packages.props`. Renovate raises it, one pull request per framework release ([packages.md](../packages.md)). A template release pins a framework version that the starter has been tested and smoke-tested on in the sandbox; take the template's update and the framework's in order, MINOR by MINOR, never skipping one. Where a framework release needs a change of the host or the migrator, the template's release notes say so under "Upgrade steps".

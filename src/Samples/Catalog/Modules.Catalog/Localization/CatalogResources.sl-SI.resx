@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Catalog.ProductNotFound" xml:space="preserve">
+    <value>Izdelek {0} ni najden.</value>
+  </data>
+  <data name="Catalog.BrandNotFound" xml:space="preserve">
+    <value>Blagovna znamka {0} ni najdena.</value>
+  </data>
+  <data name="Catalog.CategoryNotFound" xml:space="preserve">
+    <value>Kategorija {0} ni najdena.</value>
+  </data>
+  <data name="Catalog.ParentCategoryNotFound" xml:space="preserve">
+    <value>Nadrejena kategorija {0} ni najdena.</value>
+  </data>
+  <data name="Catalog.ProductImageNotFound" xml:space="preserve">
+    <value>Slika {0} ni najdena pri izdelku {1}.</value>
+  </data>
+  <data name="Catalog.ProductSkuAlreadyExists" xml:space="preserve">
+    <value>Izdelek s kodo SKU »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.ProductNameAlreadyExists" xml:space="preserve">
+    <value>Izdelek z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.AnotherProductNameAlreadyExists" xml:space="preserve">
+    <value>Drug izdelek z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.BrandNameAlreadyExists" xml:space="preserve">
+    <value>Blagovna znamka z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.AnotherBrandNameAlreadyExists" xml:space="preserve">
+    <value>Druga blagovna znamka z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.CategoryNameAlreadyExists" xml:space="preserve">
+    <value>Kategorija z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.AnotherCategoryNameAlreadyExists" xml:space="preserve">
+    <value>Druga kategorija z imenom »{0}« že obstaja.</value>
+  </data>
+  <data name="Catalog.CategoryCannotBeOwnParent" xml:space="preserve">
+    <value>Kategorija ne more biti sama sebi nadrejena.</value>
+  </data>
+  <data name="Catalog.CategoryParentCycle" xml:space="preserve">
+    <value>Z nastavitvijo te nadrejene kategorije bi nastal cikel.</value>
+  </data>
+  <data name="Catalog.CategoryHasChildren" xml:space="preserve">
+    <value>Kategorije, ki ima podrejene kategorije, ni mogoče izbrisati. Najprej premaknite ali odstranite podrejene kategorije.</value>
+  </data>
+  <data name="Validation.DeltaNonZero" xml:space="preserve">
+    <value>Sprememba ne sme biti nič.</value>
+  </data>
+  <data name="Catalog.StockAdjustmentNegative" xml:space="preserve">
+    <value>Prilagoditev zaloge za {0} bi povzročila negativno zalogo (trenutno: {1}).</value>
+  </data>
+</root>
