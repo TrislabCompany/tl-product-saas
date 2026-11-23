@@ -28,10 +28,10 @@ GitHub Packages asks for a token even for a package that is readable by the orga
 
 - `nuget.config` names the feed `https://nuget.pkg.github.com/TrislabCompany/index.json` beside nuget.org, maps `Trislab.*` to it, and reads the password from `PACKAGES_TOKEN`;
 - each client's `.npmrc` sends `@trislabcompany` to `https://npm.pkg.github.com`, with the token from `PACKAGES_TOKEN`;
-- **CI** and the **images** use the workflow's token: `ci.yml` and `deploy.yml` pass it as `packages-token`, the reusable workflow sets `PACKAGES_TOKEN` for the test command and gives every image build the BuildKit secret `packages` (the Dockerfiles read it with `--mount=type=secret,id=packages`, so it is in no layer);
+- **CI** and the **images** use the organisation secret `PACKAGES_READ_TOKEN`, or the workflow's token without it: `ci.yml` and `deploy.yml` pass it as `packages-token`, the reusable workflow sets `PACKAGES_TOKEN` for the test command and gives every image build the BuildKit secret `packages` (the Dockerfiles read it with `--mount=type=secret,id=packages`, so it is in no layer);
 - **a developer** sets `PACKAGES_TOKEN` to a personal token with `read:packages`; **Renovate** has its own.
 
-The packages are owned by `tl-framework`. For the workflow's token to read them, each package (every `Trislab.*` NuGet package and `@trislabcompany/framework-ui`) must list this repository under "Manage Actions access" in its package settings, with the role Read. A repository created from this one needs the same.
+The packages are owned by `tl-framework`. The organisation gives this repository, and every repository created from it, the secret `PACKAGES_READ_TOKEN`. Without it, the workflow's token reads a package only when the package lists the repository under "Manage Actions access" with the role Read.
 
 ## 4. Debugging into the framework
 

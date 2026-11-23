@@ -24,7 +24,7 @@ export PACKAGES_TOKEN=<the token>        # PowerShell: $env:PACKAGES_TOKEN = '<t
 
 ### Packages access (for an organization owner)
 
-The packages are owned by `tl-framework`. For `ci / ci` and the image builds, which use the workflow's token, each package must list this repository under *Manage Actions access* in its package settings (role Read). If a restore fails in CI with 401 or 403 on `nuget.pkg.github.com` or `npm.pkg.github.com`, this is the setting that is missing.
+The packages are owned by `tl-framework`. `ci / ci` and the image builds read them with the organisation secret `PACKAGES_READ_TOKEN` (a classic token with only `read:packages`), so an organization owner gives this repository that secret. Without it they fall back to the workflow's token, which can read a package only when the package lists this repository under *Manage Actions access*. If a restore fails in CI with 401 or 403 on `nuget.pkg.github.com` or `npm.pkg.github.com`, the secret is missing or its token has expired.
 
 ## 3. Run everything with the AppHost
 

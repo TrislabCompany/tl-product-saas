@@ -9,7 +9,7 @@ Yes (first release). A SaaS repository made before this release has no `.templat
 ## Requires
 
 - `app-workflows >= v0.2.0` in `.github/workflows/`.
-- The framework packages `0.2.0` on GitHub Packages, and read access to each of them for the repository: the packages are owned by `tl-framework`, so each package must list the repository under "Manage Actions access" (or be public). `PACKAGES_TOKEN` (a token with `read:packages`) for developers and Renovate.
+- The framework packages `0.2.0` on GitHub Packages, and the organisation secret `PACKAGES_READ_TOKEN` (a classic token with `read:packages`) given to the repository; without it, each package must list the repository under "Manage Actions access". `PACKAGES_TOKEN` (a token with `read:packages`) for developers and Renovate.
 
 ## Changes by ownership
 
