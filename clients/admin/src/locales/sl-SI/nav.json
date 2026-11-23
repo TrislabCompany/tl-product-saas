@@ -1,0 +1,14 @@
+{
+  "overview": "Pregled",
+  "tenants": "Najemniki",
+  "identity": "Identiteta",
+  "users": "Uporabniki",
+  "roles": "Vloge",
+  "impersonation": "Prevzem identitete",
+  "operations": "Delovanje",
+  "billing": "Obračun",
+  "webhooks": "Webhooki",
+  "audits": "Revizije",
+  "health": "Stanje sistema",
+  "settings": "Nastavitve"
+}

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- S125: SonarAnalyzer false-positives on descriptive comments with code-like tokens (not dead code). -->
+    <NoWarn>$(NoWarn);CA1515;CA1861;CA1707;CA1307;S125</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3.mtp-off" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="AutoFixture" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Trislab.Framework.Core" />
+    <PackageReference Include="Trislab.Framework.Persistence" />
+    <PackageReference Include="Trislab.Framework.Shared" />
+    <PackageReference Include="Trislab.Framework.Web" />
+    <PackageReference Include="Trislab.Modules.Auditing" />
+    <PackageReference Include="Trislab.Modules.Auditing.Contracts" />
+    <PackageReference Include="Trislab.Modules.Identity" />
+    <PackageReference Include="Trislab.Modules.Identity.Contracts" />
+    <PackageReference Include="Trislab.Modules.Multitenancy" />
+    <PackageReference Include="Trislab.Modules.Multitenancy.Contracts" />
+    <PackageReference Include="Trislab.Modules.Files" />
+    <PackageReference Include="Trislab.Modules.Files.Contracts" />
+    <ProjectReference Include="..\..\Samples\Chat\Modules.Chat\Modules.Chat.csproj" />
+    <ProjectReference Include="..\..\Samples\Chat\Modules.Chat.Contracts\Modules.Chat.Contracts.csproj" />
+    <ProjectReference Include="..\..\Host\App.Api\App.Api.csproj" />
+  </ItemGroup>
+</Project>

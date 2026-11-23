@@ -1,0 +1,10 @@
+using Trislab.Framework.Core.Domain;
+
+namespace Trislab.Modules.Tickets.Domain.Events;
+
+public sealed record TicketCommentAddedDomainEvent(
+    Guid TicketId,
+    Guid CommentId,
+    Guid AuthorUserId,
+    Guid EventId,
+    DateTimeOffset OccurredOnUtc) : DomainEvent(EventId, OccurredOnUtc);

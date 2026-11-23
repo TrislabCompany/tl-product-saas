@@ -1,0 +1,45 @@
+using Trislab.Framework.Core.Context;
+using Trislab.Framework.Core.Exceptions;
+using Trislab.Framework.Web.Realtime;
+using Trislab.Modules.Chat.Contracts.v1.Commands;
+using Trislab.Modules.Chat.Data;
+using Trislab.Modules.Chat.Features.v1.Internal;
+using Trislab.Modules.Chat.Localization;
+using Mediator;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+
+namespace Trislab.Modules.Chat.Features.v1.Messages.EditMessage;
+
+public sealed class EditMessageCommandHandler(
+    ChatDbContext db,
+    ICurrentUser currentUser,
+    IHubContext<AppHub> hub)
+    : ICommandHandler<EditMessageCommand, Unit>
+{
+    public async ValueTask<Unit> Handle(EditMessageCommand cmd, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(cmd);
+        var userId = currentUser.GetUserId();
+        if (userId == Guid.Empty) throw new UnauthorizedException("no current user").Localized("Error.NoCurrentUser");
+        var currentUserId = userId.ToString();
+
+        var message = await db.Messages.FirstOrDefaultAsync(m => m.Id == cmd.MessageId, cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new NotFoundException("Message not found.").Localized<ChatResources>("Chat.MessageNotFound");
+
+        // Verify membership through the parent channel (don't leak existence to non-members).
+        var channel = await db.Channels.FirstOrDefaultAsync(c => c.Id == message.ChannelId, cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new NotFoundException("Message not found.").Localized<ChatResources>("Chat.MessageNotFound");
+        channel.RequireMember(currentUserId);
+
+        message.Edit(cmd.Body, currentUserId); // domain enforces author-only
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        await hub.Clients.Group($"channel:{channel.Id}")
+            .SendAsync("ChatMessageEdited", message.ToDto(), cancellationToken)
+            .ConfigureAwait(false);
+        return Unit.Value;
+    }
+}

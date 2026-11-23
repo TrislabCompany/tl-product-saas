@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Trislab.Modules.Chat</RootNamespace>
+		<AssemblyName>Trislab.Modules.Chat</AssemblyName>
+		<!-- ChatResources is an intentional empty localizer marker (see Localization/ChatResources.cs). -->
+		<NoWarn>$(NoWarn);CA1031;CA1812;CA1859;CA1002;CA2227;S3267;S2094</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Mediator.Abstractions" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Trislab.Framework.Persistence" />
+		<PackageReference Include="Trislab.Framework.Web" />
+		<PackageReference Include="Trislab.Framework.Eventing" />
+		<PackageReference Include="Trislab.Framework.Storage" />
+		<ProjectReference Include="..\Modules.Chat.Contracts\Modules.Chat.Contracts.csproj" />
+		<PackageReference Include="Trislab.Modules.Files.Contracts" />
+		<PackageReference Include="Trislab.Modules.Identity.Contracts" />
+		<PackageReference Include="Trislab.Modules.Notifications.Contracts" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<RootNamespace>App.Api</RootNamespace>
+		<AssemblyName>App.Api</AssemblyName>
+		<IsPackable>false</IsPackable>
+
+		<!-- The chiseled runtime image ships without ICU and sets DOTNET_SYSTEM_GLOBALIZATION_INVARIANT,
+		     where only predefined cultures may be created, so request localization's new CultureInfo(...)
+		     kills startup. Named cultures are all it needs: resource lookup goes by name, and formatting is
+		     pinned to InvariantCulture by design (see UseTrislabLocalization). -->
+		<PredefinedCulturesOnly>false</PredefinedCulturesOnly>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Mediator.Abstractions" />
+		<PackageReference Include="Mediator.SourceGenerator">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Trislab.Framework.Web" />
+    <PackageReference Include="Trislab.Framework.Tenancy" />
+    <PackageReference Include="Trislab.Modules.Auditing.Contracts" />
+    <PackageReference Include="Trislab.Modules.Auditing" />
+    <PackageReference Include="Trislab.Modules.Identity" />
+    <PackageReference Include="Trislab.Modules.Multitenancy" />
+    <PackageReference Include="Trislab.Modules.Webhooks" /> <!-- [module:Webhooks] -->
+    <PackageReference Include="Trislab.Modules.Notifications" /> <!-- [module:Notifications] -->
+    <PackageReference Include="Trislab.Modules.Billing" /> <!-- [module:Billing] -->
+    <PackageReference Include="Trislab.Modules.Billing.Contracts" /> <!-- [module:Billing] -->
+    <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog\Modules.Catalog.csproj" /> <!-- [module:Catalog] -->
+    <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog.Contracts\Modules.Catalog.Contracts.csproj" /> <!-- [module:Catalog] -->
+    <ProjectReference Include="..\..\Samples\Tickets\Modules.Tickets\Modules.Tickets.csproj" /> <!-- [module:Tickets] -->
+    <ProjectReference Include="..\..\Samples\Tickets\Modules.Tickets.Contracts\Modules.Tickets.Contracts.csproj" /> <!-- [module:Tickets] -->
+    <PackageReference Include="Trislab.Modules.Files" /> <!-- [module:Files] -->
+    <PackageReference Include="Trislab.Modules.Files.Contracts" /> <!-- [module:Files] -->
+    <ProjectReference Include="..\..\Samples\Chat\Modules.Chat\Modules.Chat.csproj" /> <!-- [module:Chat] -->
+    <ProjectReference Include="..\..\Samples\Chat\Modules.Chat.Contracts\Modules.Chat.Contracts.csproj" /> <!-- [module:Chat] -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Integration.Tests" />
+  </ItemGroup>
+
+</Project>
