@@ -12,7 +12,7 @@ import {
   TimerOff,
 } from "lucide-react";
 import { useAuth } from "@/auth/use-auth";
-import { isTwoFactorInvalidError, isTwoFactorRequiredError } from "@/auth/api";
+import { isTwoFactorInvalidError, isTwoFactorRequiredError, OperatorOnlyError } from "@/auth/api";
 import { consumeSignedOutReason } from "@/auth/inactivity";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,7 +70,9 @@ export function LoginPage() {
   }
 
   const errorMessage = (err: unknown) =>
-    err instanceof ApiRequestError
+    err instanceof OperatorOnlyError
+      ? t("login.operatorOnly")
+      : err instanceof ApiRequestError
       ? err.problem?.detail ?? err.problem?.title ?? err.message
       : err instanceof Error
         ? err.message

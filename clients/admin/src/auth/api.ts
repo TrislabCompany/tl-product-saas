@@ -41,6 +41,14 @@ function problemCode(error: unknown): string | undefined {
 }
 
 /** The password was right, but the account has 2FA on and no code was sent. */
+/** Thrown when an account of another tenant than root signs in: the admin app is the operator console. */
+export class OperatorOnlyError extends Error {
+  constructor() {
+    super("The admin app is for the operator only.");
+    this.name = "OperatorOnlyError";
+  }
+}
+
 export function isTwoFactorRequiredError(error: unknown): boolean {
   return problemCode(error) === TWO_FACTOR_REQUIRED;
 }
