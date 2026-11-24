@@ -37,7 +37,7 @@ A module that two products need belongs in `tl-framework`, not here.
 
 ## 3. Delete a module
 
-A new product keeps only the modules it chooses: `pwsh scripts/init-product.ps1 -Keep <modules>` removes the others at creation ([the init-product skill](../.agents/skills/init-product/SKILL.md)). It handles the lines tagged `[module:<Name>]` in the host, the migrator, the demo seed, the solution and the front ends, and a sample's folder, tests, pages, API calls and catalogs. By hand, for a module of the product itself or a framework module's pages:
+A new product keeps only the modules it chooses: `pwsh scripts/init-product.ps1 -Keep <modules> -Slug <id> -PortBlock <n>` removes the others at creation ([the init-product skill](../.agents/skills/init-product/SKILL.md)). It handles the lines tagged `[module:<Name>]` in the host, the migrator, the demo seed, the solution and the front ends, and a sample's folder, tests, pages, API calls and catalogs. By hand, for a module of the product itself or a framework module's pages:
 
 1. Remove it from the four places in the two `Program.cs` files, and its project or package references from `App.Api` and `App.DbMigrator`.
 2. Delete `src/Modules/<Name>` (its migrations go with it) and its tests, and remove them from `src/App.slnx`.

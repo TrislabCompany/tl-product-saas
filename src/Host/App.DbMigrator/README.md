@@ -20,7 +20,7 @@ list-pending    Print pending migrations without applying anything.
 The image runs `apply --seed`. Locally:
 
 ```sh
-DATABASE_URL=postgresql://app:app@localhost:5432/app dotnet run --project src/Host/App.DbMigrator -- apply --seed
+DATABASE_URL=postgresql://app:app@localhost:5434/trislab_saas dotnet run --project src/Host/App.DbMigrator -- apply --seed
 ```
 
 ## Concurrency

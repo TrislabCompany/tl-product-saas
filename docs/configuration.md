@@ -10,7 +10,7 @@ The platform sets environment variables on each app. Locally, the AppHost sets t
 | --- | --- | --- | --- |
 | `PLATFORM_ENVIRONMENT` | all | The stamp: the Environment's name, such as `dev` | `local` |
 | `PLATFORM_STAMP` | all | The stamp: its name, such as `shr-con-dev` | Not set |
-| `DATABASE_URL` | `api`, `migrator` | The stamp's `postgres`, as a URL such as `postgresql://user:password@host:5432/db?sslmode=require` | The Postgres container |
+| `DATABASE_URL` | `api`, `migrator` | The stamp's `postgres`, as a URL such as `postgresql://user:password@host:5432/db?sslmode=require` | The Postgres container, database `trislab_saas`, or a shared Postgres ([local-ports.md](local-ports.md)) |
 | `REDIS_URL` | `api`, `migrator` | The stamp's `cache`, as `redis://` or `rediss://user:password@host:port` | The AppHost's Valkey; not set with Compose |
 | `MESSAGING_URL` | `api`, `migrator` | The stamp's `messaging`, as `amqp://user:password@host:5672` | Not set |
 | `S3_ENDPOINT`, `S3_PUBLIC_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | `api`, `migrator` | The stamp's `storage`: the internal endpoint, the default hostname, the bucket `storage`, and its keys | The storage container; the public endpoint is the dashboard's address |
@@ -24,6 +24,8 @@ The platform sets environment variables on each app. Locally, the AppHost sets t
 | `SEED_DEMO` | `migrator`, and as `PUBLIC_DEMO_MODE` on `dashboard` | `apps[].env` in `stamp.yaml` | `true` |
 | `PUBLIC_*` | `admin`, `dashboard` | `apps[].env` of the front end in `stamp.yaml` | `PUBLIC_DASHBOARD_URL` on `admin` |
 | `API_UPSTREAM`, `STORAGE_UPSTREAM` | `admin`, `dashboard` | Never in a stamp | `http://api:8080` and `http://storage:9000` in `docker-compose.yml` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `api`, `migrator` | Not set: the stamp collects the logs from the console | Empty, or the Aspire dashboard ([local-ports.md](local-ports.md#4-logs-traces-and-metrics-the-aspire-dashboard)); the AppHost sets its own |
+| `COMPOSE_PROFILES`, `WEB_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`, `ASPIRE_PORT` | `docker compose` only | Never | The profile `own-db` and port block 1 ([local-ports.md](local-ports.md)) |
 
 Secrets arrive as ordinary environment variables too: the platform reads them from the Key Vault. The app never signs in to the Key Vault, and no secret is ever in the repository, an image or `appsettings.json`. `appsettings.Development.json` holds local values for the AppHost run only.
 

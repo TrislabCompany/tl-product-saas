@@ -30,7 +30,9 @@ internal static partial class PostgresMigratorLock
     /// total deadline. Returns when:
     ///   · the database accepts a connection (server is ready), OR
     ///   · the connection fails with SQLSTATE 3D000 "database does not exist"
-    ///     — server is reachable; EF will create the database on Migrate.
+    ///     — server is reachable, a shared Postgres (docs/local-ports.md): the
+    ///     database is created here, through the server's "postgres" database,
+    ///     so the advisory lock below can be taken in it.
     /// </summary>
     public static async Task WaitForDatabaseAsync(
         string connectionString,
@@ -53,11 +55,11 @@ internal static partial class PostgresMigratorLock
                 LogPostgresReady(logger, attempt);
                 return;
             }
-            catch (PostgresException ex) when (ex.SqlState == "3D000")
+            catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.InvalidCatalogName)
             {
-                // Server reachable; target database doesn't exist yet. EF
-                // will create it on the first MigrateAsync call.
+                // Server reachable; target database doesn't exist yet.
                 LogTargetDatabaseMissing(logger, ex);
+                await CreateDatabaseAsync(connectionString, logger, cancellationToken).ConfigureAwait(false);
                 return;
             }
             catch (Exception ex) when (ex is NpgsqlException or TimeoutException or SocketException)
@@ -149,6 +151,41 @@ internal static partial class PostgresMigratorLock
         }
     }
 
+    /// <summary>
+    /// Creates the database of the connection string through the server's
+    /// maintenance database "postgres". Only reached when the database is
+    /// missing, so never in a stamp, whose database the platform creates. Two
+    /// migrators that start at once may both try; the second finds it there.
+    /// </summary>
+    private static async Task CreateDatabaseAsync(
+        string connectionString,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        var name = new NpgsqlConnectionStringBuilder(connectionString).Database
+            ?? throw new InvalidOperationException("DATABASE_URL names no database.");
+        var maintenance = new NpgsqlConnectionStringBuilder(connectionString) { Database = "postgres", Pooling = false };
+        await using var conn = new NpgsqlConnection(maintenance.ConnectionString);
+        await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        // CREATE DATABASE takes no parameter; the name is quoted as an
+        // identifier, so it cannot end the statement.
+        var quoted = "\"" + name.Replace("\"", "\"\"", StringComparison.Ordinal) + "\"";
+        await using var cmd = conn.CreateCommand();
+#pragma warning disable CA2100, S2077 // Justification: the only variable part is the database name, quoted as an identifier.
+        cmd.CommandText = "CREATE DATABASE " + quoted;
+#pragma warning restore CA2100, S2077
+        try
+        {
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            LogDatabaseCreated(logger, name);
+        }
+        catch (PostgresException ex) when (ex.SqlState is PostgresErrorCodes.DuplicateDatabase or PostgresErrorCodes.UniqueViolation)
+        {
+            LogDatabaseCreatedByOther(logger, ex, name);
+        }
+    }
+
     private sealed class NoopLock : IAsyncDisposable
     {
         public static readonly NoopLock Instance = new();
@@ -163,7 +200,7 @@ internal static partial class PostgresMigratorLock
     private static partial void LogPostgresReady(ILogger logger, int attempt);
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Information,
-        Message = "Postgres reachable but target database doesn't exist yet — EF will create it.")]
+        Message = "Postgres reachable but the target database doesn't exist yet; creating it.")]
     private static partial void LogTargetDatabaseMissing(ILogger logger, Exception ex);
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Information,
@@ -173,6 +210,14 @@ internal static partial class PostgresMigratorLock
     [LoggerMessage(EventId = 4, Level = LogLevel.Information,
         Message = "Target database doesn't exist — skipping advisory lock for first-run; EF will create it.")]
     private static partial void LogSkipLockForMissingDb(ILogger logger, Exception ex);
+
+    [LoggerMessage(EventId = 9, Level = LogLevel.Information,
+        Message = "Created the database {Database}.")]
+    private static partial void LogDatabaseCreated(ILogger logger, string database);
+
+    [LoggerMessage(EventId = 10, Level = LogLevel.Information,
+        Message = "The database {Database} was created by another migrator.")]
+    private static partial void LogDatabaseCreatedByOther(ILogger logger, Exception ex, string database);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Information,
         Message = "Acquiring DbMigrator advisory lock (key {Key:X16})…")]

@@ -44,6 +44,7 @@ Onboarding copies this repository into the product's repository at a template re
 | [docs/modules.md](docs/modules.md) | The modules, the samples, adding and deleting one |
 | [docs/packages.md](docs/packages.md) | How the framework packages are used here |
 | [docs/configuration.md](docs/configuration.md) | The settings of the API |
+| [docs/local-ports.md](docs/local-ports.md) | Many products side by side: port blocks, the database, a shared Postgres, the Aspire dashboard |
 | [docs/deployment.md](docs/deployment.md) | Images, migrations, deploy and release |
 | [docs/template-releases.md](docs/template-releases.md) | How the template is released (template-only) |
 | [AGENTS.md](AGENTS.md) | The guide for coding agents |
