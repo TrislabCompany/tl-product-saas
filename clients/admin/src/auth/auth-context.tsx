@@ -2,7 +2,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState, type 
 import { useQueryClient } from "@tanstack/react-query";
 import { tokenStore } from "@/auth/token-store";
 import { decodeJwt, isTokenExpired, type JwtClaims } from "@/auth/jwt";
-import { issueToken } from "@/auth/api";
+import { issueToken, OperatorOnlyError } from "@/auth/api";
 import { refreshAccessToken } from "@/lib/api-client";
 import { getMyPermissions } from "@/api/users";
 
@@ -172,6 +172,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       tokenStore.setPermissions([]);
       setPermissionsFetched(false);
       const tokens = await issueToken(input);
+      // Defence in depth: the API refuses a non-root account with X-Trislab-App=admin, but a
+      // future API regression must not quietly open the operator console to a tenant account.
+      const claims = decodeJwt(tokens.accessToken);
+      if (claims?.tenant && claims.tenant !== "root") {
+        tokenStore.clear();
+        throw new OperatorOnlyError();
+      }
       tokenStore.setTokens(tokens.accessToken, tokens.refreshToken);
     },
     [],

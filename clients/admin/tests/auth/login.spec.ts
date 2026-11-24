@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { mockJsonResponse, mockProblemDetails } from "../helpers/api-mocks";
+import { fakeJwt } from "../helpers/auth-seed";
 
 // LoginPage is the PUBLIC root-operator sign-in. We deliberately do NOT seed
 // an authed session here — a seeded session makes <LoginPage> redirect away
@@ -81,6 +82,22 @@ test.describe("admin login", () => {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
     await expect(page.getByText("Invalid credentials.")).toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
+  test("refuses a token of another tenant than root and stays on /login", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/token/issue", {
+      ...TOKEN_RESPONSE,
+      accessToken: fakeJwt({ sub: "u1", email: "admin@acme.example", tenant: "acme" }),
+    });
+
+    await page.goto("/login");
+    await page.getByLabel("Tenant").fill("acme");
+    await page.getByLabel("Email").fill("admin@acme.example");
+    await page.getByLabel("Password", { exact: true }).fill("Sup3rSecret!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+
+    await expect(page.getByText("This console is for the operator only.", { exact: false })).toBeVisible();
     await expect(page).toHaveURL(/\/login$/);
   });
 
