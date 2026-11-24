@@ -27,6 +27,14 @@
 .PARAMETER Keep
   The optional modules to keep, for example -Keep Files,Notifications,Catalog. Pass -Keep none to keep none of them.
 
+.PARAMETER Slug
+  The product's id in kebab-case, for example timesheets. Names the compose project and the database trislab_<slug>
+  (docs/local-ports.md).
+
+.PARAMETER PortBlock
+  The product's local port block, from 2 to 99 (0 and 1 are the starters'): the dashboard on 8080 + 10n, the admin on
+  the next port, its own Postgres on 5433 + n and the Aspire dashboard on 18888 + n (docs/local-ports.md).
+
 .PARAMETER TemplateVersion
   The template release the copy comes from, for example v0.1.0. Writes .template-version when given with -TemplateCommit.
 
@@ -37,11 +45,13 @@
   Prints what would change, and changes nothing.
 
 .EXAMPLE
-  pwsh scripts/init-product.ps1 -Keep Auditing,Files,Notifications -TemplateVersion v0.1.0 -TemplateCommit <sha>
+  pwsh scripts/init-product.ps1 -Keep Files,Notifications -Slug timesheets -PortBlock 2 -TemplateVersion v0.1.0 -TemplateCommit <sha>
 #>
 [CmdletBinding()]
 param(
   [Parameter(Mandatory = $true)] [string[]] $Keep,
+  [Parameter(Mandatory = $true)] [ValidatePattern('^[a-z][a-z0-9-]{1,40}$')] [string] $Slug,
+  [Parameter(Mandatory = $true)] [ValidateRange(2, 99)] [int] $PortBlock,
   [string] $TemplateVersion,
   [string] $TemplateCommit,
   [switch] $DryRun
@@ -188,6 +198,22 @@ if (Test-Path 'template-manifest.yaml') {
   Remove-Path 'template-manifest.yaml'
 }
 Remove-Path 'scripts/init-product.ps1'
+
+# ---- the local ports, database and compose project (docs/local-ports.md) ------------------------------------------
+$db = 'trislab_' + $Slug.Replace('-', '_')
+$web = 8080 + 10 * $PortBlock
+$ports = [ordered]@{ WEB_PORT = $web; ADMIN_PORT = $web + 1; POSTGRES_PORT = 5433 + $PortBlock; ASPIRE_PORT = 18888 + $PortBlock }
+$envText = Get-Content '.env.example' -Raw
+foreach ($name in $ports.Keys) { $envText = $envText -replace "(?m)^$name=.*$", "$name=$($ports[$name])" }
+$envText = $envText -replace '(?m)^POSTGRES_DB=.*$', "POSTGRES_DB=$db"
+$envText = $envText -replace '(postgresql://[^\s/]+/)trislab_[a-z0-9_]+', "`${1}$db"
+$envText = $envText -replace '(?m)^(S3_PUBLIC_ENDPOINT|PUBLIC_DASHBOARD_URL)=http://localhost:\d+', "`${1}=http://localhost:$web"
+$compose = (Get-Content 'docker-compose.yml' -Raw) -replace '(?m)^name: .*$', "name: $Slug"
+if (-not $DryRun) {
+  [System.IO.File]::WriteAllText((Join-Path $root '.env.example'), $envText)
+  [System.IO.File]::WriteAllText((Join-Path $root 'docker-compose.yml'), $compose)
+}
+Write-Host "init-product: local ports of block $PortBlock (dashboard $web, admin $($web + 1)), database $db, compose project $Slug"
 
 if ($TemplateVersion -and $TemplateCommit) {
   if (-not $DryRun) {

@@ -63,21 +63,24 @@ The services are named like the apps in `platform.yaml` and the stamp's containe
 
 | Service | What it is | Port on your machine |
 | --- | --- | --- |
-| `postgres` | Postgres 17, the same image as a dev stamp | `5432` |
+| `postgres` | Postgres 17, the same image as a dev stamp, with the profile `own-db` | `5434` (`POSTGRES_PORT`) |
 | `storage` | rustfs, the same image as a dev stamp | None: reach it through a front end's `/storage` |
 | `migrator` | Creates the bucket `storage`, applies the migrations, the seed data and the demo data, then exits. `api` starts only once it has finished | None |
 | `api` | The API, at `http://api:8080` inside Compose | None: reach it through a front end's `/api` |
-| `admin` | nginx with the operator console, proxying `/api` to `api` and `/storage` to `storage` | <http://localhost:8081> |
-| `dashboard` | nginx with the tenant app, the same proxies | <http://localhost:8082> |
+| `admin` | nginx with the operator console, proxying `/api` to `api` and `/storage` to `storage` | <http://localhost:8091> (`ADMIN_PORT`) |
+| `dashboard` | nginx with the tenant app, the same proxies | <http://localhost:8090> (`WEB_PORT`) |
+| `aspire-dashboard` | Logs, traces and metrics, with the profile `aspire` | `18889` (`ASPIRE_PORT`) |
+
+To run several products side by side, or on a Postgres that already runs, each product has its own ports, database and compose project: [local-ports.md](local-ports.md).
 
 The API answers `GET /api/health/info` without sign-in. Call it through a front end, to see that its `/api` proxy reaches the API:
 
 ```sh
-curl http://localhost:8082/api/health/info
+curl http://localhost:8090/api/health/info
 # {"name":"App.Api","version":"0.1.0","environment":"local"}
 ```
 
-Stop the product with `docker compose down`. Add `-v` to delete the database and the files too; the migrator builds them again on the next start.
+Stop the product with `docker compose down`. Add `-v` to delete the database and the files too; the migrator builds them again on the next start. With a shared Postgres, `-v` deletes nothing there: drop the database `trislab_saas` yourself.
 
 ## 5. Sign in
 

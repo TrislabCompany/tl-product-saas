@@ -33,7 +33,8 @@ else
   container=$(docker run -d --rm -e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=smoke -p 127.0.0.1::5432 \
     postgres:17.11-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b)
   pg_port=$(docker port "$container" 5432/tcp | head -n1 | sed 's/.*://')
-  export DATABASE_URL="postgresql://postgres:smoke@127.0.0.1:$pg_port/smoke"
+  # A database that does not exist yet, as on a shared Postgres (docs/local-ports.md): the migrator creates it.
+  export DATABASE_URL="postgresql://postgres:smoke@127.0.0.1:$pg_port/trislab_smoke"
 fi
 
 export PLATFORM_ENVIRONMENT=smoke
