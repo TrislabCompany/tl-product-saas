@@ -3,8 +3,9 @@ import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
 import { installAdminShellMocks, ADMIN_PERMS } from "../helpers/shell-mocks";
 import { mockJsonResponse } from "../helpers/api-mocks";
 
-// The probes go through the /api proxy: /api/health/live
-// and /api/health/ready (anonymous, no /v1 version segment).
+// Both go through the /api proxy (no /v1 version segment): the anonymous liveness
+// probe /api/health/live, and the full report /api/health/details (Health.View),
+// which answers 200 whatever the status.
 const LIVE_HEALTHY = {
   status: "Healthy",
   results: [],
@@ -59,7 +60,7 @@ test.beforeEach(async ({ page }) => {
 test.describe("health probes", () => {
   test("renders the heading, KPI strip, and a healthy check name", async ({ page }) => {
     await mockJsonResponse(page, "**/health/live", LIVE_HEALTHY);
-    await mockJsonResponse(page, "**/health/ready", READY_HEALTHY);
+    await mockJsonResponse(page, "**/health/details", READY_HEALTHY);
 
     await page.goto("/health");
 
@@ -85,8 +86,8 @@ test.describe("health probes", () => {
 
   test("surfaces an unhealthy readiness probe", async ({ page }) => {
     await mockJsonResponse(page, "**/health/live", LIVE_HEALTHY);
-    // 503 with a body — the client reads the body on 503.
-    await mockJsonResponse(page, "**/health/ready", READY_UNHEALTHY, { status: 503 });
+    // The report is always 200; the unhealthy status is in the body.
+    await mockJsonResponse(page, "**/health/details", READY_UNHEALTHY);
 
     await page.goto("/health");
 

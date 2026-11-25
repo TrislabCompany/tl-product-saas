@@ -14,10 +14,10 @@ public sealed class TicketsDbContext : BaseDbContext
     public const string Schema = "tickets";
 
     public TicketsDbContext(
-        IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor,
+        ITenantAccessor tenants,
         DbContextOptions<TicketsDbContext> options,
         IOptions<DatabaseOptions> settings,
-        IHostEnvironment environment) : base(multiTenantContextAccessor, options, settings, environment) { }
+        IHostEnvironment environment) : base(tenants, options, settings, environment) { }
 
     public DbSet<Ticket> Tickets => Set<Ticket>();
     public DbSet<TicketComment> TicketComments => Set<TicketComment>();

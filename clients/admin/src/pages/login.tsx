@@ -21,7 +21,6 @@ import { DemoAccountsDialog } from "@/components/auth/demo-accounts-dialog";
 import { TwoFactorStep } from "@/components/auth/two-factor-step";
 import { ApiRequestError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
-import { env } from "@/env";
 import type { DemoAccount } from "@/pages/login.demo-accounts";
 
 // ────────────────────────────────────────────────────────────────────────
@@ -30,12 +29,12 @@ import type { DemoAccount } from "@/pages/login.demo-accounts";
 // lockup, warm-paper card with backdrop blur.
 // The dev demo button ("Sign in with a demo account") opens the same
 // popup dialog UX the dashboard uses — pick an account → fills
-// tenant/email/password → instant sign-in. Gated on import.meta.env.DEV
+// email/password → instant sign-in (an operator always opens root). Gated on import.meta.env.DEV
 // (admin has no runtime demoMode flag).
 // ────────────────────────────────────────────────────────────────────────
 
 type LocationState = { from?: { pathname: string } };
-type Credentials = { email: string; password: string; tenant: string };
+type Credentials = { email: string; password: string };
 
 export function LoginPage() {
   const { t } = useTranslation("auth");
@@ -46,7 +45,6 @@ export function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tenant, setTenant] = useState(env.defaultTenant);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -128,15 +126,14 @@ export function LoginPage() {
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await performLogin({ email, password, tenant });
+    await performLogin({ email, password });
   };
 
   // Demo picker → reflect the chosen creds in the form, then sign in instantly.
   const onPickDemo = (account: DemoAccount) => {
     setEmail(account.email);
     setPassword(account.password);
-    setTenant(account.tenant);
-    void performLogin({ email: account.email, password: account.password, tenant: account.tenant });
+    void performLogin({ email: account.email, password: account.password });
   };
 
   return (
@@ -216,26 +213,6 @@ export function LoginPage() {
                     noValidate
                     aria-describedby={error ? "login-error" : undefined}
                   >
-                    {/* Tenant */}
-                    <div className="space-y-1.5">
-                      <Label
-                        htmlFor="tenant"
-                        className="block text-[11.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-                      >
-                        {t("login.tenant")}
-                      </Label>
-                      <Input
-                        id="tenant"
-                        value={tenant}
-                        onChange={(e) => setTenant(e.target.value)}
-                        autoComplete="organization"
-                        placeholder={t("login.tenantPlaceholder")}
-                        required
-                        aria-invalid={error ? true : undefined}
-                        className="h-11 text-[14px]"
-                      />
-                    </div>
-
                     {/* Email */}
                     <div className="space-y-1.5">
                       <Label
@@ -315,7 +292,7 @@ export function LoginPage() {
                     <div className="pt-1.5">
                       <Button
                         type="submit"
-                        disabled={submitting || !email || !password || !tenant}
+                        disabled={submitting || !email || !password}
                         className="group h-11 w-full text-[14px] font-semibold"
                       >
                         {submitting ? (

@@ -31,7 +31,7 @@ export type AuthContextValue = {
    * permissions request is still in flight.
    */
   permissionsHydrated: boolean;
-  login: (input: { email: string; password: string; tenant: string; twoFactorCode?: string }) => Promise<void>;
+  login: (input: { email: string; password: string; twoFactorCode?: string }) => Promise<void>;
   logout: () => void;
   /** Re-fetch the permission set for the signed-in user. Call after a role
    *  assignment changes for the current user. */
@@ -164,22 +164,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (input: { email: string; password: string; tenant: string; twoFactorCode?: string }) => {
-      tokenStore.setTenant(input.tenant);
+    async (input: { email: string; password: string; twoFactorCode?: string }) => {
       // Stale permissions from a previous user must not leak into the new
       // session — clear before issuing the token so the hydration effect
       // re-fetches from scratch.
       tokenStore.setPermissions([]);
       setPermissionsFetched(false);
-      const tokens = await issueToken(input);
-      // Defence in depth: the API refuses a non-root account with X-Trislab-App=admin, but a
-      // future API regression must not quietly open the operator console to a tenant account.
-      const claims = decodeJwt(tokens.accessToken);
-      if (claims?.tenant && claims.tenant !== "root") {
+      const response = await issueToken(input);
+      // A tenant choice is an account of several tenants, never an operator's (operators are in root only).
+      if (response.tenantSelectionRequired || !response.accessToken || !response.refreshToken) {
         tokenStore.clear();
         throw new OperatorOnlyError();
       }
-      tokenStore.setTokens(tokens.accessToken, tokens.refreshToken);
+      // Defence in depth: the API refuses a non-root account with X-Trislab-App=admin, but a
+      // future API regression must not quietly open the operator console to a tenant account.
+      const claims = decodeJwt(response.accessToken);
+      const tenant = response.tenant ?? claims?.tenant;
+      if (tenant && tenant !== "root") {
+        tokenStore.clear();
+        throw new OperatorOnlyError();
+      }
+      tokenStore.setTenant(tenant ?? "root");
+      tokenStore.setTokens(response.accessToken, response.refreshToken);
     },
     [],
   );

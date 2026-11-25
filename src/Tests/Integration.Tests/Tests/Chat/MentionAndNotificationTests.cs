@@ -151,47 +151,13 @@ public sealed class MentionAndNotificationTests
     private async Task<(UserCredentials user, string accessToken, string refreshToken)> RegisterUserAsync(
         HttpClient adminClient, string prefix)
     {
-        var unique = Guid.NewGuid().ToString("N")[..8];
-        var email = $"{prefix}-{unique}@example.com";
-        var userName = $"{prefix}{unique}";
-        const string password = "Test@1234!";
-
-        using var response = await adminClient.PostAsJsonAsync($"{TestConstants.IdentityBasePath}/register", new
-        {
-            firstName = prefix,
-            lastName = "Test",
-            email,
-            userName,
-            password,
-            confirmPassword = password,
-        });
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Created);
-        var registered = await response.DeserializeAsync<RegisterResult>();
-
-        // Registered users land with EmailConfirmed=false and `/token/issue` rejects them with
-        // 401 until they confirm. Bypass the email link in-process so the test can sign in.
-        await ConfirmEmailAsync(registered.UserId);
+        var registered = await TestUsers.InviteAndAcceptAsync(_factory, adminClient, prefix, firstName: prefix, lastName: "Test");
+        var email = registered.Email;
+        var userName = registered.UserName;
+        var password = registered.Password;
 
         var token = await _auth.GetTokenAsync(email, password);
         return (new UserCredentials(registered.UserId, userName, email, password), token.AccessToken, token.RefreshToken);
-    }
-
-    private async Task ConfirmEmailAsync(string userId)
-    {
-        using var scope = _factory.Services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(TestConstants.RootTenantId);
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext =
-            new MultiTenantContext<AppTenantInfo>(tenant);
-
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<TrislabUser>>();
-        var user = await userManager.FindByIdAsync(userId);
-        user.ShouldNotBeNull();
-        if (!user.EmailConfirmed)
-        {
-            user.EmailConfirmed = true;
-            (await userManager.UpdateAsync(user)).Succeeded.ShouldBeTrue();
-        }
     }
 
     private sealed record UserCredentials(string Id, string UserName, string Email, string Password);

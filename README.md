@@ -2,7 +2,7 @@
 
 The starter of every Trislab SaaS product, and the multi-tenant test app of the framework.
 
-It is a thin multi-tenant host on the packages of [`tl-framework`](https://github.com/TrislabCompany/tl-framework): a .NET 10 API, a migrator, an Aspire AppHost and two React apps (`clients/admin` for the operator, `clients/dashboard` for the tenant), in English and Slovenian. It holds no framework code: the building blocks, the modules and the React UI are packages at one version, `TrislabFrameworkVersion` in `src/Directory.Packages.props` (now `0.2.0`).
+It is a thin multi-tenant host on the packages of [`tl-framework`](https://github.com/TrislabCompany/tl-framework): a .NET 11 API, a migrator, an Aspire AppHost and two React apps (`clients/admin` for the operator, `clients/dashboard` for the tenant), in English and Slovenian. It holds no framework code: the building blocks, the modules and the React UI are packages at one version, `TrislabFrameworkVersion` in `src/Directory.Packages.props` (now `0.4.0`).
 
 ## What is in it
 
@@ -20,7 +20,7 @@ It is deployed in the Trislab sandbox, with demo data only. Each framework relea
 
 ## Run it
 
-You need Docker, the .NET SDK in `global.json` and Node 22, and a token with `read:packages`, because the Trislab packages are on GitHub Packages:
+You need Docker, the .NET SDK in `global.json` and Node 24, and a token with `read:packages`, because the Trislab packages are on GitHub Packages:
 
 ```sh
 export PACKAGES_TOKEN=<a personal token with read:packages>

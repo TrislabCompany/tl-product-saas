@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUserById, searchUsers, type UserDto } from "@/api/identity";
+import { lookupUser, pickUsers, type UserDto } from "@/api/identity";
 
 export type UserDisplay = {
   /** Best display name: "First Last" → username → email → shortened GUID. */
@@ -17,7 +17,8 @@ function shortenGuid(userId: string): string {
 }
 
 /**
- * Resolves a userId to a display tuple via GET /api/v1/identity/users/{id}.
+ * Resolves a userId to a display tuple via GET /api/v1/identity/users/lookup?ids=… (Users.Pick, so every
+ * member can see who wrote what; the full user record is Admin-only).
  * Cached in the TanStack Query cache for 5 min (stale) / 30 min (gc), so
  * multiple message rows from the same author share one network round-trip
  * and switching channels is instant.
@@ -30,7 +31,7 @@ function shortenGuid(userId: string): string {
 export function useUserDisplay(userId: string | null | undefined): UserDisplay {
   const query = useQuery({
     queryKey: ["identity", "user", userId],
-    queryFn: () => getUserById(userId!),
+    queryFn: () => lookupUser(userId!),
     enabled: !!userId,
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
@@ -64,8 +65,8 @@ export type UserByUsername = {
 
 /**
  * Resolves an @username (case-insensitive) to a full UserDto via
- * /api/v1/identity/users/search. Used by the mention profile peek so
- * the popover can show the user's avatar / email and open a DM.
+ * /api/v1/identity/users/lookup. Used by the mention profile peek so
+ * the popover can show the user's avatar and open a DM.
  *
  * Cached separately from useUserDisplay (which is keyed by userId).
  * Two consumers of the same @handle on the same page share one fetch.
@@ -82,7 +83,7 @@ export function useUserByUsername(
   const query = useQuery({
     queryKey: ["identity", "by-username", normalized],
     queryFn: async () => {
-      const page = await searchUsers({ search: normalized, pageSize: 5, isActive: true });
+      const page = await pickUsers(normalized, 5);
       const items: UserDto[] = page.items ?? [];
       return items.find((u) => (u.userName ?? "").toLowerCase() === normalized) ?? null;
     },

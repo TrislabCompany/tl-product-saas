@@ -19,7 +19,7 @@ import {
   Timer,
   Zap,
 } from "lucide-react";
-import { getReadiness, type HealthEntry, type HealthSnapshot, type HealthStatus } from "@/api/health";
+import { getHealthDetails, type HealthEntry, type HealthSnapshot, type HealthStatus } from "@/api/health";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -146,8 +146,8 @@ export function HealthPage() {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const query = useQuery({
-    queryKey: ["health", "ready"],
-    queryFn: ({ signal }) => getReadiness(signal),
+    queryKey: ["health", "details"],
+    queryFn: ({ signal }) => getHealthDetails(signal),
     refetchInterval: autoRefresh ? POLL_INTERVAL_MS : false,
     refetchOnWindowFocus: false,
     staleTime: 0,

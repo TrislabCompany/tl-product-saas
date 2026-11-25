@@ -252,6 +252,8 @@ public class EndpointConventionTests
                                name.StartsWith("Self", StringComparison.Ordinal) ||
                                name.StartsWith("Tenant", StringComparison.Ordinal) ||
                                name.StartsWith("Start", StringComparison.Ordinal) ||
+                               name.StartsWith("Invite", StringComparison.Ordinal) ||
+                               name.StartsWith("Accept", StringComparison.Ordinal) ||
                                name.StartsWith("End", StringComparison.Ordinal) ||
                                name.StartsWith("Enroll", StringComparison.Ordinal) ||
                                name.StartsWith("Verify", StringComparison.Ordinal) ||
@@ -266,6 +268,8 @@ public class EndpointConventionTests
                                name.StartsWith("Void", StringComparison.Ordinal) ||
                                name.StartsWith("Mark", StringComparison.Ordinal) ||
                                name.StartsWith("Issue", StringComparison.Ordinal) ||
+                               name.StartsWith("Convert", StringComparison.Ordinal) ||
+                               name.StartsWith("Export", StringComparison.Ordinal) ||
                                name.StartsWith("Capture", StringComparison.Ordinal) ||
                                name.StartsWith("Request", StringComparison.Ordinal) ||
                                name.StartsWith("Finalize", StringComparison.Ordinal) ||

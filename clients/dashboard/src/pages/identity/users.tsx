@@ -21,12 +21,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  inviteUser,
   listRoles,
-  registerUser,
   searchUsers,
   type UserDto,
-  type RegisterUserInput,
 } from "@/api/identity";
+import { PendingInvitations } from "@/components/identity/pending-invitations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -163,7 +163,7 @@ export function UsersPage() {
           className="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] font-semibold sm:flex-none"
         >
           <Plus className="size-4" />
-          {t("usersList.registerUser")}
+          {t("usersList.inviteUser")}
         </Button>
       </EntityPageHeader>
 
@@ -236,7 +236,7 @@ export function UsersPage() {
                 className="h-9 rounded-lg px-4 text-[13px]"
               >
                 <Plus className="mr-1.5 size-4" />
-                {t("usersList.registerUser")}
+                {t("usersList.inviteUser")}
               </Button>
             )
           }
@@ -294,7 +294,9 @@ export function UsersPage() {
         </div>
       )}
 
-      <RegisterUserDialog
+      <PendingInvitations />
+
+      <InviteUserDialog
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
       />
@@ -396,10 +398,11 @@ function UserDesktopRow({ user, isLast }: { user: UserDto; isLast: boolean }) {
 }
 
 // ───────────────────────────────────────────────────────────────────────
-//  Register dialog — hooks/mutations preserved verbatim
+//  Invite dialog — users are global: the address gets an e-mail, and its
+//  owner accepts it with their own password (or their existing account).
 // ───────────────────────────────────────────────────────────────────────
 
-function RegisterUserDialog({
+function InviteUserDialog({
   open,
   onClose,
 }: {
@@ -411,10 +414,6 @@ function RegisterUserDialog({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
 
   // Clear the form whenever the dialog closes — adjusted during render
   // (react.dev "adjusting state when a prop changes").
@@ -425,41 +424,31 @@ function RegisterUserDialog({
       setFirstName("");
       setLastName("");
       setEmail("");
-      setUserName("");
-      setPassword("");
-      setConfirmPassword("");
-      setPhoneNumber("");
     }
   }
 
-  const passwordMismatch =
-    confirmPassword.length > 0 && password !== confirmPassword;
-
   const mutation = useMutation({
-    mutationFn: (input: RegisterUserInput) => registerUser(input),
+    mutationFn: () =>
+      inviteUser({
+        email: email.trim(),
+        firstName: firstName.trim() || undefined,
+        lastName: lastName.trim() || undefined,
+      }),
     onSuccess: () => {
-      toast.success(t("usersList.toastRegistered"), {
-        description: t("usersList.toastRegisteredDesc"),
+      toast.success(t("usersList.toastInvited"), {
+        description: t("usersList.toastInvitedDesc", { email: email.trim() }),
       });
-      void queryClient.invalidateQueries({ queryKey: ["identity", "users"] });
+      void queryClient.invalidateQueries({ queryKey: ["identity", "invitations"] });
       onClose();
     },
     onError: (err) =>
-      toast.error(t("usersList.toastRegisterFailed"), { description: describe(err) }),
+      toast.error(t("usersList.toastInviteFailed"), { description: describe(err) }),
   });
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (passwordMismatch) return;
-    mutation.mutate({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      userName: userName.trim(),
-      password,
-      confirmPassword,
-      phoneNumber: phoneNumber.trim() || undefined,
-    });
+    if (!email.trim()) return;
+    mutation.mutate();
   };
 
   return (
@@ -467,96 +456,40 @@ function RegisterUserDialog({
       <DialogContent className="!max-w-lg">
         <form onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>{t("usersList.registerTitle")}</DialogTitle>
+            <DialogTitle>{t("usersList.inviteTitle")}</DialogTitle>
             <DialogDescription>
-              {t("usersList.registerDescription")}
+              {t("usersList.inviteDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <DialogBody className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field id="reg-first" label={t("field.firstName")} required>
-                <Input
-                  id="reg-first"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder={t("usersList.firstPlaceholder")}
-                  autoFocus
-                  required
-                />
-              </Field>
-              <Field id="reg-last" label={t("field.lastName")} required>
-                <Input
-                  id="reg-last"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder={t("usersList.lastPlaceholder")}
-                  required
-                />
-              </Field>
-            </div>
-
-            <Field
-              id="reg-username"
-              label={t("field.username")}
-              required
-              hint={t("usersList.usernameHint")}
-            >
+            <Field id="invite-email" label={t("field.email")} required>
               <Input
-                id="reg-username"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                placeholder={t("usersList.usernamePlaceholder")}
-                autoComplete="off"
-                required
-              />
-            </Field>
-
-            <Field id="reg-email" label={t("field.email")} required>
-              <Input
-                id="reg-email"
+                id="invite-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t("usersList.emailPlaceholder")}
+                autoFocus
                 required
-              />
-            </Field>
-
-            <Field id="reg-phone" label={t("field.phone")} hint={t("usersList.phoneHint")}>
-              <Input
-                id="reg-phone"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={t("usersList.phonePlaceholder")}
               />
             </Field>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field id="reg-pwd" label={t("field.password")} required>
+              <Field id="invite-first" label={t("field.firstName")} hint={t("usersList.nameHint")}>
                 <Input
-                  id="reg-pwd"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
+                  id="invite-first"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder={t("usersList.firstPlaceholder")}
                 />
               </Field>
-              <Field
-                id="reg-pwd2"
-                label={t("field.confirm")}
-                required
-                hint={passwordMismatch ? t("usersList.confirmMismatch") : undefined}
-              >
+              <Field id="invite-last" label={t("field.lastName")}>
                 <Input
-                  id="reg-pwd2"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                  aria-invalid={passwordMismatch || undefined}
+                  id="invite-last"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder={t("usersList.lastPlaceholder")}
                 />
               </Field>
             </div>
@@ -574,11 +507,11 @@ function RegisterUserDialog({
             </DialogClose>
             <Button
               type="submit"
-              disabled={mutation.isPending || passwordMismatch}
+              disabled={mutation.isPending || !email.trim()}
               className="gap-1.5"
             >
               <UserPlus className="h-4 w-4" />
-              {mutation.isPending ? t("usersList.registering") : t("usersList.registerSubmit")}
+              {mutation.isPending ? t("usersList.inviting") : t("usersList.inviteSubmit")}
             </Button>
           </DialogFooter>
         </form>

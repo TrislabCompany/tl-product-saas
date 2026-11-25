@@ -1,20 +1,26 @@
 import { ApiRequestError, apiFetch } from "@/lib/api-client";
 
-export type TokenResponse = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresAt: string;
-  refreshTokenExpiresAt: string;
+/**
+ * What `POST /token/issue` answers. Users are global: the tokens of the tenant the server opened (an operator
+ * always opens root), or, for an account in several tenants with no default, a tenant choice. The admin app is
+ * the operator console, so a choice means a tenant account, which it turns away.
+ */
+export type SignInResponse = {
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  refreshTokenExpiresAt?: string | null;
+  tenant?: string | null;
+  tenantSelectionRequired: boolean;
 };
 
 export function issueToken(input: {
   email: string;
   password: string;
-  tenant: string;
   /** Authenticator (TOTP) code — sent only on the second step of a 2FA sign-in. */
   twoFactorCode?: string;
 }) {
-  return apiFetch<TokenResponse>("/api/v1/identity/token/issue", {
+  return apiFetch<SignInResponse>("/api/v1/identity/token/issue", {
     method: "POST",
     body: JSON.stringify({
       email: input.email,
@@ -22,8 +28,9 @@ export function issueToken(input: {
       ...(input.twoFactorCode ? { twoFactorCode: input.twoFactorCode } : {}),
     }),
     // X-Trislab-App marks this client as the platform-admin app. Used by the
-    // API to enforce the SuperAdmin / dashboard boundary.
-    headers: { tenant: input.tenant, "X-Trislab-App": "admin" },
+    // API to enforce the SuperAdmin / dashboard boundary. No tenant header: an
+    // operator always signs in to root.
+    headers: { "X-Trislab-App": "admin" },
     skipAuth: true,
   });
 }

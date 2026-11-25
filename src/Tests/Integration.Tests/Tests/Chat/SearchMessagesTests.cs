@@ -124,33 +124,6 @@ public sealed class SearchMessagesTests
         return await response.DeserializeAsync<IReadOnlyList<MessageDto>>();
     }
 
-    private async Task RegisterAndConfirmAsync(HttpClient adminClient, string prefix, string email, string password)
-    {
-        using var register = await adminClient.PostAsJsonAsync($"{TestConstants.IdentityBasePath}/register", new
-        {
-            firstName = prefix,
-            lastName = "Test",
-            email,
-            userName = email.Split('@')[0],
-            password,
-            confirmPassword = password,
-        });
-        register.StatusCode.ShouldBe(System.Net.HttpStatusCode.Created);
-        var registered = await register.DeserializeAsync<RegisterResult>();
-
-        using var scope = _factory.Services.CreateScope();
-        var tenant = await scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>()
-            .GetAsync(TestConstants.RootTenantId);
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext =
-            new MultiTenantContext<AppTenantInfo>(tenant);
-
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<TrislabUser>>();
-        var user = await userManager.FindByIdAsync(registered.UserId);
-        user.ShouldNotBeNull();
-        if (!user.EmailConfirmed)
-        {
-            user.EmailConfirmed = true;
-            (await userManager.UpdateAsync(user)).Succeeded.ShouldBeTrue();
-        }
-    }
+    private async Task RegisterAndConfirmAsync(HttpClient adminClient, string prefix, string email, string password) =>
+        await TestUsers.InviteAndAcceptAddressAsync(_factory, adminClient, email, password, prefix, "Test");
 }

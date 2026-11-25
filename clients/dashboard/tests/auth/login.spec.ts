@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test";
 import { mockJsonResponse, mockProblemDetails } from "../helpers/api-mocks";
 
 // The dashboard login page (rebuilt to the dentalOS card layout): Trislab logo
-// lockup + ".NET 10 Starter Kit" caption, tenant/email/password card, and a
+// lockup + ".NET 11 Starter Kit" caption, email/password card (users are
+// global: the server opens the account's tenant, or asks for a choice), and a
 // demoMode-gated "Step into any role" picker that signs in instantly.
 
 const TOKEN_RESPONSE = {
@@ -10,6 +11,18 @@ const TOKEN_RESPONSE = {
   refreshToken: "refresh",
   accessTokenExpiresAt: new Date(Date.now() + 3_600_000).toISOString(),
   refreshTokenExpiresAt: new Date(Date.now() + 7_200_000).toISOString(),
+  tenant: "acme",
+  tenantSelectionRequired: false,
+};
+
+/** An account in two tenants with no default: the sign-in answers a choice instead of tokens. */
+const CHOICE_RESPONSE = {
+  tenantSelectionRequired: true,
+  selectionToken: "selection-token",
+  tenants: [
+    { id: "acme", name: "Acme Corp", isDefault: false },
+    { id: "globex", name: "Globex", isDefault: false },
+  ],
 };
 
 /** Force the runtime config so demoMode is deterministic per test. */
@@ -28,17 +41,17 @@ test.describe("login — page chrome", () => {
     await setConfig(page, true);
   });
 
-  test("renders the Trislab logo lockup with the .NET 10 caption", async ({ page }) => {
+  test("renders the Trislab logo lockup with the .NET 11 caption", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByText("Trislab").first()).toBeVisible();
-    await expect(page.getByText(/\.NET 10 Starter Kit/i)).toBeVisible();
+    await expect(page.getByText(/\.NET 11 Starter Kit/i)).toBeVisible();
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
     await expect(page.getByText(/sign in to your account/i)).toBeVisible();
   });
 
-  test("renders the tenant + email + password fields", async ({ page }) => {
+  test("renders the email + password fields and no tenant field", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByLabel("Tenant")).toBeVisible();
+    await expect(page.getByLabel("Tenant")).toHaveCount(0);
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: /forgot/i })).toHaveAttribute("href", "/forgot-password");
@@ -54,10 +67,9 @@ test.describe("login — page chrome", () => {
     await expect(pwd).toHaveAttribute("type", "password");
   });
 
-  test("submit is disabled until tenant + email + password are filled", async ({ page }) => {
+  test("submit is disabled until email + password are filled", async ({ page }) => {
     await page.goto("/login");
     const submit = page.getByRole("button", { name: /^sign in$/i });
-    // Tenant defaults to "root"; fill the rest to enable.
     await expect(submit).toBeDisabled();
     await page.getByLabel("Email").fill("alice@acme.com");
     await page.getByLabel("Password", { exact: true }).fill("secret123");
@@ -71,9 +83,8 @@ test.describe("login — manual sign in", () => {
     await mockJsonResponse(page, "**/api/v1/identity/token/issue", TOKEN_RESPONSE);
   });
 
-  test("POSTs credentials with the tenant header", async ({ page }) => {
+  test("POSTs the credentials with no tenant header", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel("Tenant").fill("acme");
     await page.getByLabel("Email").fill("alice@acme.com");
     await page.getByLabel("Password", { exact: true }).fill("Password123!");
 
@@ -83,11 +94,14 @@ test.describe("login — manual sign in", () => {
     await page.getByRole("button", { name: /^sign in$/i }).click();
     const req = await reqPromise;
 
-    expect(req.headers().tenant).toBe("acme");
+    expect(req.headers().tenant).toBeUndefined();
+    expect(req.headers()["x-trislab-app"]).toBe("dashboard");
     expect(JSON.parse(req.postData() ?? "{}")).toMatchObject({
       email: "alice@acme.com",
       password: "Password123!",
     });
+    // The session keeps the tenant the server opened.
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("tl.dashboard.tenant"))).toBe("acme");
   });
 
   test("surfaces a server error without leaving the page", async ({ page }) => {
@@ -101,6 +115,49 @@ test.describe("login — manual sign in", () => {
     await page.getByRole("button", { name: /^sign in$/i }).click();
 
     await expect(page.getByRole("alert")).toContainText(/invalid credentials/i);
+    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
+  });
+});
+
+test.describe("login — an account in several tenants", () => {
+  test.beforeEach(async ({ page }) => {
+    await setConfig(page, false);
+    await mockJsonResponse(page, "**/api/v1/identity/token/issue", CHOICE_RESPONSE);
+  });
+
+  test("asks which tenant to open, then sends the choice with the selection token", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/token/select", { ...TOKEN_RESPONSE, tenant: "globex" });
+    await page.goto("/login");
+    await page.getByLabel("Email").fill("sam@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("Password123!");
+    await page.getByRole("button", { name: /^sign in$/i }).click();
+
+    await expect(page.getByRole("heading", { name: /choose an organisation/i })).toBeVisible();
+    await expect(page.getByText("sam@example.com")).toBeVisible();
+    await page.getByRole("radio", { name: /globex/i }).check();
+    await page.getByRole("checkbox", { name: /open this one directly next time/i }).check();
+
+    const reqPromise = page.waitForRequest(
+      (r) => r.url().includes("/api/v1/identity/token/select") && r.method() === "POST",
+    );
+    await page.getByRole("button", { name: /^continue$/i }).click();
+    const req = await reqPromise;
+
+    expect(JSON.parse(req.postData() ?? "{}")).toEqual({
+      selectionToken: "selection-token",
+      tenant: "globex",
+      setDefault: true,
+    });
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("tl.dashboard.tenant"))).toBe("globex");
+  });
+
+  test("back returns to the password form", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel("Email").fill("sam@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("Password123!");
+    await page.getByRole("button", { name: /^sign in$/i }).click();
+
+    await page.getByRole("button", { name: /back to sign in/i }).click();
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
   });
 });

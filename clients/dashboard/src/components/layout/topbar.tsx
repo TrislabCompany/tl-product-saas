@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ParseKeys } from "i18next";
 import {
+  Building2,
   Check,
   ChevronsUpDown,
   KeyRound,
@@ -41,6 +42,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar } from "@/components/ui/avatar";
 import { getMyProfileWithETag, updateMyProfile } from "@/api/identity";
+import { getMyTenants } from "@/auth/api";
 import { refreshAccessToken } from "@/lib/api-client";
 import { formatNumber } from "@/lib/list-helpers";
 import i18n, { changeLanguage, SUPPORTED } from "@/i18n";
@@ -191,7 +193,7 @@ function SimpleMenuItem({
 // ─────────────────────────────────────────────────────────────────────
 
 export function Topbar() {
-  const { user, logout, impersonation } = useAuth();
+  const { user, logout, impersonation, switchTenant } = useAuth();
   // useTranslation subscribes this component to `languageChanged`, so the menu
   // labels and the active-locale check re-render the instant we switch.
   const { t } = useTranslation();
@@ -235,6 +237,22 @@ export function Topbar() {
   const { mode, setMode } = useTheme();
   const { setOpen: setPaletteOpen } = useCommandPalette();
   const navigate = useNavigate();
+
+  // Users are global: an account can belong to several tenants and switch between them here. The switch
+  // re-issues the session for the other tenant (POST /token/switch). Not while impersonating: that session
+  // belongs to someone else.
+  const tenantsQuery = useQuery({
+    queryKey: ["identity", "my-tenants", user?.id],
+    queryFn: getMyTenants,
+    enabled: !!user && !impersonation,
+    staleTime: 5 * 60_000,
+  });
+  const otherTenants = tenantsQuery.data ?? [];
+  const switchMutation = useMutation({
+    mutationFn: (tenant: string) => switchTenant({ tenant, setDefault: false }),
+    onSuccess: () => navigate("/"),
+    onError: () => toast.error(t("tenantSwitch.failed")),
+  });
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const updateProfile = useMutation({
@@ -497,6 +515,30 @@ export function Topbar() {
           </div>
 
           <DropdownMenuSeparator className="!my-0" />
+
+          {otherTenants.length > 1 && (
+            <>
+              {/* Organisation — the tenants this account belongs to, check on the current one */}
+              <DropdownMenuLabel className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
+                {t("tenantSwitch.title")}
+              </DropdownMenuLabel>
+              <div className="px-1 pb-1">
+                {otherTenants.map((tenant) => (
+                  <ThemeMenuItem
+                    key={tenant.id}
+                    icon={Building2}
+                    label={tenant.name || tenant.id}
+                    active={tenant.id === user?.tenant}
+                    onSelect={() => {
+                      if (tenant.id !== user?.tenant && !switchMutation.isPending) switchMutation.mutate(tenant.id);
+                    }}
+                  />
+                ))}
+              </div>
+
+              <DropdownMenuSeparator className="!my-0" />
+            </>
+          )}
 
           {/* Account quick actions */}
           <DropdownMenuLabel className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">

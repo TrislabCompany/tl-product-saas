@@ -11,7 +11,8 @@ import { Monogram } from "@/components/monogram";
 import { EntityPageHeader, ErrorBand } from "@/components/list";
 import { ApiRequestError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
-import { CreateUserDialog } from "@/components/users/create-user-dialog";
+import { InviteUserDialog } from "@/components/users/invite-user-dialog";
+import { PendingInvitations } from "@/components/users/pending-invitations";
 
 const PAGE_SIZE = 12;
 
@@ -127,7 +128,7 @@ export function UsersListPage() {
           onClick={() => setCreateOpen(true)}
           className="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] font-semibold sm:flex-none"
         >
-          <Plus className="size-4" /> {t("newUser")}
+          <Plus className="size-4" /> {t("inviteUser")}
         </Button>
       </EntityPageHeader>
 
@@ -296,7 +297,9 @@ export function UsersListPage() {
         </div>
       )}
 
-      <CreateUserDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <PendingInvitations />
+
+      <InviteUserDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }

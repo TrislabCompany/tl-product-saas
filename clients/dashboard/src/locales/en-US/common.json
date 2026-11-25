@@ -144,11 +144,13 @@
   "upload.extensionNotAllowed": "Extension {{extension}} is not allowed.",
   "upload.tooLarge": "File is {{size}}; limit is {{limit}}.",
   "upload.noExtension": "(none)",
-  "userPicker.searchPlaceholder": "Search by name or email…",
+  "userPicker.searchPlaceholder": "Search by name…",
   "userPicker.searchReassign": "Search to reassign…",
   "userPicker.clear": "Clear",
   "userPicker.clearSelection": "Clear selection",
   "userPicker.searching": "Searching for \"{{term}}\"…",
   "userPicker.noMatch": "No users match \"{{term}}\".",
-  "userPicker.results": "Search results"
+  "userPicker.results": "Search results",
+  "tenantSwitch.title": "Organisation",
+  "tenantSwitch.failed": "Couldn't switch organisation. Try again."
 }

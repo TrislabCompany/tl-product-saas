@@ -269,6 +269,18 @@ export async function listAudits(
   );
 }
 
+/** The signed-in user's own audit events in their tenant (`GET /audits/mine`): AuditTrails.ViewOwn, a Basic permission. */
+export async function listMyAudits(
+  query: ListAuditsQuery,
+  signal?: AbortSignal,
+): Promise<PagedResponse<AuditSummaryDto>> {
+  const qs = toQueryString(query);
+  return apiFetch<PagedResponse<AuditSummaryDto>>(
+    `/api/v1/audits/mine${qs ? `?${qs}` : ""}`,
+    { signal },
+  );
+}
+
 export async function getAuditById(
   id: string,
   signal?: AbortSignal,

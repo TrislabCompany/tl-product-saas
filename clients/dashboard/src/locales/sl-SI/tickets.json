@@ -103,7 +103,7 @@
   "detail.assign.descMid": "; če dodeljeno osebo pri zahtevku v teku odstranite, se vrne v stanje ",
   "detail.assign.descSuffix": ".",
   "detail.assign.fieldAssignee": "Dodeljeno",
-  "detail.assign.hintAssignee": "Iščite po imenu ali e-pošti. Počistite izbiro, da odstranite dodelitev.",
+  "detail.assign.hintAssignee": "Iščite po imenu ali uporabniškem imenu. Počistite izbiro, da odstranite dodelitev.",
   "detail.assign.warnPrefix": "Če počistite dodeljeno osebo, bo zahtevek ",
   "detail.assign.warnEmphasis": "nedodeljen",
   "detail.assign.warnSuffix": ".",

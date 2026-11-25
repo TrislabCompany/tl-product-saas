@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { apiFetch } from "@/lib/api-client";
 
 export type HealthStatus = "Healthy" | "Degraded" | "Unhealthy" | string;
 
@@ -58,6 +59,10 @@ export function getLiveness(): Promise<HealthResult> {
   return fetchHealth("/api/health/live");
 }
 
-export function getReadiness(): Promise<HealthResult> {
-  return fetchHealth("/api/health/ready");
+/**
+ * Every check with its details, also the ones the readiness probe skips (`GET /api/health/details`, Health.View).
+ * The anonymous probes answer the overall status only. Always 200 when the report was produced.
+ */
+export function getHealthDetails(): Promise<HealthResult> {
+  return apiFetch<HealthResult>("/api/health/details");
 }

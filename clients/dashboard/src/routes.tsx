@@ -49,6 +49,10 @@ const ConfirmEmailPage = lazyNamed(
   () => import("@/pages/auth/confirm-email"),
   "ConfirmEmailPage",
 );
+const AcceptInvitationPage = lazyNamed(
+  () => import("@/pages/auth/accept-invitation"),
+  "AcceptInvitationPage",
+);
 const OverviewPage = lazyNamed(() => import("@/pages/overview"), "OverviewPage", ["overview"]);
 const ActivityPage = lazyNamed(() => import("@/pages/activity"), "ActivityPage", ["activity", "audits"]);
 const InvoicesPage = lazyNamed(() => import("@/pages/invoices"), "InvoicesPage", ["subscription"]);
@@ -145,6 +149,12 @@ export const router = createBrowserRouter([
   {
     path: "/confirm-email",
     element: withSuspense(<ConfirmEmailPage />),
+    errorElement: <RouteError />,
+  },
+  {
+    // The link an invitation e-mail carries (users are global): set a password, or sign in, and accept.
+    path: "/accept-invitation",
+    element: withSuspense(<AcceptInvitationPage />),
     errorElement: <RouteError />,
   },
   {

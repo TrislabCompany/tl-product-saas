@@ -10,34 +10,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { DemoAccountsDialog } from "@/components/auth/demo-accounts-dialog";
+import { TenantChoiceStep } from "@/components/auth/tenant-choice-step";
 import { TwoFactorStep } from "@/components/auth/two-factor-step";
 import { ApiRequestError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
 import { env } from "@/env";
+import type { TenantMembership } from "@/auth/api";
 import type { DemoAccount } from "@/pages/login.demo-accounts";
 
 type LocationState = { from?: { pathname: string } };
-type Credentials = { email: string; password: string; tenant: string };
+type Credentials = { email: string; password: string; tenant?: string };
+type TenantChoice = { email: string; selectionToken: string; tenants: TenantMembership[] };
 
 // ────────────────────────────────────────────────────────────────────────
 // Login — dentalOS "welcome back" card on rose+saffron atmospheric orbs
 // (chrome supplied by AuthShell, shared with the rest of the auth flow).
-// Trislab stays multi-tenant, so the Tenant field leads the form; Email +
-// Password follow. The demo picker ("Step into any role") signs in
+// Users are global: the form asks only for e-mail and password, and the
+// server opens the account's tenant. An account in several tenants with no
+// default gets a choice step. The demo picker ("Step into any role") signs in
 // instantly and is gated on the runtime demoMode flag — on in staging,
 // off in production.
 // ────────────────────────────────────────────────────────────────────────
 
 export function LoginPage() {
   const { t } = useTranslation("auth");
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, chooseTenant } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as LocationState | null)?.from?.pathname ?? "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tenant, setTenant] = useState(env.defaultTenant);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -53,6 +56,8 @@ export function LoginPage() {
   const [pending, setPending] = useState<Credentials | null>(null);
   const [code, setCode] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
+  // The tenant choice of an account in several tenants (sign-in answered tenantSelectionRequired).
+  const [choice, setChoice] = useState<TenantChoice | null>(null);
 
   if (isAuthenticated) {
     return <Navigate to={from} replace />;
@@ -69,7 +74,13 @@ export function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(creds);
+      const result = await login(creds);
+      if (result.status === "selectTenant") {
+        setPassword("");
+        setShowPassword(false);
+        setChoice({ email: creds.email, selectionToken: result.selectionToken, tenants: result.tenants });
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err) {
       if (isTwoFactorRequiredError(err)) {
@@ -94,9 +105,13 @@ export function LoginPage() {
     setCodeError(null);
     setSubmitting(true);
     try {
-      await login(attempt);
+      const result = await login(attempt);
       setPending(null);
       setCode("");
+      if (result.status === "selectTenant") {
+        setChoice({ email: attempt.email, selectionToken: result.selectionToken, tenants: result.tenants });
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err) {
       setCode("");
@@ -104,6 +119,26 @@ export function LoginPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const submitChoice = async (picked: { tenant: string; setDefault: boolean }) => {
+    if (!choice) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      await chooseTenant({ selectionToken: choice.selectionToken, ...picked });
+      setChoice(null);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onBackFromChoice = () => {
+    setChoice(null);
+    setError(null);
   };
 
   const onBackToPassword = () => {
@@ -115,22 +150,30 @@ export function LoginPage() {
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await performLogin({ email, password, tenant });
+    await performLogin({ email, password });
   };
 
   // Demo picker → reflect the chosen creds in the form, then sign in
-  // instantly. Each demo account carries its own tenant + password.
+  // instantly. Each demo account carries its tenant, sent as the tenant to open.
   const onPickDemo = (account: DemoAccount) => {
     setEmail(account.email);
     setPassword(account.password);
-    setTenant(account.tenant);
     void performLogin({ email: account.email, password: account.password, tenant: account.tenant });
   };
 
   return (
     <>
       <AuthShell>
-        {pending ? (
+        {choice ? (
+          <TenantChoiceStep
+            email={choice.email}
+            tenants={choice.tenants}
+            onSubmit={(picked) => void submitChoice(picked)}
+            onBack={onBackFromChoice}
+            submitting={submitting}
+            error={error}
+          />
+        ) : pending ? (
           <TwoFactorStep
             email={pending.email}
             code={code}
@@ -167,26 +210,6 @@ export function LoginPage() {
               noValidate
               aria-describedby={error ? "login-error" : undefined}
             >
-              {/* Tenant — Trislab stays multi-tenant, so this leads the form. */}
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="tenant"
-                  className="block text-[11.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-                >
-                  {t("login.tenant")}
-                </Label>
-                <Input
-                  id="tenant"
-                  value={tenant}
-                  onChange={(e) => setTenant(e.target.value)}
-                  placeholder={t("login.tenantPlaceholder")}
-                  autoComplete="organization"
-                  required
-                  aria-invalid={error ? true : undefined}
-                  className="h-11 text-[14px]"
-                />
-              </div>
-
               <div className="space-y-1.5">
                 <Label
                   htmlFor="email"
@@ -264,7 +287,7 @@ export function LoginPage() {
               <div className="pt-1.5">
                 <Button
                   type="submit"
-                  disabled={submitting || !email || !password || !tenant}
+                  disabled={submitting || !email || !password}
                   className="group h-11 w-full text-[14px] font-semibold"
                 >
                   {submitting ? (

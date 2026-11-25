@@ -122,8 +122,8 @@ export const sections: NavSection[] = [
     captionKey: "nav.section.system",
     icon: HeartPulse,
     items: [
-      // Health hits the anonymous /api/health/ready probe — visible to everyone.
-      { to: "/system/health", labelKey: "nav.health", icon: HeartPulse },
+      // Health reads GET /api/health/details, which needs Health.View (Admins, not Basic).
+      { to: "/system/health", labelKey: "nav.health", icon: HeartPulse, perm: "Permissions.Health.View" },
       { to: "/system/audits", labelKey: "nav.audits", icon: ScrollText, perm: "Permissions.AuditTrails.View" },
       { to: "/system/sessions", labelKey: "nav.sessions", icon: Wifi, perm: "Permissions.Sessions.ViewAll" },
       // Trash fronts five tabs, each gated on a different resource's restore /

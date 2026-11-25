@@ -56,6 +56,9 @@ export async function installShellMocks(page: Page): Promise<void> {
   // this route with the exact grants they need.
   await mockJsonResponse(page, "**/api/v1/identity/profile", DEFAULT_PROFILE);
   await mockJsonResponse(page, "**/api/v1/identity/permissions", SHELL_PERMISSIONS);
+  // The tenants the account belongs to (the topbar's tenant switch): none listed means one tenant,
+  // so the switch stays hidden. tests/auth/tenant-switch.spec.ts lists several.
+  await mockJsonResponse(page, "**/api/v1/identity/profile/tenants", []);
 
   // Tenant status drives the global expiry/grace banner mounted in the
   // AppShell. Default to a healthy, far-future tenant so the banner stays

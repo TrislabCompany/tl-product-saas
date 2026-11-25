@@ -28,6 +28,8 @@
   "history.auditTrail": "Audit trail",
   "history.emptyTitle": "No history yet",
   "history.emptyBody": "Audited changes, sign-ins and errors in this tenant will show up here.",
+  "history.captionMine": "Your latest {{size}} audited events in this tenant, excluding per-request system activity.",
   "liveOnly.title": "Showing live events only",
-  "liveOnly.body": "This feed shows events received since this tab connected, so it starts empty after a refresh. Past activity lives in the audit trail, which needs the Audit trail permission. Ask an administrator if you need it."
+  "liveOnly.body": "This feed shows events received since this tab connected, so it starts empty after a refresh. Past activity lives in the audit trail, which needs the Audit trail permission. Ask an administrator if you need it.",
+  "descriptionWithOwnHistory": "Events streamed over Server-Sent Events while this tab is connected, above your own recent activity."
 }

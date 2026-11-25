@@ -170,11 +170,13 @@
   "upload.extensionNotAllowed": "Končnica {{extension}} ni dovoljena.",
   "upload.tooLarge": "Datoteka je velika {{size}}; omejitev je {{limit}}.",
   "upload.noExtension": "(brez)",
-  "userPicker.searchPlaceholder": "Iskanje po imenu ali e-pošti…",
+  "userPicker.searchPlaceholder": "Iskanje po imenu …",
   "userPicker.searchReassign": "Iščite za ponovno dodelitev…",
   "userPicker.clear": "Počisti",
   "userPicker.clearSelection": "Počisti izbiro",
   "userPicker.searching": "Iskanje „{{term}}“…",
   "userPicker.noMatch": "Noben uporabnik ne ustreza „{{term}}“.",
-  "userPicker.results": "Rezultati iskanja"
+  "userPicker.results": "Rezultati iskanja",
+  "tenantSwitch.title": "Organizacija",
+  "tenantSwitch.failed": "Organizacije ni bilo mogoče zamenjati. Poskusite znova."
 }

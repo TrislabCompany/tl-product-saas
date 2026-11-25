@@ -52,7 +52,7 @@
   "rail.dmSearching": "Searching…",
   "rail.dmLoadingPeople": "Loading people…",
   "rail.dmNoMatch": "No one matches \"{{term}}\".",
-  "rail.dmNoTeammates": "No teammates in your tenant yet.",
+  "rail.dmTypeToSearch": "Type at least two letters of a name.",
   "rail.dmSearchResults": "Search results",
   "rail.dmSuggested": "Suggested",
 

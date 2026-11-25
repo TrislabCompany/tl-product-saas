@@ -43,19 +43,30 @@ export type SearchUsersParams = {
   roleId?: string | null;
 };
 
-export type RegisterUserInput = {
-  firstName: string;
-  lastName: string;
+/** An invitation into the caller's tenant (`POST/GET /identity/invitations`). */
+export type InvitationDto = {
+  id: string;
   email: string;
-  userName: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber?: string;
+  status: string;
+  createdOnUtc: string;
+  expiresOnUtc: string;
+  acceptedOnUtc?: string | null;
+  revokedOnUtc?: string | null;
 };
 
-export type RegisterUserResponse = {
-  userId: string;
-  message?: string;
+export type InviteUserInput = {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+};
+
+/** What a user picker shows (`GET /identity/users/lookup`): no e-mail, phone or status. */
+export type UserLookupDto = {
+  id: string;
+  userName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  imageUrl?: string | null;
 };
 
 export type UpsertRoleInput = {
@@ -112,13 +123,6 @@ export async function deleteUser(userId: string): Promise<void> {
   });
 }
 
-export async function confirmUserEmail(userId: string): Promise<void> {
-  await apiFetch<void>(
-    `/api/v1/identity/users/${encodeURIComponent(userId)}/confirm-email`,
-    { method: "POST" },
-  );
-}
-
 export async function resendUserConfirmationEmail(userId: string): Promise<void> {
   await apiFetch<void>(
     `/api/v1/identity/users/${encodeURIComponent(userId)}/resend-confirmation-email`,
@@ -147,11 +151,84 @@ export async function getMyPermissions(): Promise<string[]> {
   return (await apiFetch<string[] | null>(`/api/v1/identity/permissions`)) ?? [];
 }
 
-export async function registerUser(input: RegisterUserInput): Promise<RegisterUserResponse> {
-  return apiFetch<RegisterUserResponse>(`/api/v1/identity/register`, {
+// Users are global: an administrator invites an address, and its owner accepts the e-mailed link.
+export async function inviteUser(input: InviteUserInput): Promise<void> {
+  await apiFetch<InvitationDto>(`/api/v1/identity/invitations`, {
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+export async function listInvitations(): Promise<InvitationDto[]> {
+  return (await apiFetch<InvitationDto[] | null>(`/api/v1/identity/invitations`)) ?? [];
+}
+
+export async function revokeInvitation(id: string): Promise<void> {
+  await apiFetch<void>(`/api/v1/identity/invitations/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
+/** The tenant an accepted invitation opened. */
+export type AcceptInvitationResponse = { tenant: string; tenantName?: string | null };
+
+/**
+ * Accepts an invitation. A new or unconfirmed account sends the password it sets (which also confirms the
+ * e-mail); a confirmed account must be signed in, and is answered 401 `Identity.InvitationSignInRequired` otherwise.
+ */
+export async function acceptInvitation(input: {
+  token: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  /** False for a confirmed account accepting while signed in. */
+  anonymous: boolean;
+}): Promise<AcceptInvitationResponse> {
+  const { anonymous, ...body } = input;
+  return apiFetch<AcceptInvitationResponse>(`/api/v1/identity/invitations/accept`, {
+    method: "POST",
+    skipAuth: anonymous,
+    body: JSON.stringify(body),
+  });
+}
+
+/** The shortest search `GET /users/lookup` takes. */
+export const MIN_USER_SEARCH = 2;
+
+function fromLookup(u: UserLookupDto): UserDto {
+  return {
+    id: u.id,
+    userName: u.userName ?? undefined,
+    firstName: u.firstName ?? undefined,
+    lastName: u.lastName ?? undefined,
+    imageUrl: u.imageUrl ?? undefined,
+    // The lookup returns active users only, and never their e-mail.
+    isActive: true,
+    emailConfirmed: true,
+  };
+}
+
+/**
+ * The users a picker offers for a search, in the shape the pickers render. Every user may pick (Users.Pick), so
+ * this goes through the lookup, never the Admin-only user list. A search shorter than MIN_USER_SEARCH finds nobody.
+ */
+export async function pickUsers(search: string, limit = 8): Promise<{ items: UserDto[] }> {
+  const term = search.trim();
+  if (term.length < MIN_USER_SEARCH) return { items: [] };
+  return { items: (await lookupUsers({ search: term, limit })).map(fromLookup) };
+}
+
+/** One user's name and picture by id, for showing who wrote or owns something. Null when not an active member. */
+export async function lookupUser(id: string): Promise<UserDto | null> {
+  const [found] = await lookupUsers({ ids: [id] });
+  return found ? fromLookup(found) : null;
+}
+
+/** Users for a picker by name (at least 2 characters), or the names of users by id. Needs only Users.Pick. */
+export async function lookupUsers(params: { search?: string; ids?: string[]; limit?: number }): Promise<UserLookupDto[]> {
+  const query = new URLSearchParams();
+  if (params.search) query.set("search", params.search);
+  for (const id of params.ids ?? []) query.append("ids", id);
+  if (params.limit) query.set("limit", String(params.limit));
+  return (await apiFetch<UserLookupDto[] | null>(`/api/v1/identity/users/lookup?${query.toString()}`)) ?? [];
 }
 
 // -----------------------------
@@ -467,14 +544,10 @@ export async function updateMyProfile(input: UpdateProfileInput): Promise<void> 
  * returns 200 regardless of whether the email exists — never leak account
  * presence to the caller.
  */
-export async function requestPasswordReset(input: {
-  email: string;
-  tenant: string;
-}): Promise<void> {
+export async function requestPasswordReset(input: { email: string }): Promise<void> {
   await apiFetch<string>(`/api/v1/identity/forgot-password`, {
     method: "POST",
     skipAuth: true,
-    headers: { tenant: input.tenant },
     body: JSON.stringify({ email: input.email }),
   });
 }
@@ -490,12 +563,13 @@ export async function resetPassword(input: {
   email: string;
   password: string;
   token: string;
-  tenant: string;
+  /** Only when the link names one: users are global. */
+  tenant?: string;
 }): Promise<void> {
   await apiFetch<string>(`/api/v1/identity/reset-password`, {
     method: "POST",
     skipAuth: true,
-    headers: { tenant: input.tenant },
+    headers: input.tenant ? { tenant: input.tenant } : {},
     body: JSON.stringify({
       email: input.email,
       password: input.password,
@@ -505,25 +579,21 @@ export async function resetPassword(input: {
 }
 
 /**
- * Confirm-email link landing. The server expects (userId, code, tenant)
- * as query parameters — these come from the email-confirmation link
- * produced by the registration flow. Returns the server's confirmation
- * message on 2xx.
+ * Confirm-email link landing. The link carries (userId, code, tenant); the owner sets the account's password
+ * here, which proves the address. The tenant goes in the header the endpoint reads. Returns the server's
+ * confirmation message on 2xx.
  */
 export async function confirmEmail(input: {
   userId: string;
   code: string;
   tenant: string;
+  password: string;
 }): Promise<string> {
-  const qs = new URLSearchParams({
-    userId: input.userId,
-    code: input.code,
-    tenant: input.tenant,
-  }).toString();
-  return apiFetch<string>(`/api/v1/identity/confirm-email?${qs}`, {
-    method: "GET",
+  return apiFetch<string>(`/api/v1/identity/confirm-email`, {
+    method: "POST",
     skipAuth: true,
     headers: { tenant: input.tenant },
+    body: JSON.stringify({ userId: input.userId, code: input.code, password: input.password }),
   });
 }
 

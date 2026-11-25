@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { ParseKeys, TFunction } from "i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, ChevronRight, Heart, RefreshCw } from "lucide-react";
-import { getLiveness, getReadiness, type HealthEntry, type HealthResult, type HealthStatus } from "@/api/health";
+import { getLiveness, getHealthDetails, type HealthEntry, type HealthResult, type HealthStatus } from "@/api/health";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EntityPageHeader, ErrorBand, SettingsSection, StatStrip, Stat } from "@/components/list";
@@ -36,7 +36,7 @@ export function HealthPage() {
 
   const ready = useQuery({
     queryKey: ["health", "ready"],
-    queryFn: getReadiness,
+    queryFn: getHealthDetails,
     refetchInterval: REFRESH_INTERVAL_MS,
     refetchOnWindowFocus: false,
     retry: 1,
@@ -69,7 +69,7 @@ export function HealthPage() {
             {t("description", {
               seconds: REFRESH_INTERVAL_MS / 1000,
               live: "/api/health/live",
-              ready: "/api/health/ready",
+              ready: "/api/health/details",
             })}
           </>
         }
@@ -134,7 +134,7 @@ export function HealthPage() {
 
       <ProbeSection
         title={t("probe.readiness.title")}
-        path="/api/health/ready"
+        path="/api/health/details"
         result={ready.data}
         loading={ready.isLoading}
         description={t("probe.readiness.description")}

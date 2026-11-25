@@ -26,6 +26,8 @@ function tokenResponse() {
     refreshToken: "refresh",
     accessTokenExpiresAt: new Date(Date.now() + 3_600_000).toISOString(),
     refreshTokenExpiresAt: new Date(Date.now() + 7_200_000).toISOString(),
+    tenant: "root",
+    tenantSelectionRequired: false,
   };
 }
 
@@ -84,7 +86,6 @@ test.beforeEach(async ({ page }) => {
 
 async function submitPassword(page: Page) {
   await page.goto("/login");
-  await page.getByLabel("Tenant").fill("root");
   await page.getByLabel("Email").fill(EMAIL);
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -112,8 +113,8 @@ test.describe("login — two-factor step", () => {
     expect(bodies).toHaveLength(2);
     expect(bodies[0]).toEqual({ email: EMAIL, password: PASSWORD });
     expect(bodies[1]).toEqual({ email: EMAIL, password: PASSWORD, twoFactorCode: VALID_CODE });
-    // The tenant chosen on the password step rides the retry too.
-    expect(bodies.tenants).toEqual(["root", "root"]);
+    // Users are global: neither step sends a tenant (an operator always opens root).
+    expect(bodies.tenants).toEqual([undefined, undefined]);
 
     // The password never lands in browser storage.
     const stored = await page.evaluate(() => JSON.stringify({ ...localStorage, ...sessionStorage }));

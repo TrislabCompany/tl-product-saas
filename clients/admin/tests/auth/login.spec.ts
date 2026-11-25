@@ -6,15 +6,17 @@ import { fakeJwt } from "../helpers/auth-seed";
 // an authed session here — a seeded session makes <LoginPage> redirect away
 // (Navigate to "/") and the form never renders.
 //
-// The login form posts to /api/v1/identity/token/issue with the `tenant`
-// header + `X-Trislab-App: admin`, and a body of { email, password } (the tenant
-// rides the header, not the body). See src/auth/api.ts.
+// The login form posts to /api/v1/identity/token/issue with `X-Trislab-App: admin`
+// and a body of { email, password }. Users are global and an operator always
+// opens root, so there is no tenant field or header. See src/auth/api.ts.
 
 const TOKEN_RESPONSE = {
   accessToken: "fake.access.token",
   refreshToken: "fake-refresh-token",
   accessTokenExpiresAt: "2099-01-01T00:00:00Z",
   refreshTokenExpiresAt: "2099-01-08T00:00:00Z",
+  tenant: "root",
+  tenantSelectionRequired: false,
 };
 
 test.describe("admin login", () => {
@@ -31,7 +33,7 @@ test.describe("admin login", () => {
 
     // Form fields (plain labels). Password is exact — a "Show password"
     // toggle button shares the substring otherwise.
-    await expect(page.getByLabel("Tenant")).toBeVisible();
+    await expect(page.getByLabel("Tenant")).toHaveCount(0);
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
 
@@ -40,15 +42,13 @@ test.describe("admin login", () => {
     await expect(page.getByRole("link", { name: "Forgot?" })).toBeVisible();
   });
 
-  test("manual sign-in posts to token/issue with the admin app + tenant headers", async ({
+  test("manual sign-in posts to token/issue with the admin app header and no tenant", async ({
     page,
   }) => {
     await mockJsonResponse(page, "**/api/v1/identity/token/issue", TOKEN_RESPONSE);
 
     await page.goto("/login");
 
-    // Tenant pre-fills from env.defaultTenant ("root"); set email + password.
-    await page.getByLabel("Tenant").fill("root");
     await page.getByLabel("Email").fill("operator@root.example");
     await page.getByLabel("Password", { exact: true }).fill("Sup3rSecret!");
 
@@ -60,9 +60,9 @@ test.describe("admin login", () => {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     const req = await reqPromise;
 
-    // X-Trislab-App marks this as the platform-admin client; tenant rides the header.
+    // X-Trislab-App marks this as the platform-admin client.
     expect(req.headers()["x-trislab-app"]).toBe("admin");
-    expect(req.headers().tenant).toBe("root");
+    expect(req.headers().tenant).toBeUndefined();
 
     const body = JSON.parse(req.postData() ?? "{}");
     expect(body.email).toBe("operator@root.example");
@@ -76,7 +76,6 @@ test.describe("admin login", () => {
     });
 
     await page.goto("/login");
-    await page.getByLabel("Tenant").fill("root");
     await page.getByLabel("Email").fill("operator@root.example");
     await page.getByLabel("Password", { exact: true }).fill("wrong-password");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -89,11 +88,30 @@ test.describe("admin login", () => {
     await mockJsonResponse(page, "**/api/v1/identity/token/issue", {
       ...TOKEN_RESPONSE,
       accessToken: fakeJwt({ sub: "u1", email: "admin@acme.example", tenant: "acme" }),
+      tenant: "acme",
     });
 
     await page.goto("/login");
-    await page.getByLabel("Tenant").fill("acme");
     await page.getByLabel("Email").fill("admin@acme.example");
+    await page.getByLabel("Password", { exact: true }).fill("Sup3rSecret!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+
+    await expect(page.getByText("This console is for the operator only.", { exact: false })).toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
+  test("refuses an account that is asked to choose a tenant (a tenant account, never an operator)", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/token/issue", {
+      tenantSelectionRequired: true,
+      selectionToken: "sel",
+      tenants: [
+        { id: "acme", name: "Acme", isDefault: false },
+        { id: "globex", name: "Globex", isDefault: false },
+      ],
+    });
+
+    await page.goto("/login");
+    await page.getByLabel("Email").fill("sam@example.com");
     await page.getByLabel("Password", { exact: true }).fill("Sup3rSecret!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
@@ -114,7 +132,7 @@ test.describe("admin login", () => {
     await expect(dialog.getByText("superadmin@root.com")).toBeVisible();
 
     // Picking the account fills the creds and signs in instantly — assert the
-    // resulting token/issue POST carries the demo email + tenant header.
+    // resulting token/issue POST carries the demo email.
     const reqPromise = page.waitForRequest(
       (r) =>
         r.url().includes("/api/v1/identity/token/issue") && r.method() === "POST",
@@ -125,6 +143,5 @@ test.describe("admin login", () => {
 
     const body = JSON.parse(req.postData() ?? "{}");
     expect(body.email).toBe("superadmin@root.com");
-    expect(req.headers().tenant).toBe("root");
   });
 });

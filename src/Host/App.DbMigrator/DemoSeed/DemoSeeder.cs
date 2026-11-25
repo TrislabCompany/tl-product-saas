@@ -113,13 +113,13 @@ internal sealed class DemoSeeder
     private async Task EnsureDemoTenantsExistAsync(CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
         var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
         var tenantDb = scope.ServiceProvider.GetRequiredService<TenantDbContext>();
 
         foreach (var demo in new[] { Acme, Globex })
         {
-            var existing = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+            var existing = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
             if (existing is null)
             {
                 if (_logger.IsEnabled(LogLevel.Information))
@@ -193,8 +193,8 @@ internal sealed class DemoSeeder
     private async Task SeedTenantSubscriptionAsync(DemoTenant demo, CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
+        var tenant = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
         if (tenant is null) return;
 
         // BillingDbContext is NOT tenant-filtered (TenantId is an explicit column), so no Finbuckle
@@ -287,8 +287,8 @@ internal sealed class DemoSeeder
     private async Task SeedTenantUsersAsync(DemoTenant demo, CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
+        var tenant = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
         if (tenant is null) return;
 
         var users = demo.Id == Acme.Id ? BuildAcmeUsers() : BuildGlobexUsers();
@@ -303,8 +303,7 @@ internal sealed class DemoSeeder
         CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<TrislabUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
@@ -345,7 +344,17 @@ internal sealed class DemoSeeder
 
         foreach (var demoUser in users)
         {
+            // Users are global: FindByEmailAsync sees only the members of this tenant. An account without a
+            // membership here (seeded into another tenant, or by an earlier run that stopped) is reused.
             var existing = await userManager.FindByEmailAsync(demoUser.Email).ConfigureAwait(false);
+            if (existing is null)
+            {
+                var normalizedEmail = demoUser.Email.ToUpperInvariant();
+                existing = await context.Users.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
             if (existing is null)
             {
                 var user = new TrislabUser
@@ -355,7 +364,6 @@ internal sealed class DemoSeeder
                     EmailConfirmed = true,
                     FirstName = demoUser.FirstName,
                     LastName = demoUser.LastName,
-                    IsActive = true,
                     NormalizedEmail = demoUser.Email.ToUpperInvariant(),
                     NormalizedUserName = demoUser.UserName.ToUpperInvariant(),
                 };
@@ -379,6 +387,8 @@ internal sealed class DemoSeeder
                 await EnsureSharedPasswordAsync(userManager, hasher, existing).ConfigureAwait(false);
             }
 
+            await EnsureMembershipAsync(context, existing.Id, tenant.Id, cancellationToken).ConfigureAwait(false);
+
             foreach (var role in demoUser.Roles)
             {
                 if (!await userManager.IsInRoleAsync(existing, role).ConfigureAwait(false))
@@ -400,6 +410,22 @@ internal sealed class DemoSeeder
                 await EnsureSharedPasswordAsync(userManager, hasher, admin).ConfigureAwait(false);
             }
         }
+    }
+
+    /// <summary>The demo user is an accepted member of the tenant, as if they had accepted an invitation.</summary>
+    private static async Task EnsureMembershipAsync(
+        IdentityDbContext context, string userId, string tenantId, CancellationToken cancellationToken)
+    {
+        bool member = await context.TenantMemberships.IgnoreQueryFilters()
+            .AnyAsync(m => m.UserId == userId && m.TenantId == tenantId, cancellationToken)
+            .ConfigureAwait(false);
+        if (member)
+        {
+            return;
+        }
+
+        context.TenantMemberships.Add(TenantMembership.CreateAccepted(userId, tenantId));
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task EnsureSharedPasswordAsync(
@@ -433,12 +459,11 @@ internal sealed class DemoSeeder
     private async Task SeedTenantCatalogAsync(DemoTenant demo, CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
+        var tenant = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
         if (tenant is null) return;
 
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         bool alreadySeeded = await dbContext.Brands.AnyAsync(cancellationToken).ConfigureAwait(false)
@@ -476,12 +501,11 @@ internal sealed class DemoSeeder
     private async Task SeedTenantTicketsAsync(DemoTenant demo, CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
+        var tenant = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
         if (tenant is null) return;
 
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
         if (await dbContext.Tickets.AnyAsync(cancellationToken).ConfigureAwait(false))
@@ -546,12 +570,11 @@ internal sealed class DemoSeeder
     private async Task SeedTenantChatAsync(DemoTenant demo, CancellationToken cancellationToken)
     {
         using var scope = _services.CreateScope();
-        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var tenant = await tenantStore.GetAsync(demo.Id).ConfigureAwait(false);
+        var tenantStore = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
+        var tenant = await tenantStore.GetAsync(demo.Id, cancellationToken).ConfigureAwait(false);
         if (tenant is null) return;
 
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var dbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
         if (await dbContext.Channels.AnyAsync(cancellationToken).ConfigureAwait(false))

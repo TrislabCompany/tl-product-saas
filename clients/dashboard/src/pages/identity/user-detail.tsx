@@ -30,7 +30,6 @@ import {
   adminRevokeAllUserSessions,
   adminRevokeUserSession,
   assignUserRoles,
-  confirmUserEmail,
   deleteUser,
   getUserById,
   getUserRoles,
@@ -186,19 +185,6 @@ export function UserDetailPage() {
       setDialog({ mode: "closed" });
     },
     onError: (err) => toast.error(t("status.changeFailed"), { description: describe(err) }),
-  });
-
-  const confirmEmail = useMutation({
-    mutationFn: () => {
-      if (!user?.id) throw new Error("Missing user id");
-      return confirmUserEmail(user.id);
-    },
-    onSuccess: () => {
-      toast.success(t("email.confirmed"));
-      void queryClient.invalidateQueries({ queryKey: ["identity", "users", userId] });
-      void queryClient.invalidateQueries({ queryKey: ["identity", "users"] });
-    },
-    onError: (err) => toast.error(t("email.confirmFailed"), { description: describe(err) }),
   });
 
   const resendConfirmation = useMutation({
@@ -366,6 +352,7 @@ export function UserDetailPage() {
                 <UserCog className="h-3.5 w-3.5" /> {t("actions.impersonate")}
               </Button>
             )}
+            {/* Confirming is the owner's, through the e-mailed link: an administrator can only resend it. */}
             {canConfirmEmail && !user.emailConfirmed && (
               <>
                 <Button
@@ -377,16 +364,6 @@ export function UserDetailPage() {
                 >
                   <Mail className="h-3.5 w-3.5" />
                   {resendConfirmation.isPending ? t("actions.sending") : t("actions.resendConfirmation")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => confirmEmail.mutate()}
-                  disabled={confirmEmail.isPending}
-                  className="gap-1.5"
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  {confirmEmail.isPending ? t("actions.confirming") : t("actions.confirmEmail")}
                 </Button>
               </>
             )}

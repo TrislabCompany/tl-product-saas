@@ -124,6 +124,25 @@ test.describe("activity (/activity)", () => {
     await expect.poll(() => audits.count).toBe(2);
   });
 
+  test("a member without the tenant's trail sees their own history from /audits/mine", async ({ page }) => {
+    await grantPermissions(page, ["Permissions.AuditTrails.ViewOwn"]);
+    await mockJsonResponse(page, "**/api/v1/audits/mine**", paged([HISTORY_ROW]));
+    const tenantTrail: string[] = [];
+    page.on("request", (r) => {
+      if (new URL(r.url()).pathname === "/api/v1/audits") tenantTrail.push(r.url());
+    });
+    const request = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/v1/audits/mine");
+
+    await page.goto("/activity");
+    expect(new URL((await request).url()).searchParams.get("ExcludeEventType")).toBe("Activity");
+
+    await expect(page.getByText(/your latest 25 audited events/i)).toBeVisible();
+    await expect(page.getByText("changed catalog records").last()).toBeVisible();
+    // The Admin-only trail is never asked for, and its link isn't offered.
+    expect(tenantTrail).toEqual([]);
+    await expect(page.getByRole("link", { name: /audit trail/i })).toHaveCount(0);
+  });
+
   test("without Audit trail access, no audits call and a live-only notice", async ({ page }) => {
     // installShellMocks grants only SHELL_PERMISSIONS, not AuditTrails.View.
     await mockSseOnce(page);

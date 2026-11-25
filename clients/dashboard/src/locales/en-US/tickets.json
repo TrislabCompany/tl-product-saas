@@ -97,7 +97,7 @@
   "detail.assign.descMid": "; clearing the assignee on an in-progress ticket sends it back to ",
   "detail.assign.descSuffix": ".",
   "detail.assign.fieldAssignee": "Assignee",
-  "detail.assign.hintAssignee": "Search by name or email. Clear the selection to unassign.",
+  "detail.assign.hintAssignee": "Search by name or username. Clear the selection to unassign.",
   "detail.assign.warnPrefix": "Clearing the assignee will ",
   "detail.assign.warnEmphasis": "unassign",
   "detail.assign.warnSuffix": " the ticket.",

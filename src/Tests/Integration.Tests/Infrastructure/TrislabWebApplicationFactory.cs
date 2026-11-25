@@ -35,9 +35,6 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
     internal const string S3SecretKey = "rustfsadmin";
     internal const string S3Bucket = "tl-integration-test-uploads";
 
-    /// <summary>The shared host's Hangfire storage; see <see cref="PrimaryHostStaticsRestorer"/>.</summary>
-    internal static JobStorage? PrimaryJobStorage { get; private set; }
-
     /// <summary>The shared host's audit configurator; see <see cref="PrimaryHostStaticsRestorer"/>.</summary>
     internal static AuditingConfigurator? PrimaryAuditingConfigurator { get; private set; }
 
@@ -80,7 +77,6 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
 
         // Force host creation via the Server property (no leaked HttpClient)
         _ = Server;
-        PrimaryJobStorage = Services.GetRequiredService<JobStorage>();
         PrimaryAuditingConfigurator = Services.GetServices<IHostedService>().OfType<AuditingConfigurator>().Single();
 
         // Migrate + seed the root tenant. The semaphore stops test classes sharing the DB
@@ -113,7 +109,7 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
     {
         ArgumentNullException.ThrowIfNull(tenantIds);
         using var scope = Services.CreateScope();
-        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
         foreach (var tenantId in tenantIds)
         {
             await store.RemoveAsync(tenantId);
@@ -246,7 +242,9 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
                 services.Remove(service);
             }
 
-            services.AddHangfire(config => config.UseInMemoryStorage());
+            // Each host has its own job storage; the framework registers Hangfire per host, so a job runs on the
+            // host that queued it.
+            services.AddSingleton<JobStorage>(_ => new InMemoryStorage(new InMemoryStorageOptions()));
             services.AddHostedService<PrimaryHostStaticsRestorer>();
             services.AddHangfireServer(options =>
             {
@@ -254,7 +252,6 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
                 options.Queues = ["default", "email"];
                 options.WorkerCount = 2;
             });
-            services.TryAddTransient<IJobService, HangfireService>();
 
             services.PostConfigure<JwtBearerOptions>(
                 JwtBearerDefaults.AuthenticationScheme,
@@ -326,7 +323,7 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        // Disable ValidateOnBuild for .NET 10 minimal API dual-host model
+        // Disable ValidateOnBuild for the minimal API dual-host model
         builder.UseServiceProviderFactory(new DefaultServiceProviderFactory(new ServiceProviderOptions
         {
             ValidateOnBuild = false,
@@ -366,8 +363,7 @@ public class TrislabWebApplicationFactory : WebApplicationFactory<Program>, IAsy
             }
 
             // 3. Run all module migrations (identity, audit, webhook schemas)
-            var setter = scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>();
-            setter.MultiTenantContext = new MultiTenantContext<AppTenantInfo>(rootTenant);
+            using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(rootTenant);
 
             foreach (var init in scope.ServiceProvider.GetServices<IDbInitializer>())
             {

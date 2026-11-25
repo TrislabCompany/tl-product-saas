@@ -62,8 +62,7 @@ public sealed class RolePermissionSyncerTests
         // 2. Run the syncer through the production scope/tenant pattern.
         using (var scope = _factory.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-                .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(rootTenant);
+            using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(rootTenant);
 
             var syncer = scope.ServiceProvider.GetRequiredService<RolePermissionSyncer>();
             await syncer.SyncAsync(CancellationToken.None);
@@ -86,8 +85,7 @@ public sealed class RolePermissionSyncerTests
         // Running the syncer twice in a row must not duplicate claims or throw.
         using (var scope = _factory.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-                .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(rootTenant);
+            using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(rootTenant);
 
             var syncer = scope.ServiceProvider.GetRequiredService<RolePermissionSyncer>();
             await syncer.SyncAsync(CancellationToken.None);
@@ -213,8 +211,7 @@ public sealed class RolePermissionSyncerTests
         {
             using var scope = _factory.Services.CreateScope();
             var sp = scope.ServiceProvider;
-            sp.GetRequiredService<IMultiTenantContextSetter>()
-                .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(rootTenant);
+            using var tenantUse = sp.GetRequiredService<ITenantAccessor>().Use(rootTenant);
 
             // Stands in for a second instance starting at the same time: just before this instance's
             // first save, it deletes the same row from its own connection.
@@ -275,8 +272,7 @@ public sealed class RolePermissionSyncerTests
         {
             using var scope = _factory.Services.CreateScope();
             var sp = scope.ServiceProvider;
-            sp.GetRequiredService<IMultiTenantContextSetter>()
-                .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(rootTenant);
+            using var tenantUse = sp.GetRequiredService<ITenantAccessor>().Use(rootTenant);
 
             // Stands in for a second instance starting at the same time: just before this instance's
             // first save, it inserts the same missing permission from its own connection.
@@ -312,18 +308,13 @@ public sealed class RolePermissionSyncerTests
                 sp.GetRequiredService<DbContextOptions<IdentityDbContext>>())
             .AddInterceptors(interceptor)
             .Options;
-        return new IdentityDbContext(
-            sp.GetRequiredService<IMultiTenantContextAccessor<AppTenantInfo>>(),
-            options,
-            sp.GetRequiredService<IOptions<DatabaseOptions>>(),
-            sp.GetRequiredService<IHostEnvironment>());
+        return new IdentityDbContext(sp.GetRequiredService<ITenantAccessor>(), options);
     }
 
     private async Task<int> CountClaimRowsAsync(AppTenantInfo tenant, string roleName, string claimValue)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
         var role = await roleManager.Roles.SingleAsync(r => r.Name == roleName);
@@ -336,8 +327,7 @@ public sealed class RolePermissionSyncerTests
     private async Task<int> RunSyncRoleAsync(AppTenantInfo tenant, string roleName, IReadOnlyList<TrislabPermission> target, bool removeRevoked)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var syncer = ActivatorUtilities.CreateInstance<RolePermissionSyncer>(
             scope.ServiceProvider, Options.Create(new PermissionSyncOptions { RemoveRevoked = removeRevoked }));
@@ -347,8 +337,7 @@ public sealed class RolePermissionSyncerTests
     private async Task<string> CreateProbeRoleAsync(AppTenantInfo tenant, string permission)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         string roleName = $"sync-probe-{Guid.NewGuid():N}";
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
@@ -361,8 +350,7 @@ public sealed class RolePermissionSyncerTests
     private async Task DeleteRoleAsync(AppTenantInfo tenant, string roleName)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         // Role claims cascade with the role.
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
@@ -376,8 +364,7 @@ public sealed class RolePermissionSyncerTests
     private async Task DeleteClaimAsync(AppTenantInfo tenant, string roleName, string claimValue)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
         var role = await roleManager.Roles.SingleAsync(r => r.Name == roleName);
@@ -411,7 +398,7 @@ public sealed class RolePermissionSyncerTests
     private async Task<AppTenantInfo> GetRootTenantAsync()
     {
         using var scope = _factory.Services.CreateScope();
-        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
         var tenant = await store.GetAsync(MultitenancyConstants.Root.Id);
         tenant.ShouldNotBeNull("Root tenant must be provisioned before this test runs.");
         return tenant;
@@ -420,8 +407,7 @@ public sealed class RolePermissionSyncerTests
     private async Task RunSyncerAsync(AppTenantInfo tenant)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var syncer = scope.ServiceProvider.GetRequiredService<RolePermissionSyncer>();
         await syncer.SyncAsync(CancellationToken.None);
@@ -430,8 +416,7 @@ public sealed class RolePermissionSyncerTests
     private async Task SeedClaimAsync(AppTenantInfo tenant, string roleName, string claimType, string claimValue)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
         var role = await roleManager.Roles.SingleAsync(r => r.Name == roleName);
@@ -444,8 +429,7 @@ public sealed class RolePermissionSyncerTests
     private async Task WipeClaimsAsync(AppTenantInfo tenant, string roleName, string claimType, IReadOnlyCollection<string> claimValues)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
         var role = await roleManager.Roles.SingleAsync(r => r.Name == roleName);
@@ -466,8 +450,7 @@ public sealed class RolePermissionSyncerTests
     private async Task<HashSet<string>> GetClaimsAsync(AppTenantInfo tenant, string roleName, string claimType)
     {
         using var scope = _factory.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TrislabRole>>();
         var role = await roleManager.Roles.SingleAsync(r => r.Name == roleName);

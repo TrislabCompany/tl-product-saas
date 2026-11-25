@@ -10,11 +10,10 @@ test.describe("admin reset-password", () => {
     await expect(page.getByRole("link", { name: /request a new link/i })).toBeVisible();
   });
 
-  test("renders the form with the email + tenant echoed back", async ({ page }) => {
+  test("renders the form with the email echoed back", async ({ page }) => {
     await page.goto(VALID_LINK);
     await expect(page.getByRole("heading", { name: /set a new password/i })).toBeVisible();
     await expect(page.getByText("admin@root.com", { exact: true })).toBeVisible();
-    await expect(page.getByText("root", { exact: true })).toBeVisible();
     await expect(page.getByLabel("New password")).toBeVisible();
     await expect(page.getByLabel("Confirm password")).toBeVisible();
   });

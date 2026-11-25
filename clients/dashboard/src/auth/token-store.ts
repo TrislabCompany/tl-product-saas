@@ -61,6 +61,8 @@ export const tokenStore = {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(PERMS_KEY);
+    // The tenant belongs to the session: after sign-out an anonymous call sends none.
+    localStorage.removeItem(TENANT_KEY);
     // Also clear any impersonation stash so a fresh login doesn't
     // inherit half of a previous operator's session.
     localStorage.removeItem(STASH_ACCESS_KEY);

@@ -30,6 +30,8 @@
   "history.auditTrail": "Revizijska sled",
   "history.emptyTitle": "Še ni zgodovine",
   "history.emptyBody": "Revidirane spremembe, prijave in napake v tem najemniku se bodo prikazale tukaj.",
+  "history.captionMine": "Vaših zadnjih {{size}} revidiranih dogodkov v tem najemniku, brez sistemske dejavnosti posameznih zahtevkov.",
   "liveOnly.title": "Prikazani so samo dogodki v živo",
-  "liveOnly.body": "Ta tok prikazuje dogodke, prejete od povezave tega zavihka, zato je po osvežitvi prazen. Pretekla dejavnost je v revizijski sledi, ki zahteva dovoljenje za revizijsko sled. Če ga potrebujete, vprašajte skrbnika."
+  "liveOnly.body": "Ta tok prikazuje dogodke, prejete od povezave tega zavihka, zato je po osvežitvi prazen. Pretekla dejavnost je v revizijski sledi, ki zahteva dovoljenje za revizijsko sled. Če ga potrebujete, vprašajte skrbnika.",
+  "descriptionWithOwnHistory": "Dogodki, pretočeni prek Server-Sent Events, dokler je ta zavihek povezan, nad vašo nedavno dejavnostjo."
 }

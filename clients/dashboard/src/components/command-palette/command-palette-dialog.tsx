@@ -228,6 +228,7 @@ export function CommandPaletteDialog({
             Icon: HeartPulse,
             keywords: t("keywords.nav-health").split(" "),
             perform: go("/system/health"),
+            perm: "Permissions.Health.View",
           },
           {
             id: "nav-audits",

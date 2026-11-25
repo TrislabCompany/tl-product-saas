@@ -28,8 +28,7 @@ internal static class TenantInitializers
     {
         using var scope = services.CreateScope();
 
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         foreach (var initializer in scope.ServiceProvider.GetServices<IDbInitializer>())
         {
