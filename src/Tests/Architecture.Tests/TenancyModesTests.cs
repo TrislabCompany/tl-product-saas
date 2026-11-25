@@ -16,7 +16,7 @@ namespace Architecture.Tests;
 public sealed class TenancyModesTests
 {
     /// <summary>The modules that need a tenant catalog. Adding to this list is a design decision: say why in the PR.</summary>
-    private static readonly string[] MultitenantOnly = ["BillingModule", "MultitenancyModule"];
+    private static readonly string[] MultitenantOnly = ["MultitenancyModule", "SubscriptionsUsageModule"];
 
     private static readonly string[] MultitenantOnlyAssemblies =
         ["Trislab.Modules.Multitenancy", "Trislab.Modules.Multitenancy.Contracts"];
@@ -60,7 +60,7 @@ public sealed class TenancyModesTests
     }
 
     [Fact]
-    public void OnlyTheTenantCatalogAndBilling_Should_BeMultitenantOnly()
+    public void OnlyTheTenantCatalogAndSubscriptionsUsage_Should_BeMultitenantOnly()
     {
         var multitenantOnly = Modules()
             .Where(m => !m.Module.SupportedTenancyModes.Supports(TenancyMode.SingleTenant))
@@ -92,7 +92,7 @@ public sealed class TenancyModesTests
         var multi = ModuleLoader.SelectSupported(TenancyMode.Multitenant, all);
 
         single.Select(a => a.GetName().Name).ShouldNotContain("Trislab.Modules.Multitenancy");
-        single.Select(a => a.GetName().Name).ShouldNotContain("Trislab.Modules.Billing");
+        single.Select(a => a.GetName().Name).ShouldNotContain("Trislab.Modules.SubscriptionsUsage");
         single.Select(a => a.GetName().Name).ShouldContain("Trislab.Modules.Identity");
         multi.Length.ShouldBe(all.Length, "multi-tenant mode supports every module");
     }

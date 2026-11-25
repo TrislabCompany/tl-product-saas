@@ -14,7 +14,7 @@ The **framework modules** come from the packages `Trislab.Modules.<Name>` and `T
 | Multitenancy | The tenant catalog, sign-up and a tenant's provisioning, activation and plan, its theme, and the tenant-expiry e-mails | Always: this host is multi-tenant through it |
 | Auditing | An append-only audit trail: entity changes, security events, exceptions and HTTP activity | Always: Identity writes its security events through it |
 | Files | Uploads and downloads with presigned URLs, used by Catalog's images, Chat's attachments and the users' avatars | While a module uses files |
-| Billing | Plans, subscriptions, usage, and monthly invoices, marked paid by hand: there is no payment provider | When the product bills its tenants |
+| SubscriptionsUsage | Plans, subscriptions, usage, and monthly invoices, marked paid by hand: there is no payment provider | When the product bills its tenants |
 | Notifications | Each user's in-app inbox, pushed live over SignalR. Any module adds to it by publishing `UserNotificationRequestedIntegrationEvent` | Optional |
 | Webhooks | A tenant's outgoing webhooks, signed and retried | Optional |
 | Catalog | Sample: products, categories and brands, with images, search and a trash. Needs Files | A pattern to copy |

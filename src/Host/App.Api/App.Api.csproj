@@ -33,8 +33,8 @@
     <PackageReference Include="Trislab.Modules.Multitenancy" />
     <PackageReference Include="Trislab.Modules.Webhooks" /> <!-- [module:Webhooks] -->
     <PackageReference Include="Trislab.Modules.Notifications" /> <!-- [module:Notifications] -->
-    <PackageReference Include="Trislab.Modules.Billing" /> <!-- [module:Billing] -->
-    <PackageReference Include="Trislab.Modules.Billing.Contracts" /> <!-- [module:Billing] -->
+    <PackageReference Include="Trislab.Modules.SubscriptionsUsage" /> <!-- [module:SubscriptionsUsage] -->
+    <PackageReference Include="Trislab.Modules.SubscriptionsUsage.Contracts" /> <!-- [module:SubscriptionsUsage] -->
     <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog\Modules.Catalog.csproj" /> <!-- [module:Catalog] -->
     <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog.Contracts\Modules.Catalog.Contracts.csproj" /> <!-- [module:Catalog] -->
     <ProjectReference Include="..\..\Samples\Tickets\Modules.Tickets\Modules.Tickets.csproj" /> <!-- [module:Tickets] -->

@@ -3,7 +3,7 @@ import type { PagedResponse } from "@/lib/api-types";
 
 // ─── shared enums ────────────────────────────────────────────────────
 
-// Mirrors TopupRequestStatus in Modules.Billing.Contracts/BillingEnums.cs. "Approved" was never
+// Mirrors TopupRequestStatus in Modules.SubscriptionsUsage.Contracts/BillingEnums.cs. "Approved" was never
 // one of them: approving a request moves it to Invoiced.
 export type TopupRequestStatus =
   | "Pending"

@@ -30,7 +30,7 @@ The rules of `template-only` and `sample` come first in `template-manifest.yaml`
 
 `pwsh scripts/init-product.ps1 -Keep <modules> -Slug <id> -PortBlock <n>` turns a new copy of the template into a product ([init-product skill](../.agents/skills/init-product/SKILL.md)). A change to the template must keep it working:
 
-- A line, a block or a file that belongs to a removable module (Billing, Files, Notifications, Webhooks, Catalog, Tickets, Chat) carries the tag `[module:<Name>]`, or sits between `[module:<Name>:begin]` and `[module:<Name>:end]`, in a comment of the language of its file. Without the tag, removing the module leaves a broken build.
+- A line, a block or a file that belongs to a removable module (SubscriptionsUsage, Files, Notifications, Webhooks, Catalog, Tickets, Chat) carries the tag `[module:<Name>]`, or sits between `[module:<Name>:begin]` and `[module:<Name>:end]`, in a comment of the language of its file. Without the tag, removing the module leaves a broken build.
 - A new module that a product may leave out: add it to the table at the top of the script (its kind and what it needs), tag its lines, and for a sample list the files it owns outside `src/Samples/<Name>`.
 - A new path that only makes sense in the template: give it the class `template-only` before the broad rules.
 - Check it before a release: run the script on a copy with `-Keep none` and with everything kept, then build both (`dotnet build src/App.slnx`, `npm run build` in each client) and run `bash scripts/smoke-test.sh`.

@@ -4,9 +4,9 @@ using Finbuckle.MultiTenant.Abstractions;
 using Trislab.Framework.Shared.Constants;
 using Trislab.Framework.Shared.Identity.Claims;
 using Trislab.Framework.Shared.Multitenancy;
-using Trislab.Modules.Billing.Contracts; // [module:Billing]
-using Trislab.Modules.Billing.Data; // [module:Billing]
-using Trislab.Modules.Billing.Domain; // [module:Billing]
+using Trislab.Modules.SubscriptionsUsage.Contracts; // [module:SubscriptionsUsage]
+using Trislab.Modules.SubscriptionsUsage.Data; // [module:SubscriptionsUsage]
+using Trislab.Modules.SubscriptionsUsage.Domain; // [module:SubscriptionsUsage]
 using Trislab.Modules.Catalog.Contracts.Authorization; // [module:Catalog]
 using Trislab.Modules.Catalog.Data; // [module:Catalog]
 using Trislab.Modules.Catalog.Domain; // [module:Catalog]
@@ -86,7 +86,7 @@ internal sealed class DemoSeeder
 
         foreach (var demo in new[] { Acme, Globex })
         {
-            await SeedTenantSubscriptionAsync(demo, cancellationToken).ConfigureAwait(false); // [module:Billing]
+            await SeedTenantSubscriptionAsync(demo, cancellationToken).ConfigureAwait(false); // [module:SubscriptionsUsage]
             await SeedTenantUsersAsync(demo, cancellationToken).ConfigureAwait(false);
             await SeedTenantCatalogAsync(demo, cancellationToken).ConfigureAwait(false); // [module:Catalog]
             await SeedTenantTicketsAsync(demo, cancellationToken).ConfigureAwait(false); // [module:Tickets]
@@ -173,7 +173,7 @@ internal sealed class DemoSeeder
         await tenantDb.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    // [module:Billing:begin]
+    // [module:SubscriptionsUsage:begin]
     // ─── Subscription ──────────────────────────────────────────────────
 
     /// <summary>
@@ -269,7 +269,7 @@ internal sealed class DemoSeeder
         await billingDb.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    // [module:Billing:end]
+    // [module:SubscriptionsUsage:end]
     // ─── Users + roles ─────────────────────────────────────────────────
 
     private async Task SeedRootSuperAdminAsync(CancellationToken cancellationToken)

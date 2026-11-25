@@ -1,6 +1,6 @@
 ---
 name: init-product
-description: Turn a new copy of this starter into a SaaS product — choose the modules the product keeps (Billing, Files, Notifications, Webhooks, and the samples Catalog, Tickets, Chat), run scripts/init-product.ps1 to remove the rest at creation, build, test and smoke-test the result, write the product's README and AGENTS.md, and open the first pull request. Use once, when onboarding has copied tl-product-saas into a new product repository and the user asks to initialise, set up or trim the product.
+description: Turn a new copy of this starter into a SaaS product — choose the modules the product keeps (SubscriptionsUsage, Files, Notifications, Webhooks, and the samples Catalog, Tickets, Chat), run scripts/init-product.ps1 to remove the rest at creation, build, test and smoke-test the result, write the product's README and AGENTS.md, and open the first pull request. Use once, when onboarding has copied tl-product-saas into a new product repository and the user asks to initialise, set up or trim the product.
 metadata:
   owner: template-saas
   ownership: template-only

@@ -7,7 +7,7 @@ How this repository uses the packages of `tl-framework`. The framework's own pag
 | Kind | Packages | Where |
 | --- | --- | --- |
 | NuGet, building blocks | `Trislab.Framework.*` (Core, Shared, Web, Persistence, Tenancy, Eventing, Storage, …) | `src/Host/*`, `src/Samples/*` |
-| NuGet, modules | `Trislab.Modules.<Name>` and `Trislab.Modules.<Name>.Contracts` for Identity, Multitenancy, Auditing, Files, Billing, Notifications and Webhooks | `src/Host/App.Api`, `src/Host/App.DbMigrator`, the samples |
+| NuGet, modules | `Trislab.Modules.<Name>` and `Trislab.Modules.<Name>.Contracts` for Identity, Multitenancy, Auditing, Files, SubscriptionsUsage, Notifications and Webhooks | `src/Host/App.Api`, `src/Host/App.DbMigrator`, the samples |
 | npm | `@trislabcompany/framework-ui` (i18n, the language switch, formatting by language, the Turnstile widget) | `clients/admin`, `clients/dashboard` |
 
 A project reference to a framework module is a package reference here, so the host and the samples use the framework as a product does. Migrations ship inside each module's package, and the migrator finds them there.

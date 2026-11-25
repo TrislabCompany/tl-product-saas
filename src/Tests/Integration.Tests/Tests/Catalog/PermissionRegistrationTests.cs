@@ -1,6 +1,6 @@
 using Trislab.Framework.Shared.Constants;
 using Trislab.Modules.Auditing.Contracts.Authorization;
-using Trislab.Modules.Billing.Contracts.Authorization;
+using Trislab.Modules.SubscriptionsUsage.Contracts.Authorization;
 using Trislab.Modules.Catalog.Contracts.Authorization;
 using Trislab.Modules.Identity.Contracts.Authorization;
 using Trislab.Modules.Multitenancy.Contracts.Authorization;

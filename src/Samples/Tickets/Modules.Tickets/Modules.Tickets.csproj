@@ -13,4 +13,8 @@
 		<ProjectReference Include="..\Modules.Tickets.Contracts\Modules.Tickets.Contracts.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Tickets.Tests" />
+	</ItemGroup>
+
 </Project>
