@@ -163,8 +163,8 @@ public sealed class TicketSearchAndLifecycleTests
         #endregion
 
         #region Act
-        // Number sort is lexicographic on the "TK-n" string; the later-created
-        // ticket has the higher number, so it sorts first when descending.
+        // The later-created ticket has the higher number, so it sorts first when descending,
+        // also across a digit boundary (TK-9, TK-10: SearchTicketsSortTests).
         var page = await SearchAsync(client,
             $"assignedToUserId={assignee}&sortBy=number&sortDir=desc&pageSize=200");
         #endregion

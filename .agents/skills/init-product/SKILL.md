@@ -1,6 +1,6 @@
 ---
 name: init-product
-description: Turn a new copy of this starter into a SaaS product — choose the modules the product keeps (Billing, Files, Notifications, Webhooks, and the samples Catalog, Tickets, Chat), run scripts/init-product.ps1 to remove the rest at creation, build, test and smoke-test the result, write the product's README and AGENTS.md, and open the first pull request. Use once, when onboarding has copied tl-product-saas into a new product repository and the user asks to initialise, set up or trim the product.
+description: Turn a new copy of this starter into a SaaS product — choose the modules the product keeps (SubscriptionsUsage, Files, Notifications, Webhooks, and the samples Catalog, Tickets, Chat), run scripts/init-product.ps1 to remove the rest at creation, build, test and smoke-test the result, write the product's README and AGENTS.md, and open the first pull request. Use once, when onboarding has copied tl-product-saas into a new product repository and the user asks to initialise, set up or trim the product.
 metadata:
   owner: template-saas
   ownership: template-only
@@ -14,7 +14,7 @@ Runs once, in the first pull request of a new product repository. The skill is `
 
 1. **Start clean.** The repository is a fresh copy of the starter at a template release (`template-saas/vX.Y.Z`), with no changes yet. Branch `init-product`.
 2. **Choose the modules.** Identity, Multitenancy and Auditing are always kept: Multitenancy makes the product multi-tenant, and Identity does not start without Auditing. Ask which of the others the product needs, from its definition in `tl-product-ideas` (the hand-off brief names them):
-   - framework modules: `Billing`, `Files`, `Notifications`, `Webhooks`;
+   - framework modules: `SubscriptionsUsage`, `Files`, `Notifications`, `Webhooks`;
    - samples: `Catalog` (needs `Files`), `Tickets`, `Chat` (needs `Files` and `Notifications`). A product keeps a sample only when it wants it as its own starting point; the rest of the samples are removed.
    - the **slug** (the product's id, such as `timesheets`) and its **port block** (from 2; the hand-off plan names it), for its local ports, database and compose project ([docs/local-ports.md](../../../docs/local-ports.md)).
 3. **Dry run:** `pwsh scripts/init-product.ps1 -Keep <list> -Slug <id> -PortBlock <n> -DryRun`. Read what it would delete. `-Keep none` keeps only Identity, Multitenancy and Auditing.

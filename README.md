@@ -8,7 +8,7 @@ It is a thin multi-tenant host on the packages of [`tl-framework`](https://githu
 
 | Part | What |
 | --- | --- |
-| The host | `src/Host/App.Api` registers the multi-tenant tenancy and every framework module that supports multi-tenant mode: Identity, Multitenancy, Auditing, Files, Billing, Notifications and Webhooks |
+| The host | `src/Host/App.Api` registers the multi-tenant tenancy and every framework module that supports multi-tenant mode: Identity, Multitenancy, Auditing, Files, SubscriptionsUsage, Notifications and Webhooks |
 | The migrator | `src/Host/App.DbMigrator` migrates every module and seeds; `seed-demo` creates the demo tenants `acme` and `globex` with users, roles and the samples' data |
 | The samples | `src/Samples/`: Catalog, Tickets and Chat, with their tests, as patterns to copy; they are modules of this host |
 | The React apps | `clients/admin` and `clients/dashboard`, with i18n from `@trislabcompany/framework-ui` |

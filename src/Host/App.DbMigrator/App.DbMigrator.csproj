@@ -25,8 +25,8 @@
     <PackageReference Include="Trislab.Framework.Tenancy" />
     <PackageReference Include="Trislab.Modules.Auditing" />
     <PackageReference Include="Trislab.Modules.Auditing.Contracts" />
-    <PackageReference Include="Trislab.Modules.Billing" /> <!-- [module:Billing] -->
-    <PackageReference Include="Trislab.Modules.Billing.Contracts" /> <!-- [module:Billing] -->
+    <PackageReference Include="Trislab.Modules.SubscriptionsUsage" /> <!-- [module:SubscriptionsUsage] -->
+    <PackageReference Include="Trislab.Modules.SubscriptionsUsage.Contracts" /> <!-- [module:SubscriptionsUsage] -->
     <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog\Modules.Catalog.csproj" /> <!-- [module:Catalog] -->
     <ProjectReference Include="..\..\Samples\Catalog\Modules.Catalog.Contracts\Modules.Catalog.Contracts.csproj" /> <!-- [module:Catalog] -->
     <ProjectReference Include="..\..\Samples\Chat\Modules.Chat\Modules.Chat.csproj" /> <!-- [module:Chat] -->

@@ -11,7 +11,7 @@ using Trislab.Modules.Identity.Features.v1.Tokens.TokenGeneration;
 using Trislab.Modules.Multitenancy;
 using Trislab.Modules.Multitenancy.Contracts.v1.GetTenantStatus;
 using Trislab.Modules.Webhooks; // [module:Webhooks]
-using Trislab.Modules.Billing; // [module:Billing]
+using Trislab.Modules.SubscriptionsUsage; // [module:SubscriptionsUsage]
 using Trislab.Modules.Catalog; // [module:Catalog]
 using Trislab.Modules.Tickets; // [module:Tickets]
 using Trislab.Modules.Multitenancy.Features.v1.GetTenantStatus;
@@ -74,8 +74,8 @@ builder.Services.AddMediator(o =>
         typeof(Trislab.Modules.Auditing.Persistence.AuditDbContext),
         typeof(Trislab.Modules.Webhooks.Contracts.v1.CreateWebhookSubscription.CreateWebhookSubscriptionCommand), // [module:Webhooks]
         typeof(Trislab.Modules.Webhooks.WebhooksModule), // [module:Webhooks]
-        typeof(Trislab.Modules.Billing.Contracts.BillingContractsMarker), // [module:Billing]
-        typeof(Trislab.Modules.Billing.BillingModule), // [module:Billing]
+        typeof(Trislab.Modules.SubscriptionsUsage.Contracts.BillingContractsMarker), // [module:SubscriptionsUsage]
+        typeof(Trislab.Modules.SubscriptionsUsage.SubscriptionsUsageModule), // [module:SubscriptionsUsage]
         typeof(Trislab.Modules.Catalog.Contracts.CatalogContractsMarker), // [module:Catalog]
         typeof(Trislab.Modules.Catalog.CatalogModule), // [module:Catalog]
         typeof(Trislab.Modules.Tickets.Contracts.TicketsContractsMarker), // [module:Tickets]
@@ -96,7 +96,7 @@ var moduleAssemblies = new Assembly[]
     typeof(AuditingModule).Assembly,
     typeof(Trislab.Modules.Files.FilesModule).Assembly, // [module:Files]
     typeof(WebhooksModule).Assembly, // [module:Webhooks]
-    typeof(BillingModule).Assembly, // [module:Billing]
+    typeof(SubscriptionsUsageModule).Assembly, // [module:SubscriptionsUsage]
     typeof(CatalogModule).Assembly, // [module:Catalog]
     typeof(TicketsModule).Assembly, // [module:Tickets]
     typeof(Trislab.Modules.Chat.ChatModule).Assembly, // [module:Chat]

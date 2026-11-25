@@ -10,7 +10,7 @@ using Trislab.Framework.Tenancy;
 using Trislab.Framework.Web;
 using Trislab.Framework.Web.Modules;
 using Trislab.Modules.Auditing;
-using Trislab.Modules.Billing; // [module:Billing]
+using Trislab.Modules.SubscriptionsUsage; // [module:SubscriptionsUsage]
 using Trislab.Modules.Catalog; // [module:Catalog]
 using Trislab.Modules.Identity;
 using Trislab.Modules.Identity.Contracts.v1.Tokens.TokenGeneration;
@@ -96,8 +96,8 @@ builder.Services.AddMediator(o =>
         typeof(Trislab.Modules.Auditing.Persistence.AuditDbContext),
         typeof(Trislab.Modules.Webhooks.Contracts.v1.CreateWebhookSubscription.CreateWebhookSubscriptionCommand), // [module:Webhooks]
         typeof(Trislab.Modules.Webhooks.WebhooksModule), // [module:Webhooks]
-        typeof(Trislab.Modules.Billing.Contracts.BillingContractsMarker), // [module:Billing]
-        typeof(Trislab.Modules.Billing.BillingModule), // [module:Billing]
+        typeof(Trislab.Modules.SubscriptionsUsage.Contracts.BillingContractsMarker), // [module:SubscriptionsUsage]
+        typeof(Trislab.Modules.SubscriptionsUsage.SubscriptionsUsageModule), // [module:SubscriptionsUsage]
         typeof(Trislab.Modules.Catalog.Contracts.CatalogContractsMarker), // [module:Catalog]
         typeof(Trislab.Modules.Catalog.CatalogModule), // [module:Catalog]
         typeof(Trislab.Modules.Tickets.Contracts.TicketsContractsMarker), // [module:Tickets]
@@ -118,7 +118,7 @@ var moduleAssemblies = new Assembly[]
     typeof(AuditingModule).Assembly,
     typeof(Trislab.Modules.Files.FilesModule).Assembly, // [module:Files]
     typeof(WebhooksModule).Assembly, // [module:Webhooks]
-    typeof(BillingModule).Assembly, // [module:Billing]
+    typeof(SubscriptionsUsageModule).Assembly, // [module:SubscriptionsUsage]
     typeof(CatalogModule).Assembly, // [module:Catalog]
     typeof(TicketsModule).Assembly, // [module:Tickets]
     typeof(Trislab.Modules.Chat.ChatModule).Assembly, // [module:Chat]

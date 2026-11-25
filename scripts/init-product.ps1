@@ -8,7 +8,7 @@
   Identity, Multitenancy and Auditing are always kept: Multitenancy makes the host multi-tenant, and Identity writes
   its security events through Auditing (it does not start without it). Every other module is optional:
 
-    framework modules   Billing, Files, Notifications, Webhooks
+    framework modules   SubscriptionsUsage, Files, Notifications, Webhooks
     samples             Catalog (needs Files), Tickets, Chat (needs Files and Notifications)
 
   A module that is not kept is removed at creation, so the product never carries code it does not use:
@@ -64,7 +64,7 @@ Set-Location $root
 
 # Module -> what it needs.
 $modules = [ordered]@{
-  Billing       = @{ Kind = 'framework'; Requires = @() }
+  SubscriptionsUsage = @{ Kind = 'framework'; Requires = @() }
   Files         = @{ Kind = 'framework'; Requires = @() }
   Notifications = @{ Kind = 'framework'; Requires = @() }
   Webhooks      = @{ Kind = 'framework'; Requires = @() }

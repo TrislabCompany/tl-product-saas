@@ -73,7 +73,11 @@ public sealed class SearchTicketsQueryHandler(TicketsDbContext dbContext)
         };
     }
 
-    private static IQueryable<Ticket> ApplySort(IQueryable<Ticket> q, string? sortBy, string? sortDir)
+    /// <summary>
+    /// Orders the tickets. A number (<c>TK-n</c>) sorts by its length first, so <c>TK-10</c> comes after
+    /// <c>TK-9</c> rather than between <c>TK-1</c> and <c>TK-2</c>.
+    /// </summary>
+    internal static IQueryable<Ticket> ApplySort(IQueryable<Ticket> q, string? sortBy, string? sortDir)
     {
         bool desc = !string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase);
         return (sortBy?.ToUpperInvariant()) switch
@@ -81,7 +85,9 @@ public sealed class SearchTicketsQueryHandler(TicketsDbContext dbContext)
             "TITLE"    => desc ? q.OrderByDescending(t => t.Title)    : q.OrderBy(t => t.Title),
             "PRIORITY" => desc ? q.OrderByDescending(t => t.Priority) : q.OrderBy(t => t.Priority),
             "STATUS"   => desc ? q.OrderByDescending(t => t.Status)   : q.OrderBy(t => t.Status),
-            "NUMBER"   => desc ? q.OrderByDescending(t => t.Number)   : q.OrderBy(t => t.Number),
+            "NUMBER"   => desc
+                ? q.OrderByDescending(t => t.Number.Length).ThenByDescending(t => t.Number)
+                : q.OrderBy(t => t.Number.Length).ThenBy(t => t.Number),
             _ => desc ? q.OrderByDescending(t => t.CreatedAtUtc) : q.OrderBy(t => t.CreatedAtUtc),
         };
     }

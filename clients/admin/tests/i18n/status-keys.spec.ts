@@ -41,14 +41,14 @@ const CASES = [
   {
     label: "top-up requests",
     ns: "billing",
-    file: "src/Modules/Billing/Modules.Billing.Contracts/BillingEnums.cs",
+    file: "src/Modules/SubscriptionsUsage/Modules.SubscriptionsUsage.Contracts/BillingEnums.cs",
     enumName: "TopupRequestStatus",
     key: camel,
   },
   {
     label: "invoices",
     ns: "billing",
-    file: "src/Modules/Billing/Modules.Billing.Contracts/BillingEnums.cs",
+    file: "src/Modules/SubscriptionsUsage/Modules.SubscriptionsUsage.Contracts/BillingEnums.cs",
     enumName: "InvoiceStatus",
     key: mapped(INVOICE_STATUS_KEYS),
   },

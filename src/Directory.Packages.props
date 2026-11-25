@@ -27,8 +27,8 @@
     <PackageVersion Include="Trislab.Framework.Web" Version="$(TrislabFrameworkVersion)" />
     <PackageVersion Include="Trislab.Modules.Auditing" Version="$(TrislabFrameworkVersion)" />
     <PackageVersion Include="Trislab.Modules.Auditing.Contracts" Version="$(TrislabFrameworkVersion)" />
-    <PackageVersion Include="Trislab.Modules.Billing" Version="$(TrislabFrameworkVersion)" />
-    <PackageVersion Include="Trislab.Modules.Billing.Contracts" Version="$(TrislabFrameworkVersion)" />
+    <PackageVersion Include="Trislab.Modules.SubscriptionsUsage" Version="$(TrislabFrameworkVersion)" />
+    <PackageVersion Include="Trislab.Modules.SubscriptionsUsage.Contracts" Version="$(TrislabFrameworkVersion)" />
     <PackageVersion Include="Trislab.Modules.Files" Version="$(TrislabFrameworkVersion)" />
     <PackageVersion Include="Trislab.Modules.Files.Contracts" Version="$(TrislabFrameworkVersion)" />
     <PackageVersion Include="Trislab.Modules.Identity" Version="$(TrislabFrameworkVersion)" />

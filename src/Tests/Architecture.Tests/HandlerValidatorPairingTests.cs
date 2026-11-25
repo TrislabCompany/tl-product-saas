@@ -15,9 +15,9 @@ public class HandlerValidatorPairingTests
     
     // Known missing validators (to be implemented)
     private static readonly string[] KnownMissingCommandHandlers = [
-        "Trislab.Modules.Billing.Features.v1.Invoices.VoidInvoice.VoidInvoiceCommandHandler",
-        "Trislab.Modules.Billing.Features.v1.Invoices.MarkInvoicePaid.MarkInvoicePaidCommandHandler",
-        "Trislab.Modules.Billing.Features.v1.Invoices.IssueInvoice.IssueInvoiceCommandHandler",
+        "Trislab.Modules.SubscriptionsUsage.Features.v1.Invoices.VoidInvoice.VoidInvoiceCommandHandler",
+        "Trislab.Modules.SubscriptionsUsage.Features.v1.Invoices.MarkInvoicePaid.MarkInvoicePaidCommandHandler",
+        "Trislab.Modules.SubscriptionsUsage.Features.v1.Invoices.IssueInvoice.IssueInvoiceCommandHandler",
         "Trislab.Modules.Catalog.Features.v1.Products.RestoreProduct.RestoreProductCommandHandler",
         "Trislab.Modules.Catalog.Features.v1.Products.DeleteProduct.DeleteProductCommandHandler",
         "Trislab.Modules.Catalog.Features.v1.Categories.RestoreCategory.RestoreCategoryCommandHandler",
@@ -35,8 +35,8 @@ public class HandlerValidatorPairingTests
     ];
 
     private static readonly string[] KnownMissingQueryHandlers = [
-        "Trislab.Modules.Billing.Features.v1.Invoices.GetMyInvoices.GetMyInvoicesQueryHandler",
-        "Trislab.Modules.Billing.Features.v1.Invoices.GetInvoices.GetInvoicesQueryHandler",
+        "Trislab.Modules.SubscriptionsUsage.Features.v1.Invoices.GetMyInvoices.GetMyInvoicesQueryHandler",
+        "Trislab.Modules.SubscriptionsUsage.Features.v1.Invoices.GetInvoices.GetInvoicesQueryHandler",
         "Trislab.Modules.Catalog.Features.v1.Products.SearchProducts.SearchProductsQueryHandler",
         "Trislab.Modules.Catalog.Features.v1.Products.ListTrashedProducts.ListTrashedProductsQueryHandler",
         "Trislab.Modules.Catalog.Features.v1.Categories.SearchCategories.SearchCategoriesQueryHandler",
