@@ -79,7 +79,7 @@ function namespacesUsed(modules: Iterable<string>): Map<string, string> {
 
 // The eager namespaces: the keys of the eager map in src/i18n.ts.
 const i18nSource = read(path.join(src, "i18n.ts"));
-const eagerBlock = /const EAGER_CATALOGS = \{([^}]*)\}/.exec(i18nSource)?.[1] ?? "";
+const eagerBlock = /const eagerCatalogs = \{([^}]*)\}/.exec(i18nSource)?.[1] ?? "";
 const EAGER = new Set([...eagerBlock.matchAll(/^\s*([A-Za-z]+):/gm)].map((m) => m[1]));
 
 const initial = closure(path.join(src, "main.tsx"));
