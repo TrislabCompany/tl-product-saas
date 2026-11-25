@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { BACKEND_ENUMS } from "./backend-enums";
 import { IMPERSONATION_STATUS_KEYS, INVOICE_STATUS_KEYS, statusKey } from "../../src/lib/status-keys";
 
 // Several labels build their catalog key from a value the API sends: `status.${status}`. Catalog
@@ -9,22 +10,15 @@ import { IMPERSONATION_STATUS_KEYS, INVOICE_STATUS_KEYS, statusKey } from "../..
 // what shipped for top-ups: approving one moves it to `Invoiced`, and the badge read
 // "status.invoiced".
 //
-// The member list is read from the backend enum rather than copied here, so adding a member to the
-// C# enum without translating it fails this test instead of reaching a screen. Where the app maps a
+// The member list comes from tests/i18n/backend-enums.ts, which Architecture.Tests keeps equal to the C#
+// enum, so adding a member to the enum without translating it fails a test instead of reaching a screen. Where the app maps a
 // status to its key (src/lib/status-keys.ts) the test reads that map, so a member the map lacks fails
 // too; where it still builds the key from the value, the test applies the same transformation.
 
-const repoRoot = path.resolve("../..");
-
-function enumMembers(relativePath: string, enumName: string): string[] {
-  const source = readFileSync(path.join(repoRoot, relativePath), "utf8");
-  const declaration = new RegExp(`enum\\s+${enumName}\\s*\\{([^}]*)\\}`, "s").exec(source);
-  expect(declaration, `${enumName} not found in ${relativePath}`).not.toBeNull();
-  const members = [...declaration![1].matchAll(/^\s*([A-Z]\w*)\s*(?:=\s*-?\d+\s*)?,?\s*$/gm)].map(
-    (m) => m[1],
-  );
-  expect(members.length, `${enumName} parsed as empty`).toBeGreaterThan(0);
-  return members;
+function enumMembers(enumName: string): readonly string[] {
+  const members = BACKEND_ENUMS[enumName];
+  expect(members, `${enumName} is not in tests/i18n/backend-enums.ts`).toBeDefined();
+  return members!;
 }
 
 const readCatalog = (locale: string, ns: string): Record<string, string> =>
@@ -41,21 +35,18 @@ const CASES = [
   {
     label: "top-up requests",
     ns: "billing",
-    file: "src/Modules/SubscriptionsUsage/Modules.SubscriptionsUsage.Contracts/BillingEnums.cs",
     enumName: "TopupRequestStatus",
     key: camel,
   },
   {
     label: "invoices",
     ns: "billing",
-    file: "src/Modules/SubscriptionsUsage/Modules.SubscriptionsUsage.Contracts/BillingEnums.cs",
     enumName: "InvoiceStatus",
     key: mapped(INVOICE_STATUS_KEYS),
   },
   {
     label: "impersonation grants",
     ns: "impersonation",
-    file: "src/Modules/Identity/Modules.Identity.Contracts/v1/Impersonation/ImpersonationGrantDto.cs",
     enumName: "ImpersonationGrantStatus",
     key: mapped(IMPERSONATION_STATUS_KEYS),
   },
@@ -64,7 +55,7 @@ const CASES = [
 test.describe("status keys built from backend enums", () => {
   for (const testCase of CASES) {
     test(`${testCase.label}: every member has a label in both locales`, () => {
-      const members = enumMembers(testCase.file, testCase.enumName);
+      const members = enumMembers(testCase.enumName);
       const en = readCatalog("en-US", testCase.ns);
       const sl = readCatalog("sl-SI", testCase.ns);
 
