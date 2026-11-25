@@ -10,7 +10,7 @@
   <PropertyGroup>
     <!-- The one framework version every Trislab.* package uses (lockstep, docs/packages.md of tl-framework).
          Renovate raises it in one pull request per framework release. -->
-    <TrislabFrameworkVersion>0.2.0</TrislabFrameworkVersion>
+    <TrislabFrameworkVersion>0.3.0</TrislabFrameworkVersion>
   </PropertyGroup>
   <ItemGroup Label="Trislab framework">
     <PackageVersion Include="Trislab.Framework.Core" Version="$(TrislabFrameworkVersion)" />
