@@ -92,6 +92,10 @@ Both runs seed the demo data (`SEED_DEMO=true`):
 | `admin@acme.com`, `admin@globex.com` and the other demo users | `acme`, `globex` | `Password123!` | dashboard, also through its demo sign-in |
 | `superadmin@root.com` | `root` | `Password123!` | admin |
 
+Sign in with the e-mail and password only. Users are global: the server opens the account's tenant, and an account in several tenants with no default picks one after the password (and switches from the profile menu). An operator always opens `root`, in the admin app only.
+
+New users are invited, never created with a password: an administrator sends an invitation from the users page, and its owner accepts the e-mailed link (`/accept-invitation` in the dashboard), choosing their own password.
+
 The demo password is public: it is in the dashboard's code. That is why `SEED_DEMO` is only ever true where there is no real data.
 
 ## 6. Run the tests

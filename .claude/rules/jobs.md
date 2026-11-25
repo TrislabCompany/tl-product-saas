@@ -37,6 +37,6 @@ Examples in the tree: `PurgeOrphanedFiles`/`PurgeDeletedFiles` (Files), `Monthly
 
 ## Gotchas
 
-- Jobs run on the server with **no HTTP/tenant context** — restore Finbuckle tenant context inside the job (fresh scope + `IMultiTenantContextSetter`) before touching a tenant-filtered DbContext. A job enqueued from a request carries that request's tenant; in single-tenant mode a job with no tenant parameter (a recurring job) runs in the fixed tenant (`TrislabJobActivator` falls back to `ISingleTenantProvider`).
+- Jobs run on the server with **no HTTP/tenant context** — set the tenant inside the job (`using var tenantUse = tenants.Use(tenant);`, `ITenantAccessor`), then create a fresh scope and resolve the tenant-filtered DbContext from it; `Use` restores the previous tenant when disposed, so a job can walk every tenant in turn. A job enqueued from a request carries that request's tenant; in single-tenant mode a job with no tenant parameter (a recurring job) runs in the fixed tenant (`TrislabJobActivator` falls back to `ISingleTenantProvider`).
 - The DbMigrator registers `NoOpJobService` whose methods **throw** — surfaces any accidental enqueue during migration. Don't enqueue from migration/seed paths.
 - A job class is a normal DI-resolved type (scope-per-job via `TrislabJobActivator`); inject what you need.

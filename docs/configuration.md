@@ -56,7 +56,7 @@ Secrets arrive as ordinary environment variables too: the platform reads them fr
 
 ## 2a. Tenancy mode
 
-This host is multi-tenant, in code: `Program.cs` of the API and of the migrator call `AddTrislabTenancy(t => t.UseMultitenant())`, and the API calls `UseTrislabTenancy()`. Many tenants are served from the tenant catalog of the Multitenancy module; the tenant of a request comes from the sign-in claim, the `tenant` header or a query value. A single-tenant product starts from `tl-product-webapp` instead, not from a setting here.
+This host is multi-tenant, in code: `Program.cs` of the API and of the migrator call `AddTrislabTenancy(t => t.UseMultitenant())`, and the API calls `UseTrislabTenancy()`. Many tenants are served from the tenant catalog of the Multitenancy module; the tenant of a request comes from the sign-in claim, the `tenant` header or a query value. Users are global, with a membership per tenant: signing in needs no tenant (the server opens the account's default or only tenant), and code reads the current tenant through `ITenantAccessor`. A single-tenant product starts from `tl-product-webapp` instead, not from a setting here.
 
 ## 3. `/config.json`
 

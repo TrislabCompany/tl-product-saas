@@ -103,7 +103,7 @@ export function InviteUserDialog({
           <DialogDescription className="mt-1">{t("invite.description")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} noValidate>
           <DialogBody className="space-y-4">
             <Field id="iu-email" label={t("invite.field.email")} required error={errors.email?.message}>
               <Input
