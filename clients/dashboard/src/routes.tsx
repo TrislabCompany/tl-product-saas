@@ -1,14 +1,12 @@
 import { lazy, Suspense, type ComponentType } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProtectedRoute } from "@/auth/protected-route";
 import { RouteGuard } from "@/auth/route-guard";
 import type { RouteGate } from "@/auth/route-gate";
 import { BRANDING_GATE, navGate } from "@/components/layout/nav-data";
 import { RouteError } from "@/components/route-error";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/cn";
+import { RouteFallback } from "@/components/route-fallback";
 import { loadNamespaces, type LazyNamespace } from "@/i18n";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -96,32 +94,6 @@ const GroupsPage = lazyNamed(() => import("@/pages/identity/groups"), "GroupsPag
 const GroupDetailPage = lazyNamed(() => import("@/pages/identity/group-detail"), "GroupDetailPage", ["identity"]);
 const MyFilesPage = lazyNamed(() => import("@/pages/files/my-files"), "MyFilesPage", ["files"]);
 const ChatPage = lazyNamed(() => import("@/pages/chat/chat-page"), "ChatPage", ["chat"]); // [module:Chat]
-
-/**
- * RouteFallback — what shows while a lazy chunk is downloading. Mirrors
- * the resolved page's shape: a thin header line, an atmospheric hero
- * placeholder, and three card placeholders. Uses the modernized
- * `.skeleton` shimmer so it feels like part of the same surface family.
- */
-function RouteFallback() {
-  const { t } = useTranslation("common");
-  return (
-    <div className={cn("space-y-6 tl-enter")} role="status" aria-busy="true">
-      <span className="sr-only">{t("list.loading")}</span>
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-3 w-96 max-w-full" />
-      </div>
-      <Skeleton className="h-32 w-full rounded-[20px]" />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-      </div>
-    </div>
-  );
-}
 
 /**
  * Wrap a lazy route element in Suspense so each route boundary has its
