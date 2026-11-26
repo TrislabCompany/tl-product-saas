@@ -29,7 +29,7 @@ flowchart LR
 
 | Step | Workflow | What happens |
 | --- | --- | --- |
-| Check | `ci.yml`, on every PR and push to `main` | Builds the four images, runs `dotnet test src/App.slnx`, scans the images with Trivy and checks `platform.yaml`. Pushes nothing. The check `ci / ci` must pass before a PR can merge |
+| Check | `ci.yml`, on every PR and push to `main` | Builds the four images, runs the tests the PR affects (`node scripts/affected-tests.mjs`; every test on `main`), scans the images with Trivy and checks `platform.yaml`. Pushes nothing. The check `ci / ci` must pass before a PR can merge |
 | Deploy | `deploy.yml`, on every push to `main` | Builds the images once, scans them, pushes them to the GitHub Container Registry (GHCR) as `sha-<commit>` with their software bills of materials, and deploys them to every `dev` tier Environment |
 | Release | `release.yml`, on a tag `vX.Y.Z` on a commit of `main` | Builds nothing. Adds the tag to that commit's images, creates the GitHub Release, and deploys them to every `release` tier Environment |
 | Promote | `promote.yml`, by hand with a version and an Environment | Checks that the version runs healthy in a `release` tier Environment, waits for the reviewers, and deploys the same images. Rolling back is promoting the previous version |

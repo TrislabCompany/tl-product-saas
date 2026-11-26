@@ -49,7 +49,7 @@ A **multi-tenant modular monolith** (Vertical Slice Architecture) backend with t
 | `src/Samples/{Name}` | The samples Catalog, Tickets and Chat, each a runtime project, its `.Contracts` and its tests: patterns to copy. They are modules of this host like any other. |
 | `src/Tests/` | `Architecture.Tests` (NetArchTest) and `Integration.Tests` (Testcontainers, needs Docker). |
 | `clients/admin`, `clients/dashboard` | The two React apps, each with its Dockerfile and `docker/` (nginx, `/config.json`). |
-| `scripts/` | `init-product.ps1`, `smoke-test.sh`, `test-clients.sh`, `check-template-manifest.ps1` ([scripts/README.md](scripts/README.md)). |
+| `scripts/` | `init-product.ps1`, `affected-tests.mjs`, `smoke-test.sh`, `test-clients.sh`, `check-template-manifest.ps1` ([scripts/README.md](scripts/README.md)). |
 | `template-manifest.yaml` | The ownership of every path, for `update-from-template` ([docs/template-releases.md](docs/template-releases.md)). Deleted by `init-product`. |
 | `docs/` | Getting started, architecture, configuration, deployment, modules, packages, template releases. |
 | `platform.yaml`, `.github/workflows/` | The images and app sizing for the platform; `ci.yml` (the check `ci / ci`), `deploy.yml`, `release.yml`. |
@@ -62,12 +62,15 @@ export PACKAGES_TOKEN=...
 
 dotnet run --project src/Host/App.AppHost   # the whole stack; one-time: npm install in both clients
 dotnet build src/App.slnx
+node scripts/affected-tests.mjs             # the tests this branch affects, before every push (--all for everything)
 dotnet test src/App.slnx                    # the integration tests REQUIRE Docker
 bash scripts/smoke-test.sh                  # the app starts, migrates and seeds in multi-tenant mode (Docker)
 bash scripts/test-clients.sh                # lint and the Playwright tests of both React apps (API mocked)
 
 cd clients/dashboard && npm install && npm run dev   # http://localhost:5174 (admin: 5173)
 ```
+
+`ci / ci` runs `node scripts/affected-tests.mjs` on a PR, and every part on a push to `main`. Before starting work, check the open issues labelled `ci-main`: a red `main` is fixed by the next PR.
 
 Migrations and seed (the migrator, a separate step): `DATABASE_URL=... dotnet run --project src/Host/App.DbMigrator -- apply [--seed]`, `seed-demo`, `list-pending`.
 
