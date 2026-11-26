@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { ParseKeys } from "i18next";
 import { ALL_TRASH_PERMISSIONS } from "@/lib/trash-permissions";
+import { isGranted, type RouteGate } from "@/auth/route-gate";
 
 export type NavSpec = {
   to: string;
@@ -137,9 +138,21 @@ export const sections: NavSection[] = [
 /** True when the user satisfies the item's gates: the single `perm` (if any)
  *  AND at least one of `anyPerm` (if any). Ungated items are always visible. */
 function isNavItemVisible(item: NavSpec, permissions: readonly string[]): boolean {
-  if (item.perm && !permissions.includes(item.perm)) return false;
-  if (item.anyPerm && !item.anyPerm.some((p) => permissions.includes(p))) return false;
-  return true;
+  return isGranted(item, permissions);
+}
+
+/** The Branding tab of Settings: the permission the tenant /theme endpoints enforce. */
+export const BRANDING_GATE: RouteGate = { perm: "Permissions.Tenants.UpdateTheme" };
+
+/**
+ * The gate of the page at `to`: its menu item's. routes.tsx wraps each page in
+ * RouteGuard with it, so a page opens exactly when its menu item shows.
+ * Throws for a path without a menu item, so a typo fails at start-up.
+ */
+export function navGate(to: string): RouteGate {
+  const item = [...topNavTop, ...topNavBottom, ...sections.flatMap((s) => s.items)].find((i) => i.to === to);
+  if (!item) throw new Error(`No menu item for ${to}`);
+  return { perm: item.perm, anyPerm: item.anyPerm };
 }
 
 /** Drop items the user can't access, then drop any section left empty. */

@@ -16,7 +16,17 @@ test.beforeEach(async ({ page }) => {
   await installShellMocks(page);
 });
 
-test("an account in one tenant sees no organisation section", async ({ page }) => {
+test("an account in one tenant sees only its name, with nothing to switch to", async ({ page }) => {
+  await mockJsonResponse(page, "**/api/v1/identity/profile/tenants", [TENANTS[0]]);
+  await page.goto("/");
+  await page.getByRole("button", { name: /open profile menu/i }).click();
+  await expect(page.getByRole("menuitem", { name: /sign out/i })).toBeVisible();
+  await expect(page.getByText("Organisation", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("current-tenant")).toHaveText("Acme Corp");
+  await expect(page.getByRole("menuitem", { name: "Acme Corp" })).toHaveCount(0);
+});
+
+test("while the tenants are unknown, no organisation section shows", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /open profile menu/i }).click();
   await expect(page.getByRole("menuitem", { name: /sign out/i })).toBeVisible();

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { mockJsonResponse } from "../helpers/api-mocks";
 import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
-import { installShellMocks, paged } from "../helpers/shell-mocks";
+import { installShellMocks, paged, grantPermissions } from "../helpers/shell-mocks";
 
 // A pair of users for the search results. We assert on "Bob Patel" which
 // only appears in our mock data — never in the shell defaults.
@@ -35,6 +35,7 @@ test.describe("identity/users — list", () => {
   test.beforeEach(async ({ page }) => {
     await seedAuthedSession(page, TEST_USER);
     await installShellMocks(page);
+    await grantPermissions(page, ["Permissions.Users.Update"]);
     // The role filter combobox loads the role list on mount.
     await mockJsonResponse(page, "**/api/v1/identity/roles", ROLES);
     // The pending invitations below the list; none unless a test says otherwise.
@@ -158,6 +159,7 @@ test.describe("identity/users/:userId — detail", () => {
   test.beforeEach(async ({ page }) => {
     await seedAuthedSession(page, TEST_USER);
     await installShellMocks(page);
+    await grantPermissions(page, ["Permissions.Users.Update"]);
     await mockJsonResponse(page, `**/api/v1/identity/users/${USER_ID}/roles`, [
       {
         roleId: ROLES[0].id,

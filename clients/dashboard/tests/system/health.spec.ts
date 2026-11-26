@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { mockJsonResponse } from "../helpers/api-mocks";
 import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
-import { installShellMocks } from "../helpers/shell-mocks";
+import { installShellMocks, grantPermissions } from "../helpers/shell-mocks";
 
 // The page reads the health report with every check's details at the ORIGIN
 // (no /api/v1 prefix): src/api/health.ts → `${env.apiBase}/api/health/details`,
@@ -25,6 +25,7 @@ function readiness(
 test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, TEST_USER);
   await installShellMocks(page);
+  await grantPermissions(page, ["Permissions.Health.View"]);
 });
 
 test.describe("system/health", () => {

@@ -247,7 +247,7 @@ export function Topbar() {
     enabled: !!user && !impersonation,
     staleTime: 5 * 60_000,
   });
-  const otherTenants = tenantsQuery.data ?? [];
+  const myTenants = tenantsQuery.data ?? [];
   const switchMutation = useMutation({
     mutationFn: (tenant: string) => switchTenant({ tenant, setDefault: false }),
     onSuccess: () => navigate("/"),
@@ -516,14 +516,29 @@ export function Topbar() {
 
           <DropdownMenuSeparator className="!my-0" />
 
-          {otherTenants.length > 1 && (
+          {myTenants.length === 1 && (
+            <>
+              {/* Organisation — an account in one tenant sees only its name: there is nothing to switch to */}
+              <DropdownMenuLabel className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
+                {t("tenantSwitch.title")}
+              </DropdownMenuLabel>
+              <p data-testid="current-tenant" className="flex items-center gap-2 truncate px-3.5 pb-2 text-[12px] text-[var(--color-foreground)]">
+                <Building2 className="h-3.5 w-3.5 shrink-0 text-[var(--color-muted-foreground)]" aria-hidden />
+                <span className="truncate">{myTenants[0].name || myTenants[0].id}</span>
+              </p>
+
+              <DropdownMenuSeparator className="!my-0" />
+            </>
+          )}
+
+          {myTenants.length > 1 && (
             <>
               {/* Organisation — the tenants this account belongs to, check on the current one */}
               <DropdownMenuLabel className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
                 {t("tenantSwitch.title")}
               </DropdownMenuLabel>
               <div className="px-1 pb-1">
-                {otherTenants.map((tenant) => (
+                {myTenants.map((tenant) => (
                   <ThemeMenuItem
                     key={tenant.id}
                     icon={Building2}

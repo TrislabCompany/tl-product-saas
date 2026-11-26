@@ -45,7 +45,7 @@ playbook is the review procedure, not a second copy of the rules.
 - Every behaviour change has a test that fails without it; a bug fix has the reproducing test.
 
 **Frontend** (`frontend/*` rules)
-- Hand-written types + `apiFetch`; mutation data passed via `mutate(arg)`; query keys hierarchical; admin gates routes with `RouteGuard` + mirrors the permission; dashboard uses `withSuspense`.
+- Hand-written types + `apiFetch`; mutation data passed via `mutate(arg)`; query keys hierarchical; admin gates routes with `RouteGuard` + mirrors the permission; dashboard uses `withSuspense`, and `guarded(navGate(…))` for a page behind a permission.
 
 ## Commands
 ```bash

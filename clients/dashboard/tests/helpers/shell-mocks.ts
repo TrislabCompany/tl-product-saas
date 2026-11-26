@@ -77,6 +77,15 @@ export async function installShellMocks(page: Page): Promise<void> {
   });
 }
 
+/**
+ * Grant the Basic shell permissions plus `perms`. A spec that opens a page behind a permission
+ * calls it after installShellMocks: the dashboard's routes are guarded with the gate of their
+ * menu item (nav-data.ts), so without it the page shows the 403 view.
+ */
+export async function grantPermissions(page: Page, perms: readonly string[]): Promise<void> {
+  await mockJsonResponse(page, "**/api/v1/identity/permissions", [...SHELL_PERMISSIONS, ...perms]);
+}
+
 /** Build a Playwright-shaped paged response body. */
 export function paged<T>(items: T[], overrides: Partial<{ pageNumber: number; pageSize: number; totalCount: number; totalPages: number }> = {}) {
   const pageSize = overrides.pageSize ?? 20;

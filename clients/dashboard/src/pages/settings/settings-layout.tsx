@@ -14,6 +14,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { EntityPageHeader } from "@/components/list";
 import { useAuth } from "@/auth/use-auth";
+import { BRANDING_GATE } from "@/components/layout/nav-data";
 import { cn } from "@/lib/cn";
 
 type Tab = {
@@ -37,7 +38,7 @@ const TABS: Tab[] = [
   // Tenant-wide branding (palette + logos served on sign-in), distinct from the
   // per-user Appearance prefs above. Gated on the same permission the /theme
   // endpoints enforce server-side.
-  { to: "/settings/branding", labelKey: "tab.branding.label", hintKey: "tab.branding.hint", icon: Brush, perm: "Permissions.Tenants.UpdateTheme" },
+  { to: "/settings/branding", labelKey: "tab.branding.label", hintKey: "tab.branding.hint", icon: Brush, perm: BRANDING_GATE.perm },
   { to: "/settings/notifications", labelKey: "tab.notifications.label", hintKey: "tab.notifications.hint", icon: Bell },
   { to: "/settings/api-keys", labelKey: "tab.apiKeys.label", hintKey: "tab.apiKeys.hint", icon: KeyRound },
 ];

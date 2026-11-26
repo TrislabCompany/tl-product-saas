@@ -24,7 +24,7 @@ The repository builds four images, listed in `platform.yaml`. Each Environment r
 | `api` | `src/Host/App.Api/Dockerfile` | The app `api`, with internal ingress and no hostname | The API on port 8080 |
 | `migrator` | `src/Host/App.DbMigrator/Dockerfile` | The init container of `api` | Migrates and seeds the database, then exits |
 
-Every image runs as a non-root user, and every base image is pinned by digest. The three apps listen on port 8080 and answer `/healthz` and `/readyz`, which the platform probes. The API is ready only while its database checks pass, and the cache's too when it has one.
+Every image runs as a non-root user, and every base image is pinned by digest. The three apps listen on port 8080 and answer `/healthz` and `/readyz`, which the platform probes. The API is ready only while its database checks pass, and the cache's too when it has one. The details-only checks (storage) are left out of `/readyz`: files fail while storage is down, but the rest of the app works. `/api/health/details` lists every check, for Admins and operators.
 
 ## 3. Backing services
 

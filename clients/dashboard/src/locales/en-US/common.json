@@ -152,5 +152,9 @@
   "userPicker.noMatch": "No users match \"{{term}}\".",
   "userPicker.results": "Search results",
   "tenantSwitch.title": "Organisation",
-  "tenantSwitch.failed": "Couldn't switch organisation. Try again."
+  "tenantSwitch.failed": "Couldn't switch organisation. Try again.",
+  "routeGuard.resolving": "Checking your permissions",
+  "forbidden.title": "You can't open this page",
+  "forbidden.body": "Your role in this organisation doesn't include it. An Admin of the organisation can give you access.",
+  "forbidden.backHome": "Back home"
 }

@@ -64,7 +64,7 @@ So `RouteGuard` passes on first paint, add the new permission to the test seed s
 
 ## Dashboard
 
-No mirror, no `RouteGuard`. The JWT carries only role names — the app fetches the permission list from `GET /api/v1/identity/permissions` at hydration and the server enforces access; a missing permission yields a 403 the UI surfaces. Routes aren't permission-gated; to hide a nav entry, set `perm`/`anyPerm` on the item in `src/components/layout/nav-data.ts`. Permission-gated specs mock `GET /identity/permissions` with the grants they need (shell mocks stub it to `[]`).
+No mirror. The JWT carries only role names — the app fetches the permission list from `GET /api/v1/identity/permissions` at hydration and the server enforces access. Set `perm`/`anyPerm` on the page's item in `src/components/layout/nav-data.ts`: it hides the menu entry, and the route takes the same gate with `guarded(navGate("/path"), <Page />)` in `src/routes.tsx`, so a typed address shows the 403 view. A Settings tab without a menu item gets its own gate constant in `nav-data.ts` (see `BRANDING_GATE`). Permission-gated specs mock `GET /identity/permissions` with the grants they need (shell mocks stub it to `[]`).
 
 ## Verify
 

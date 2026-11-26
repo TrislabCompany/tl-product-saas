@@ -31,8 +31,8 @@ the order of operations and the **contract** that keeps the two halves in sync.
 2. **Lock the contract** — note the final **route path**, HTTP method, request shape, and response DTO field names/casing. The React side must match these exactly.
 3. **Frontend page** — `add-react-page` in the chosen app:
    - API module calls the **same path**; hand-write TS types mirroring the **response DTO** (the API serializes C# records as camelCase JSON — TS fields are camelCase even though admin *query params* are PascalCase).
-   - Page (`useQuery`/`useMutation`), route (`RouteGuard` for admin / `withSuspense` for dashboard).
-4. **Permission** — if the endpoint is gated, mirror the constant into admin's `lib/permissions.ts` and gate the route (`add-permission`). Dashboard relies on the server 403.
+   - Page (`useQuery`/`useMutation`), route (`RouteGuard` for admin / `withSuspense` for dashboard, `guarded(navGate(…))` behind a permission).
+4. **Permission** — if the endpoint is gated, mirror the constant into admin's `lib/permissions.ts` and gate the route (`add-permission`). Dashboard: set the gate on the page's item in `nav-data.ts` and guard the route with `navGate`.
 5. **Tests both sides** — backend handler/validator test (xUnit/Shouldly/NSubstitute) + frontend Playwright spec (route-mocked).
 
 ## The contract (the thing that breaks if you're sloppy)
@@ -42,7 +42,7 @@ the order of operations and the **contract** that keeps the two halves in sync.
 | Endpoint route `api/v{n}/{module}/{resources}` | `apiFetch` path |
 | Request: the `Command`/`Query` record fields | request body / query-param keys (admin params PascalCase; **body JSON camelCase**) |
 | Response: the DTO record (camelCase JSON) | the hand-written TS `type` |
-| `.RequirePermission({X}Permissions...)` | (admin) `RouteGuard perms` + the mirrored constant |
+| `.RequirePermission({X}Permissions...)` | (admin) `RouteGuard perms` + the mirrored constant; (dashboard) `perm` in `nav-data.ts` + `guarded(navGate(…))` |
 | Paginated → `PagedResponse<T>` | `PagedResponse<T>` (admin: `@/lib/api-types`; dashboard: inline) |
 
 ## Verify end-to-end
