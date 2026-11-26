@@ -49,6 +49,7 @@ export const RULES = [
   ['.github/workflows/release.yml', []],
   ['.github/workflows/audit.yml', []],
   ['.github/workflows/template-release.yml', []],
+  ['.github/workflows/template-update.yml', []],
   ['template-manifest.yaml', []],
   ['scripts/check-template-manifest.ps1', []],
   ['scripts/init-product.ps1', []],
