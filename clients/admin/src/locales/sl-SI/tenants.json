@@ -195,5 +195,16 @@
   "branding.preview.primaryAction": "Glavno dejanje",
   "branding.preview.secondary": "Sekundarno",
   "branding.preview.warn": "opozorilo",
-  "branding.preview.error": "napaka"
+  "branding.preview.error": "napaka",
+  "members.title": "Uporabniki in vloge",
+  "members.description": "Uporabniki najemnika in vloge, ki jih imajo v njem. Samo za ogled: spreminjajo jih skrbniki najemnika ali vi, ko prevzamete enega od njegovih uporabnikov.",
+  "members.search": "Iskanje uporabnikov",
+  "members.empty": "Ni ustreznih uporabnikov.",
+  "members.loadFailed": "Uporabnikov najemnika ni bilo mogoče naložiti.",
+  "members.inactive": "Neaktiven",
+  "members.unconfirmed": "E-pošta ni potrjena",
+  "members.noRoles": "Brez vloge",
+  "members.rolesLoading": "Nalaganje vlog …",
+  "members.rolesFailed": "Vloge niso na voljo",
+  "members.rolesOf": "Vloge uporabnika {{name}}"
 }

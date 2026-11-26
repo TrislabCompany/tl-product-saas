@@ -191,5 +191,16 @@
   "branding.preview.primaryAction": "Primary action",
   "branding.preview.secondary": "Secondary",
   "branding.preview.warn": "warn",
-  "branding.preview.error": "error"
+  "branding.preview.error": "error",
+  "members.title": "Users and roles",
+  "members.description": "The tenant's users and the roles each holds there. Read only: the tenant's Admins change them, or you while impersonating one of its users.",
+  "members.search": "Search users",
+  "members.empty": "No users match.",
+  "members.loadFailed": "Couldn't load the tenant's users.",
+  "members.inactive": "Inactive",
+  "members.unconfirmed": "E-mail not confirmed",
+  "members.noRoles": "No role",
+  "members.rolesLoading": "Loading roles…",
+  "members.rolesFailed": "Roles unavailable",
+  "members.rolesOf": "Roles of {{name}}"
 }

@@ -25,6 +25,7 @@ import { useAuth } from "@/auth/use-auth";
 import { ImpersonateDialog } from "@/components/impersonation/impersonate-dialog";
 import { ActiveGrantsCard } from "@/components/impersonation/active-grants-card";
 import { TenantBrandingCard } from "@/components/tenants/tenant-branding-card";
+import { TenantMembersCard } from "@/components/tenants/tenant-members-card";
 import { RenewTenantDialog } from "@/components/tenants/renew-tenant-dialog";
 import { AdjustValidityDialog } from "@/components/tenants/adjust-validity-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -286,6 +287,8 @@ export function TenantDetailPage() {
           )}
 
           <ActiveGrantsCard tenantId={tenant.id} />
+
+          <TenantMembersCard tenantId={tenant.id} />
 
           <TenantBrandingCard tenantId={tenant.id} />
 

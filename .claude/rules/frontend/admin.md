@@ -25,6 +25,7 @@ Form layout primitives live in `src/components/list/` (`PageHeader`, `Field`, `F
 - The JWT carries only role names. Admin fetches the permission set separately: `GET /api/v1/identity/permissions` (`getMyPermissions`), cached under `tl.admin.permissions`.
 - `AuthProvider` hydrates them in an effect keyed on subject change and exposes `permissionsHydrated` to avoid a 403 flash on first paint.
 - **Route gating:** wrap gated route elements in `<RouteGuard perms={[IdentityPermissions.Users.View]}>…</RouteGuard>`. It renders a "Resolving permissions" state while `!permissionsHydrated`, else `<ForbiddenView missing={…}/>`. (`ProtectedRoute` also accepts a `permissions?` prop.)
+- **Looking into a tenant:** an operator's session is in root. A card on a tenant's page sends that tenant in the `tenant` header (`searchUsers({ tenantId })`, `getUserRoles(id, tenantId)`, the branding calls), which the framework scopes to that tenant for root operators only, with the operator's own permissions. Read only by default: a change to a tenant's users or roles is the tenant Admins' job, or the operator's while impersonating (`TenantMembersCard`).
 - **Mirror server permissions by hand** in `src/lib/permissions.ts` (`IdentityPermissions`, `MultitenancyPermissions`, … frozen objects + `PERMISSION_CATALOG` driving the role editor). There is intentionally **no** runtime catalog fetch — when the server adds a permission, mirror the constant here.
 
 ## Routing & realtime
