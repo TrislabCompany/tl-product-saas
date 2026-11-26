@@ -163,8 +163,14 @@ export async function getUser(id: string): Promise<UserDto> {
   return apiFetch<UserDto>(`${BASE}/${encodeURIComponent(id)}`);
 }
 
-export async function getUserRoles(id: string): Promise<UserRoleDto[]> {
-  return apiFetch<UserRoleDto[]>(`${BASE}/${encodeURIComponent(id)}/roles`);
+/**
+ * The user's roles, each with `enabled` when the user holds it. `tenantId` scopes the read to that tenant
+ * (the root operator's `tenant` header override), as on a tenant's page.
+ */
+export async function getUserRoles(id: string, tenantId?: string): Promise<UserRoleDto[]> {
+  return apiFetch<UserRoleDto[]>(`${BASE}/${encodeURIComponent(id)}/roles`, {
+    headers: tenantId ? { tenant: tenantId } : undefined,
+  });
 }
 
 // Users are global: an operator invites an address into root, and its owner accepts the e-mailed link
