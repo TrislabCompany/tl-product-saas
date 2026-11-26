@@ -44,9 +44,9 @@ A container service keeps its data only while it runs: after a restart, the migr
 `migrator` runs before `api`, in every replica of every new revision (`src/Host/App.DbMigrator/Program.cs`):
 
 1. It waits for Postgres, then takes a Postgres advisory lock (`PostgresMigratorLock.cs`), so only one replica migrates at a time.
-2. It applies the tenant catalog's migrations, and seeds the root tenant the first time. 
+2. It applies the tenant catalog's migrations, and seeds the root tenant the first time.
 3. It creates the storage bucket where it is missing; a stamp's storage service has already created it.
-4. For every tenant, it applies each module's migrations and the seed data: roles, groups, and the tenant's admin user. The root tenant's admin, `admin@root.com`, gets `SEED_ADMIN_PASSWORD`; without it, no admin user is seeded. 
+4. For every tenant, it applies each module's migrations and the seed data: roles, groups, and the tenant's admin user. The root tenant's admin, `admin@root.com`, gets `SEED_ADMIN_PASSWORD`; without it, no admin user is seeded.
 5. Where `SEED_DEMO` is true, it seeds the demo tenants `acme` and `globex` with users, products, tickets and chat (`DemoSeed/`).
 6. It exits. Then `api` starts.
 
