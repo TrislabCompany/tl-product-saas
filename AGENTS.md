@@ -101,7 +101,7 @@ Migrations and seed (the migrator, a separate step): `DATABASE_URL=... dotnet ru
 
 Read the relevant file before you work (`.claude/rules/`, each scoped with `paths:`).
 
-**Backend and cross-cutting**
+### Backend and cross-cutting
 
 | Working on… | Read |
 |---|---|
@@ -115,7 +115,7 @@ Read the relevant file before you work (`.claude/rules/`, each scoped with `path
 | Unit and integration tests | `testing.md`, `integration-testing.md` |
 | A sample's quirks | `modules/catalog.md`, `modules/tickets.md`, `modules/chat.md` |
 
-**Frontend**
+### Frontend
 
 | Working on… | Read |
 |---|---|
