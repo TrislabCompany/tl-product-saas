@@ -64,7 +64,7 @@
   "appearance.accent.description": "Izberite barvo blagovne znamke za glavna dejanja, grafikone in poudarke po vsej nadzorni plošči.",
   "appearance.accent.ariaLabel": "Poudarna barva: {{label}}",
   "appearance.font.title": "Pisava",
-  "appearance.font.description": "Pisava uporabniškega vmesnika. Bloki kode z enakomerno širino vedno uporabljajo JetBrains Mono.",
+  "appearance.font.description": "Pisava uporabniškega vmesnika. Bloki kode vedno uporabljajo pisavo enakomerne širine.",
   "appearance.font.ariaLabel": "Pisava: {{label}}",
   "appearance.font.sample": "Aa",
   "appearance.density.title": "Gostota",

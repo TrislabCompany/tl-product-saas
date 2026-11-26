@@ -61,8 +61,8 @@ Login `POST /api/v1/identity/token/issue` with header `X-Trislab-App: "admin"|"d
 
 - **`cn()` is at `src/lib/cn.ts`** (`twMerge(clsx(...))`) — not `lib/utils.ts`. `components.json`: `style:new-york`, `baseColor:slate`, `cssVariables:true`, `iconLibrary:lucide`.
 - UI primitives in `src/components/ui/` are cva-based: `cva(base, { variants, defaultVariants })` + Radix `Slot`/`asChild` + `cn(buttonVariants({...}))`. Layout primitives in `src/components/list/` (admin) / similar (dashboard), re-exported from `index.ts`.
-- **Tailwind v4 is CSS-first — there is NO `tailwind.config`.** Configured via the `@tailwindcss/vite` plugin and one entrypoint `src/styles/globals.css` (imported in `main.tsx`). Tokens: `:root` oklch primitives → semantic vars → an `@theme inline { --color-*: var(--…) }` block exposing them as utilities. `@custom-variant dark (&:is(.dark *))`.
-- Add a new token in `globals.css` (primitive → semantic → `@theme inline`), then use the utility. Don't hard-code colors in components.
+- **Tailwind v4 is CSS-first — there is NO `tailwind.config`.** Configured via the `@tailwindcss/vite` plugin and one entrypoint `src/styles/globals.css` (imported in `main.tsx`). Tokens: `framework-ui`'s `theme.css` → `styles/starter/theme.css` → the product's `styles/theme.css`, then an `@theme inline { --color-*: var(--…) }` block in `globals.css` exposing them as utilities. `@custom-variant dark (&:is(.dark *))` ([docs/theme.md](../../../docs/theme.md)).
+- **No colour outside a `theme.css`.** A new token goes in `styles/starter/theme.css`, derived from a theme variable where it can be, and in `@theme inline`; then use the utility. A colour with transparency is the variable with an opacity: `bg-primary/10`, or `color-mix(in oklab, var(--primary) 10%, transparent)` in CSS or a style. `framework-ui-check-colors src` (in `scripts/test-clients.sh`) fails on a hex value, a colour function or Tailwind's palette; a value that must stay fixed gets `raw-color-allowed: <why>` on its line.
 
 ### Design language (both apps differ on purpose)
 

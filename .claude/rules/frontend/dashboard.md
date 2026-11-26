@@ -39,7 +39,7 @@ A query that mounts outside its own nav-gated page (topbar badges, overview card
 
 ## Theme
 
-**Chroma-0 neutrals** (`--neutral-*: oklch(L 0 0)` — untinted; the warm-paper tint was deliberately removed). Rose default brand with **swappable accent themes** via `.accent-{rose,indigo,violet,sky,emerald,amber}` classes that override the `--brand-*` oklch stops; saffron secondary; Figtree font. Defined in `src/styles/globals.css`. Keep neutrals at chroma 0.
+The Trislab theme of `framework-ui` (dark slate, the orange accent, Inter), with the starter's additions in `src/styles/starter/theme.css` and the product's look in `src/styles/theme.css` ([docs/theme.md](../../../docs/theme.md)). A user may swap the accent: `.accent-{rose,indigo,violet,sky,emerald,amber,custom}` on `<html>` sets the `--brand-*` stops, which replace `--primary` below `<body>`; "Default" is the theme's own colour (`--theme-primary`). Saffron is the warm second accent. No colour anywhere else.
 
 ## Add-a-page deltas (on top of shared steps)
 

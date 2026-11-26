@@ -75,7 +75,7 @@ function ProfileTile({ src, initials }: { src: string | null; initials: string }
       aria-hidden
       className={cn(
         "grid size-8 shrink-0 place-items-center overflow-hidden rounded-lg",
-        "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.15)] text-[var(--color-primary)]",
+        "bg-primary/15 text-[var(--color-primary)]",
         "font-display text-[11px] font-bold tracking-tight",
       )}
     >
@@ -288,7 +288,7 @@ export function Topbar() {
     <header
       className={cn(
         "sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2",
-        "border-b border-[var(--color-border)] bg-[oklch(from_var(--color-background)_l_c_h_/_0.8)]",
+        "border-b border-[var(--color-border)] bg-background/80",
         "px-3 backdrop-blur-sm md:px-5",
       )}
     >
@@ -333,7 +333,7 @@ export function Topbar() {
           </div>
           <ChevronsUpDown
             className={cn(
-              "size-3.5 shrink-0 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]",
+              "size-3.5 shrink-0 text-muted-foreground/50",
               "transition-colors duration-[var(--duration-fast)]",
               "group-hover:text-[var(--color-muted-foreground)]",
             )}

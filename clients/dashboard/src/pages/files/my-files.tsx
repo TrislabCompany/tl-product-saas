@@ -372,7 +372,7 @@ function TabButton({
           className={cn(
             "ml-0.5 rounded-full px-1.5 py-0.5 font-mono text-[10px] tabular-nums",
             active
-              ? "bg-[oklch(from_var(--color-primary-foreground)_l_c_h_/_0.20)] text-[var(--color-primary-foreground)]"
+              ? "bg-primary-foreground/20 text-[var(--color-primary-foreground)]"
               : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
           )}
         >
@@ -419,8 +419,8 @@ function FilterBar({
           className={cn(
             "h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-9",
             "text-[13px] outline-none transition-colors",
-            "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]",
-            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+            "placeholder:text-muted-foreground/70",
+            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
           )}
         />
         {searchQuery && (
@@ -509,7 +509,7 @@ function KindChip({
         "inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-2.5 text-[11.5px] font-medium",
         "transition-colors duration-[var(--duration-fast)]",
         active
-          ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.30)]"
+          ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-inset ring-primary/30"
           : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]",
         disabled &&
           "cursor-not-allowed opacity-40 hover:bg-transparent hover:text-[var(--color-muted-foreground)]",
@@ -521,7 +521,7 @@ function KindChip({
         className={cn(
           "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
           active
-            ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.18)] text-[var(--color-primary)]"
+            ? "bg-primary/18 text-[var(--color-primary)]"
             : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
         )}
       >
@@ -630,7 +630,7 @@ function MobileCard({
         "block w-full cursor-pointer rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left",
         "shadow-xs",
         "transition-colors duration-[var(--duration-fast)]",
-        "hover:border-[var(--color-border-strong)] hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.03)]",
+        "hover:border-[var(--color-border-strong)] hover:bg-primary/3",
       )}
     >
       <div className="flex items-center gap-3">
@@ -708,7 +708,7 @@ function DesktopRow({
         <span>{formatDate(file.createdAtUtc)}</span>
         <ChevronRight
           aria-hidden
-          className="size-4 shrink-0 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.4)] transition-colors group-hover:text-[var(--color-muted-foreground)]"
+          className="size-4 shrink-0 text-muted-foreground/40 transition-colors group-hover:text-[var(--color-muted-foreground)]"
         />
       </span>
     </EntityListRow>

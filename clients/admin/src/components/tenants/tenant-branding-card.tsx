@@ -218,7 +218,7 @@ function PaletteEditor({
   const { t } = useTranslation("tenants");
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
-      <div className="flex items-center justify-between border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
         <h4 className="text-[12.5px] font-semibold tracking-tight text-[var(--color-foreground)]">
           {title}
         </h4>
@@ -266,7 +266,7 @@ function ColorRow({
       >
         <input
           type="color"
-          value={valid ? value : "#000000"}
+          value={valid ? value : "#000000"} // raw-color-allowed: a colour input needs a hex value while the field is invalid
           onChange={(e) => onChange(e.target.value.toUpperCase())}
           className="sr-only"
           aria-label={t("branding.color.aria", { name: label })}
@@ -306,7 +306,7 @@ function BrandAssetsEditor({
   const { t } = useTranslation("tenants");
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
-      <div className="border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-4 py-2.5">
+      <div className="border-b border-border/50 px-4 py-2.5">
         <h4 className="text-[12.5px] font-semibold tracking-tight text-[var(--color-foreground)]">
           {t("branding.assets.title")}
         </h4>

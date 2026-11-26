@@ -284,7 +284,7 @@ export function ProductsPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+        <Search className="absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground/50" />
         <input
           type="text"
           placeholder={t("products.searchPlaceholder")}
@@ -293,16 +293,16 @@ export function ProductsPage() {
           className={cn(
             "h-[46px] w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]",
             "pl-12 pr-4 text-[14px] font-normal text-[var(--color-foreground)] outline-none",
-            "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]",
+            "placeholder:text-muted-foreground/50",
             "shadow-xs",
             "transition-all duration-200",
-            "focus:border-[oklch(from_var(--color-ring)_l_c_h_/_0.30)] focus:ring-2 focus:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.10)]",
+            "focus:border-ring/30 focus:ring-2 focus:ring-ring/10",
           )}
         />
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-medium text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)] transition-colors hover:text-[var(--color-muted-foreground)]"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-medium text-muted-foreground/50 transition-colors hover:text-[var(--color-muted-foreground)]"
           >
             {t("action.clear")}
           </button>
@@ -360,7 +360,7 @@ export function ProductsPage() {
           {/* Desktop: table */}
           <div className="hidden overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-xs md:block">
             {/* Header */}
-            <div className="grid grid-cols-[1fr_120px_24px] gap-3 border-b border-[var(--color-border)] bg-[oklch(from_var(--color-muted)_l_c_h_/_0.4)] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)] lg:grid-cols-[1fr_140px_110px_120px_90px]">
+            <div className="grid grid-cols-[1fr_120px_24px] gap-3 border-b border-[var(--color-border)] bg-muted/40 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)] lg:grid-cols-[1fr_140px_110px_120px_90px]">
               <span>{t("col.product")}</span>
               <span>{t("col.sku")}</span>
               <span className="hidden lg:block">{t("col.brand")}</span>
@@ -398,7 +398,7 @@ export function ProductsPage() {
       {query.isError && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-[var(--color-destructive)]"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <span>{describe(query.error)}</span>
@@ -441,8 +441,8 @@ function MobileCard({
       className={cn(
         "block rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left",
         "shadow-xs",
-        "transition-colors hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)] active:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.6)]",
-        "outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.4)]",
+        "transition-colors hover:bg-accent/40 active:bg-accent/60",
+        "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40",
       )}
     >
       <div className="flex items-center justify-between">
@@ -458,7 +458,7 @@ function MobileCard({
                 {product.name}
               </p>
               {!product.isActive && (
-                <span className="inline-flex h-4 items-center rounded-full border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.20)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-destructive)]">
+                <span className="inline-flex h-4 items-center rounded-full border border-destructive/20 bg-destructive/10 px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-destructive)]">
                   {t("badge.hidden")}
                 </span>
               )}
@@ -535,9 +535,9 @@ function DesktopRow({
     <div
       className={cn(
         "group grid grid-cols-[1fr_120px_24px] items-center gap-3 px-5 py-3 transition-colors duration-100",
-        "hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)]",
+        "hover:bg-accent/40",
         "lg:grid-cols-[1fr_140px_110px_120px_90px]",
-        !isLast && "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.3)]",
+        !isLast && "border-b border-border/30",
         !product.isActive && "opacity-75",
       )}
     >
@@ -555,7 +555,7 @@ function DesktopRow({
           {product.name}
         </span>
         {!product.isActive && (
-          <span className="inline-flex h-4 shrink-0 items-center rounded-full border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.20)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-destructive)]">
+          <span className="inline-flex h-4 shrink-0 items-center rounded-full border border-destructive/20 bg-destructive/10 px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-destructive)]">
             {t("badge.hidden")}
           </span>
         )}
@@ -576,7 +576,7 @@ function DesktopRow({
             <span className="truncate">{brand.name}</span>
           </span>
         ) : (
-          <span className="text-[12px] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]">
+          <span className="text-[12px] text-muted-foreground/50">
             —
           </span>
         )}
@@ -644,9 +644,9 @@ function EmptyResults({
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
         {searchActive ? (
-          <Search className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.4)]" />
+          <Search className="size-6 text-muted-foreground/40" />
         ) : (
-          <PackageX className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.4)]" />
+          <PackageX className="size-6 text-muted-foreground/40" />
         )}
       </div>
       <h3 className="mb-1.5 font-display text-[17px] font-semibold text-[var(--color-foreground)]">
@@ -700,7 +700,7 @@ function LoadingList() {
             key={i}
             className={cn(
               "grid grid-cols-[1fr_140px_110px_120px_24px] gap-3 items-center px-5 py-3",
-              i < 5 && "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.3)]",
+              i < 5 && "border-b border-border/30",
             )}
           >
             <div className="flex items-center gap-3">
@@ -736,9 +736,9 @@ function StockChip({
     default:
       "bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-1)]",
     warning:
-      "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.14)] text-[var(--color-warning)] hover:bg-[oklch(from_var(--color-warning)_l_c_h_/_0.22)]",
+      "bg-warning/14 text-[var(--color-warning)] hover:bg-warning/22",
     danger:
-      "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.14)] text-[var(--color-destructive)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.22)]",
+      "bg-destructive/14 text-[var(--color-destructive)] hover:bg-destructive/22",
   } as const;
   const Comp = onClick ? "button" : "span";
   return (
@@ -810,8 +810,8 @@ function ProductImage({
       style={style}
       className={cn(
         "relative grid shrink-0 place-items-center overflow-hidden rounded-xl",
-        "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)]",
-        "ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)]",
+        "bg-primary/10",
+        "ring-1 ring-inset ring-primary/22",
       )}
     >
       <span className="font-display text-[12px] font-bold text-[var(--color-primary)]">
@@ -1064,8 +1064,8 @@ function ProductEditorDialog({
                 maxLength={4000}
                 className={cn(
                   "flex w-full rounded-lg border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm shadow-xs",
-                  "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]",
-                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+                  "placeholder:text-muted-foreground/60",
+                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 )}
                 placeholder={t("placeholder.productDescription")}
               />
@@ -1360,7 +1360,7 @@ function StockDialog({
             </div>
 
             {willGoNegative && (
-              <div className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.20)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)] px-3 py-2 text-[12.5px] text-[var(--color-destructive)]">
+              <div className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/8 px-3 py-2 text-[12.5px] text-[var(--color-destructive)]">
                 <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
                 <span>
                   {t("stock.negativePrefix")}

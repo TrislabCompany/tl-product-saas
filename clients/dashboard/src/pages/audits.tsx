@@ -367,7 +367,7 @@ export function AuditsPage() {
       ) : auditsQuery.isError ? (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-[var(--color-destructive)]"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <span>{(auditsQuery.error as Error)?.message ?? t("page.loadError")}</span>
@@ -480,7 +480,7 @@ function AuditMobileCard({
       className={cn(
         "block w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left",
         "shadow-xs",
-        "transition-colors hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)] active:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.6)]",
+        "transition-colors hover:bg-accent/40 active:bg-accent/60",
       )}
     >
       <div className="flex items-center justify-between gap-3">
@@ -564,7 +564,7 @@ function AuditDesktopRow({
             {auditPredicate(row)}
           </div>
           <div className="mt-0.5 flex min-w-0 items-center gap-1.5">
-            <code className="truncate font-mono text-[11px] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.8)]">
+            <code className="truncate font-mono text-[11px] text-muted-foreground/80">
               {row.source ?? "—"}
             </code>
             {tags.slice(0, 2).map((name) => (
@@ -769,7 +769,7 @@ function FilterBar({
                 className={cn(
                   "rounded-md px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors",
                   filters.range === opt.key
-                    ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-[0_1px_0_oklch(0_0_0_/_0.05)]"
+                    ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-[0_1px_0_color-mix(in_oklab,var(--shadow-color)_5%,transparent)]"
                     : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]",
                 )}
               >
@@ -1041,7 +1041,7 @@ function AuditDetailDrawer({
             // Slide-in panel from the right edge.
             "fixed right-0 top-0 z-50 h-screen w-full max-w-[640px] outline-none",
             "bg-card border border-border rounded-none border-y-0 border-r-0 shadow-sm",
-            "shadow-[-12px_0_40px_-16px_oklch(0_0_0_/_0.35)]",
+            "shadow-[-12px_0_40px_-16px_color-mix(in_oklab,var(--shadow-color)_35%,transparent)]",
             "data-[state=open]:animate-in data-[state=open]:slide-in-from-right",
             "data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right",
             "duration-[var(--duration-default)]",
@@ -1111,7 +1111,7 @@ function DrawerHeader({ detail, loading }: { detail?: AuditDetailDto; loading: b
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          background: `linear-gradient(180deg, oklch(from ${toneColor} l c h / 0.08), transparent 60%)`,
+          background: `linear-gradient(180deg, color-mix(in oklab, ${toneColor} 8%, transparent), transparent 60%)`,
         }}
       />
       <div className="relative">
@@ -1120,9 +1120,9 @@ function DrawerHeader({ detail, loading }: { detail?: AuditDetailDto; loading: b
             aria-hidden
             className="grid h-7 w-7 place-items-center rounded-md ring-1 ring-inset"
             style={{
-              background: `linear-gradient(135deg, oklch(from ${toneColor} l c h / 0.20), oklch(from ${toneColor} l c h / 0.02))`,
+              background: `linear-gradient(135deg, color-mix(in oklab, ${toneColor} 20%, transparent), color-mix(in oklab, ${toneColor} 2%, transparent))`,
               color: toneColor,
-              boxShadow: `inset 0 0 0 1px oklch(from ${toneColor} l c h / 0.25)`,
+              boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${toneColor} 25%, transparent)`,
             }}
           >
             <EventTypeIcon eventType={detail.eventType} className="h-3.5 w-3.5" />
@@ -1392,7 +1392,7 @@ function RelatedEventsSection({
                   aria-hidden
                   className={cn(
                     "absolute -left-0 top-2 h-2.5 w-2.5 rounded-full ring-2 ring-[var(--color-card)]",
-                    isCurrent && "shadow-[0_0_0_3px_oklch(from_var(--color-primary)_l_c_h_/_0.18)]",
+                    isCurrent && "shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-primary)_18%,transparent)]",
                   )}
                   style={{ background: isCurrent ? "var(--color-primary)" : tone }}
                 />

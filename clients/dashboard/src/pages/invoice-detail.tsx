@@ -145,14 +145,14 @@ function InvoiceHeader({ invoice }: { invoice: InvoiceDto }) {
         className="h-1 w-full"
         style={{
           background:
-            "linear-gradient(90deg, var(--color-primary), oklch(from var(--color-primary) l c h / 0.8), var(--color-saffron))",
+            "linear-gradient(90deg, var(--color-primary), color-mix(in oklab, var(--color-primary) 80%, transparent), var(--color-saffron))",
         }}
       />
       <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between sm:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <span
             aria-hidden
-            className="grid size-11 shrink-0 place-items-center rounded-xl bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)] text-[var(--color-primary)] sm:size-14"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/8 text-[var(--color-primary)] sm:size-14"
           >
             <Receipt className="size-5 sm:size-6" />
           </span>
@@ -223,7 +223,7 @@ function LineItemsTable({ invoice }: { invoice: InvoiceDto }) {
   return (
     <div>
       <div
-        className={`grid ${LINE_GRID} items-center gap-3 border-b border-[var(--color-border)] bg-[oklch(from_var(--color-muted)_l_c_h_/_0.4)] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]`}
+        className={`grid ${LINE_GRID} items-center gap-3 border-b border-[var(--color-border)] bg-muted/40 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]`}
       >
         <span>{t("invoiceDetail.col.description")}</span>
         <span className="text-right">{t("invoiceDetail.col.qty")}</span>
@@ -242,7 +242,7 @@ function LineItemsTable({ invoice }: { invoice: InvoiceDto }) {
 
       {/* Total */}
       <div
-        className={`grid ${LINE_GRID} items-center gap-3 border-t border-[var(--color-border)] bg-[oklch(from_var(--color-muted)_l_c_h_/_0.25)] px-5 py-3.5`}
+        className={`grid ${LINE_GRID} items-center gap-3 border-t border-[var(--color-border)] bg-muted/25 px-5 py-3.5`}
       >
         <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
           {t("invoiceDetail.total")}
@@ -269,7 +269,7 @@ function LineItemRow({
   return (
     <div
       className={`grid ${LINE_GRID} items-center gap-3 px-5 py-3 ${
-        isLast ? "" : "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.3)]"
+        isLast ? "" : "border-b border-border/30"
       }`}
     >
       <div className="min-w-0">
@@ -396,7 +396,7 @@ function NotFoundPanel() {
   const { t } = useTranslation("subscription");
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-8 py-16 text-center">
-      <div className="mb-5 grid size-16 place-items-center rounded-2xl bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]">
+      <div className="mb-5 grid size-16 place-items-center rounded-2xl bg-primary/8">
         <Receipt className="size-7 text-[var(--color-primary)]" />
       </div>
       <h3 className="mb-1.5 text-[17px] font-semibold text-[var(--color-foreground)]">

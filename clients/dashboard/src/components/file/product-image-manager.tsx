@@ -188,7 +188,7 @@ function ImageTile({
         "group relative overflow-hidden rounded-xl border bg-[var(--color-card)] shadow-xs transition-colors",
         image.isThumbnail
           ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]"
-          : "border-border hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)]",
+          : "border-border hover:bg-accent/40",
       )}
     >
       <button
@@ -212,7 +212,7 @@ function ImageTile({
         </span>
       )}
 
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-[oklch(0_0_0/0.65)] to-transparent p-2 opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover:opacity-100 focus-within:opacity-100">
+      <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-[var(--color-overlay)] to-transparent p-2 opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover:opacity-100 focus-within:opacity-100">
         {!image.isThumbnail && (
           <Button
             type="button"
@@ -225,7 +225,7 @@ function ImageTile({
             disabled={busy}
             title={t("pim.setCover")}
             aria-label={t("pim.setCover")}
-            className="bg-[var(--color-overlay)] text-[var(--color-overlay-foreground)] hover:bg-[oklch(0_0_0/0.65)]"
+            className="bg-[var(--color-overlay)] text-[var(--color-overlay-foreground)] hover:bg-[color-mix(in_oklab,var(--color-overlay)_80%,var(--shadow-color))]"
           >
             <StarOff className="h-4 w-4" />
           </Button>

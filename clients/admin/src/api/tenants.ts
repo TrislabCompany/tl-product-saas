@@ -195,27 +195,27 @@ export type TenantThemeDto = {
 };
 
 export const DEFAULT_LIGHT_PALETTE: PaletteDto = {
-  primary: "#2563EB",
-  secondary: "#0F172A",
-  tertiary: "#6366F1",
-  background: "#F8FAFC",
-  surface: "#FFFFFF",
-  error: "#DC2626",
-  warning: "#F59E0B",
-  success: "#16A34A",
-  info: "#0284C7",
+  primary: "#2563EB", // raw-color-allowed: the API's default tenant palette, data and not styling
+  secondary: "#0F172A", // raw-color-allowed: the API's default tenant palette, data and not styling
+  tertiary: "#6366F1", // raw-color-allowed: the API's default tenant palette, data and not styling
+  background: "#F8FAFC", // raw-color-allowed: the API's default tenant palette, data and not styling
+  surface: "#FFFFFF", // raw-color-allowed: the API's default tenant palette, data and not styling
+  error: "#DC2626", // raw-color-allowed: the API's default tenant palette, data and not styling
+  warning: "#F59E0B", // raw-color-allowed: the API's default tenant palette, data and not styling
+  success: "#16A34A", // raw-color-allowed: the API's default tenant palette, data and not styling
+  info: "#0284C7", // raw-color-allowed: the API's default tenant palette, data and not styling
 };
 
 export const DEFAULT_DARK_PALETTE: PaletteDto = {
-  primary: "#38BDF8",
-  secondary: "#94A3B8",
-  tertiary: "#818CF8",
-  background: "#0B1220",
-  surface: "#111827",
-  error: "#F87171",
-  warning: "#FBBF24",
-  success: "#22C55E",
-  info: "#38BDF8",
+  primary: "#38BDF8", // raw-color-allowed: the API's default tenant palette, data and not styling
+  secondary: "#94A3B8", // raw-color-allowed: the API's default tenant palette, data and not styling
+  tertiary: "#818CF8", // raw-color-allowed: the API's default tenant palette, data and not styling
+  background: "#0B1220", // raw-color-allowed: the API's default tenant palette, data and not styling
+  surface: "#111827", // raw-color-allowed: the API's default tenant palette, data and not styling
+  error: "#F87171", // raw-color-allowed: the API's default tenant palette, data and not styling
+  warning: "#FBBF24", // raw-color-allowed: the API's default tenant palette, data and not styling
+  success: "#22C55E", // raw-color-allowed: the API's default tenant palette, data and not styling
+  info: "#38BDF8", // raw-color-allowed: the API's default tenant palette, data and not styling
 };
 
 /** Fetch a tenant's theme. Caller needs MultitenancyPermissions.Tenants.ViewTheme. */

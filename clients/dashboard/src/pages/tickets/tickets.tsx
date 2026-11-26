@@ -275,7 +275,7 @@ export function TicketsPage() {
       {query.isError && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-[var(--color-destructive)]"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <span>{describe(query.error)}</span>
@@ -306,8 +306,8 @@ function MobileCard({ ticket }: { ticket: TicketDto }) {
       className={cn(
         "block rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left",
         "shadow-xs",
-        "transition-colors hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)] active:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.6)]",
-        "outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.4)]",
+        "transition-colors hover:bg-accent/40 active:bg-accent/60",
+        "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40",
       )}
     >
       <div className="flex items-center justify-between gap-3">
@@ -401,7 +401,7 @@ function DesktopRow({
             </span>
           </>
         ) : (
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground/60">
             {t("row.unassigned")}
           </span>
         )}
@@ -515,8 +515,8 @@ function CreateTicketDialog({
                 rows={4}
                 className={cn(
                   "flex w-full rounded-lg border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm shadow-xs",
-                  "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]",
-                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+                  "placeholder:text-muted-foreground/60",
+                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 )}
                 maxLength={4096}
               />

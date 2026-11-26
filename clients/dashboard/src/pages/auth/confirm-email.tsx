@@ -115,8 +115,8 @@ export function ConfirmEmailPage() {
                 role="alert"
                 className={cn(
                   "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-                  "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-                  "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+                  "border-destructive/30",
+                  "bg-destructive/6",
                   "text-[var(--color-destructive)]",
                 )}
               >
@@ -154,7 +154,7 @@ export function ConfirmEmailPage() {
           <div className="grid place-items-center">
             <span
               aria-hidden
-              className="grid size-14 place-items-center rounded-2xl bg-[oklch(from_var(--color-success)_l_c_h_/_0.10)] text-[var(--color-success)]"
+              className="grid size-14 place-items-center rounded-2xl bg-success/10 text-[var(--color-success)]"
             >
               <CheckCircle2 className="size-6" />
             </span>
@@ -179,7 +179,7 @@ export function ConfirmEmailPage() {
           <div className="grid place-items-center">
             <span
               aria-hidden
-              className="grid size-14 place-items-center rounded-2xl bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] text-[var(--color-destructive)]"
+              className="grid size-14 place-items-center rounded-2xl bg-destructive/10 text-[var(--color-destructive)]"
             >
               <AlertCircle className="size-6" />
             </span>

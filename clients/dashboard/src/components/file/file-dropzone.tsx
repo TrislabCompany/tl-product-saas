@@ -105,9 +105,9 @@ export function FileDropzone({ options, onUploaded, disabled, accept, className 
           "outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]",
           disabled
             ? "cursor-not-allowed border-border bg-[var(--color-muted)] opacity-60"
-            : "cursor-pointer border-border bg-[var(--color-muted)] hover:bg-[oklch(from_var(--color-muted)_l_c_h_/_0.6)]",
+            : "cursor-pointer border-border bg-[var(--color-muted)] hover:bg-muted/60",
           dragOver
-            && "border-[var(--color-primary)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.06)]",
+            && "border-[var(--color-primary)] bg-primary/6",
           isError && "border-[var(--color-destructive)]",
         )}
       >
@@ -180,14 +180,14 @@ function DropzoneIcon({ status }: { status: string | undefined }) {
   }
   if (status === "done") {
     return (
-      <span className="grid h-12 w-12 place-items-center rounded-xl bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)]">
+      <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 ring-1 ring-inset ring-primary/22">
         <CheckCircle2 className="h-5 w-5 text-[var(--color-primary)]" />
       </span>
     );
   }
   if (status === "error") {
     return (
-      <span className="grid h-12 w-12 place-items-center rounded-xl bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] ring-1 ring-inset ring-[oklch(from_var(--color-destructive)_l_c_h_/_0.22)]">
+      <span className="grid h-12 w-12 place-items-center rounded-xl bg-destructive/10 ring-1 ring-inset ring-destructive/22">
         <AlertCircle className="h-5 w-5 text-[var(--color-destructive)]" />
       </span>
     );

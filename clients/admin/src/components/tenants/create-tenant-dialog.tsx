@@ -102,7 +102,7 @@ function AdornButton({
       className={cn(
         "grid size-7 shrink-0 place-items-center rounded-md outline-none transition-colors cursor-pointer",
         "text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]",
-        "focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+        "focus-visible:ring-2 focus-visible:ring-ring/50",
         "[&_svg]:size-3.5",
       )}
     >
@@ -133,14 +133,14 @@ function PreviewRail({
       className={cn(
         "relative flex items-center gap-4 overflow-hidden p-5 sm:flex-col sm:items-start sm:gap-0 sm:p-6",
         "border-b border-[var(--color-border)] sm:border-b-0 sm:border-r",
-        "bg-gradient-to-b from-[oklch(from_var(--color-primary)_l_c_h_/_0.06)] to-[var(--color-muted)]/40",
+        "bg-gradient-to-b from-primary/6 to-[var(--color-muted)]/40",
       )}
     >
       {/* Soft radial glow behind the monogram for depth */}
       <div
         aria-hidden
         className="pointer-events-none absolute -left-8 -top-10 h-40 w-40 rounded-full opacity-60 blur-2xl
-          bg-[radial-gradient(circle,oklch(from_var(--color-primary)_l_c_h_/_0.18),transparent_70%)]"
+          bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-primary)_18%,transparent),transparent_70%)]"
       />
 
       <div className="relative shrink-0">
@@ -166,7 +166,7 @@ function PreviewRail({
           <div className="flex items-center gap-2">
             <span
               aria-hidden
-              className="size-1.5 rounded-full bg-[var(--color-primary)] ring-2 ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)]"
+              className="size-1.5 rounded-full bg-[var(--color-primary)] ring-2 ring-primary/18"
             />
             <span className="text-[12px] text-[var(--color-muted-foreground)]">
               {planLabel ?? t("create.preview.defaultPlan")}
@@ -175,7 +175,7 @@ function PreviewRail({
           <div className="flex items-center gap-2">
             <span
               aria-hidden
-              className="size-1.5 rounded-full bg-[var(--color-success)] ring-2 ring-[oklch(from_var(--color-success)_l_c_h_/_0.18)]"
+              className="size-1.5 rounded-full bg-[var(--color-success)] ring-2 ring-success/18"
             />
             <span className="text-[12px] text-[var(--color-muted-foreground)]">
               {t("create.preview.activeOnCreation")}
@@ -420,7 +420,7 @@ export function CreateTenantDialog({
                         className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium
                           text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-accent)]
                           hover:text-[var(--color-foreground)] cursor-pointer outline-none
-                          focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+                          focus-visible:ring-2 focus-visible:ring-ring/50"
                       >
                         <Pencil className="size-3" aria-hidden /> {t("create.identifier.edit")}
                       </button>
@@ -431,7 +431,7 @@ export function CreateTenantDialog({
                         className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium
                           text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-accent)]
                           hover:text-[var(--color-foreground)] cursor-pointer outline-none
-                          focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+                          focus-visible:ring-2 focus-visible:ring-ring/50"
                       >
                         <Lock className="size-3" aria-hidden /> {t("create.identifier.auto")}
                       </button>
@@ -528,7 +528,7 @@ export function CreateTenantDialog({
                   aria-expanded={advancedOpen}
                   className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left outline-none
                     transition-colors hover:bg-[var(--color-accent)] cursor-pointer
-                    focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+                    focus-visible:ring-2 focus-visible:ring-ring/50"
                 >
                   <span className="text-[12.5px] font-medium text-[var(--color-foreground)]">
                     {t("create.advanced.title")}

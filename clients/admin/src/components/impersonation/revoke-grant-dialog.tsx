@@ -110,7 +110,7 @@ export function RevokeGrantDialog({ grant, onOpenChange, onRevoked }: Props) {
                 "w-full resize-y rounded-md border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm",
                 "transition-[border-color,background-color,box-shadow] duration-[var(--duration-fast)]",
                 "hover:border-[var(--color-border-strong)]",
-                "focus-visible:outline-none focus-visible:border-[var(--color-accent-signal)] focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.25)] focus-visible:bg-[var(--color-surface-2)]",
+                "focus-visible:outline-none focus-visible:border-[var(--color-accent-signal)] focus-visible:ring-2 focus-visible:ring-accent-signal/25 focus-visible:bg-[var(--color-surface-2)]",
               )}
             />
             <p className="text-[11px] text-[var(--color-muted-foreground)]">

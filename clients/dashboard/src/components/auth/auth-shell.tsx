@@ -5,13 +5,13 @@ import { ShieldCheck } from "lucide-react";
 // ────────────────────────────────────────────────────────────────────────
 // AuthShell — calm centered-card chrome for unauthenticated pages
 // (forgot-password, reset-password, confirm-email). Mirrors login.tsx's
-// dentalOS vocabulary: atmospheric rose+saffron orbs, Outfit "Trislab"
+// dentalOS vocabulary: atmospheric rose+saffron orbs, display-face "Trislab"
 // brand lockup, warm-paper card with backdrop blur. No parallax, no
 // brackets, no graph paper, no dialog-script eyebrow.
 // ────────────────────────────────────────────────────────────────────────
 
 /**
- * Display headline — Outfit, semibold, calm tracking. Mirrors the
+ * Display headline — display-face, semibold, calm tracking. Mirrors the
  * "Welcome back" line in login.tsx. `lead`/`accent`/`trail` compose
  * but the accent is now a flat foreground-strong colour rather than a
  * gradient sweep (the gradient read too "demo-y" against the new palette).
@@ -51,21 +51,21 @@ export function AuthShell({
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div
           className="absolute -top-[25%] -left-[15%] h-[70vw] w-[70vw] rounded-full blur-[140px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.05)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 5%, transparent)" }}
         />
         <div
           className="absolute -bottom-[20%] -right-[10%] h-[55vw] w-[55vw] rounded-full blur-[120px]"
-          style={{ backgroundColor: "oklch(from var(--color-saffron) l c h / 0.07)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-saffron) 7%, transparent)" }}
         />
         <div
           className="absolute top-[10%] right-[5%] h-[30vw] w-[30vw] rounded-full blur-[80px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.025)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 2.5%, transparent)" }}
         />
       </div>
 
       {/* Card column */}
       <div className="relative z-10 w-full max-w-[420px] tl-enter tl-enter-1">
-        {/* Brand lockup — Trislab logo + Outfit wordmark + .NET 10 caption */}
+        {/* Brand lockup — Trislab logo + display-face wordmark + .NET 10 caption */}
         <div className="mb-8 flex flex-col items-center">
           <div className="flex items-center gap-2.5">
             <span aria-hidden className="brand-mark grid size-9 shrink-0 place-items-center rounded-lg font-display text-[15px] font-bold text-[var(--color-primary-foreground)]">T</span>
@@ -73,7 +73,7 @@ export function AuthShell({
               Tris<span className="text-[var(--color-primary)]">lab</span>
             </span>
           </div>
-          <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+          <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
             <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
             <span>{t("shell.tagline")}</span>
             <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
@@ -81,7 +81,7 @@ export function AuthShell({
         </div>
 
         {/* Form card — warm-paper with backdrop blur */}
-        <div className="rounded-xl border border-[var(--color-border)] bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] backdrop-blur-xl shadow-[0_1px_3px_oklch(0_0_0_/_0.04),0_8px_24px_oklch(0_0_0_/_0.06)]">
+        <div className="rounded-xl border border-[var(--color-border)] bg-card/85 backdrop-blur-xl shadow-[0_1px_3px_color-mix(in_oklab,var(--shadow-color)_4%,transparent),0_8px_24px_color-mix(in_oklab,var(--shadow-color)_6%,transparent)]">
           <div className="px-6 py-7 sm:px-8 sm:py-9">{children}</div>
         </div>
 
@@ -95,7 +95,7 @@ export function AuthShell({
           <ShieldCheck className="size-3" />
           <span>{t("shell.encrypted")}</span>
         </div>
-        <p className="mt-4 text-center text-[10px] font-medium uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]">
+        <p className="mt-4 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
           {t("shell.footer")}
         </p>
       </div>

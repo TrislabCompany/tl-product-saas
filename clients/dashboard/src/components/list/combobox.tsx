@@ -299,10 +299,10 @@ const FilterTrigger = ({
           "inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-full pl-3 pr-2.5",
           "text-[11px] font-semibold uppercase tracking-wider",
           "border transition-colors duration-[var(--duration-fast)]",
-          "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.18)]",
+          "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/18",
           "disabled:cursor-not-allowed disabled:opacity-50",
           hasValue
-            ? "border-[oklch(from_var(--color-primary)_l_c_h_/_0.25)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] text-[var(--color-primary)]"
+            ? "border-primary/25 bg-primary/10 text-[var(--color-primary)]"
             : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)]",
           "data-[state=open]:bg-[var(--color-muted)] data-[state=open]:text-[var(--color-foreground)]",
         )}
@@ -365,8 +365,8 @@ const FieldTrigger = ({
         "transition-colors duration-[var(--duration-fast)]",
         "hover:border-[var(--color-border-strong)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2",
-        "data-[state=open]:border-[oklch(from_var(--color-primary)_l_c_h_/_0.4)]",
-        "data-[state=open]:ring-2 data-[state=open]:ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)] data-[state=open]:ring-offset-0",
+        "data-[state=open]:border-primary/40",
+        "data-[state=open]:ring-2 data-[state=open]:ring-primary/18 data-[state=open]:ring-offset-0",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}

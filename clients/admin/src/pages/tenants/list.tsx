@@ -187,7 +187,7 @@ function StatusPill({ active }: { active: boolean }) {
       className={cn(
         "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-medium",
         active
-          ? "bg-[oklch(from_var(--color-success)_l_c_h_/_0.12)] text-[var(--color-success)]"
+          ? "bg-success/12 text-[var(--color-success)]"
           : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
       )}
     >

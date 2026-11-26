@@ -203,7 +203,7 @@ function BalanceCard({
       </div>
 
       {loading ? (
-        <div className="mt-3 h-10 w-40 animate-pulse rounded-lg bg-[oklch(from_var(--color-muted)_l_c_h_/_0.6)]" />
+        <div className="mt-3 h-10 w-40 animate-pulse rounded-lg bg-muted/60" />
       ) : (
         <div className="mt-2 flex items-baseline gap-2">
           <span className="font-display text-[38px] font-semibold leading-none tracking-tight tabular-nums text-[var(--color-foreground)]">
@@ -213,7 +213,7 @@ function BalanceCard({
       )}
 
       {!loading && isLow && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-warning)_l_c_h_/_0.25)] bg-[oklch(from_var(--color-warning)_l_c_h_/_0.08)] px-3 py-2 text-[12.5px] text-[var(--color-warning)]">
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-warning/25 bg-warning/8 px-3 py-2 text-[12.5px] text-[var(--color-warning)]">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
           <span>
             {balance !== null && balance <= 0
@@ -308,7 +308,7 @@ function TopupRequestForm({ currency }: { currency: string }) {
             className={cn(
               "flex w-full rounded-lg border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm shadow-xs",
               "placeholder:text-[var(--color-muted-foreground)]",
-              "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+              "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
             )}
           />
         </Field>

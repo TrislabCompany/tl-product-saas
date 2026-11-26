@@ -486,7 +486,7 @@ export function CommandPaletteDialog({
         >
           {/* Search row — mirrors EntitySearch shape (rounded-xl, soft icon left). */}
           <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
-            <Search className="h-[18px] w-[18px] shrink-0 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" aria-hidden />
+            <Search className="h-[18px] w-[18px] shrink-0 text-muted-foreground/50" aria-hidden />
             <Command.Input
               placeholder={t("ui.searchPlaceholder")}
               aria-label={t("ui.searchAria")}
@@ -562,7 +562,7 @@ function CommandRow({ item }: { item: ActionItem }) {
         "group/cmd flex cursor-default select-none items-center gap-3 rounded-md px-2.5 py-2 text-sm",
         "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
         "outline-none focus:outline-none focus-visible:outline-none focus-visible:shadow-none",
-        "hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)]",
+        "hover:bg-accent/40",
         "data-[selected=true]:bg-[var(--color-primary-soft)] data-[selected=true]:text-[var(--color-foreground)]",
       )}
     >

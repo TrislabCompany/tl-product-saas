@@ -99,7 +99,7 @@ export function ChannelRail({
     <aside
       className={cn(
         "h-full shrink-0 flex-col border-r border-[var(--color-border)]",
-        "bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] backdrop-blur-xl backdrop-saturate-150",
+        "bg-card/85 backdrop-blur-xl backdrop-saturate-150",
         // Mobile: full-width when no channel is active; collapsed when one is.
         // Desktop: always a fixed 260px column alongside the message area.
         "md:flex md:w-[260px]",
@@ -110,7 +110,7 @@ export function ChannelRail({
       <div className="flex h-12 shrink-0 items-center gap-2.5 px-4">
         <span
           aria-hidden
-          className="grid size-7 place-items-center rounded-lg bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] text-[var(--color-primary)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)]"
+          className="grid size-7 place-items-center rounded-lg bg-primary/10 text-[var(--color-primary)] ring-1 ring-inset ring-primary/22"
         >
           <MessageCircle className="size-3.5" />
         </span>
@@ -137,10 +137,10 @@ export function ChannelRail({
             className={cn(
               "h-8 w-full rounded-lg border bg-[var(--color-background)] pl-7 pr-7 text-[12.5px]",
               "border-[var(--color-input)] text-[var(--color-foreground)]",
-              "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]",
+              "placeholder:text-muted-foreground/60",
               "shadow-xs transition-all duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
               "focus:border-[var(--color-ring)] focus:outline-none",
-              "focus:ring-[3px] focus:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+              "focus:ring-[3px] focus:ring-ring/50",
             )}
           />
           {filter.length > 0 && (
@@ -559,7 +559,7 @@ function NewDmDialog({
                       the operator understands they're seeing the first page
                       of teammates, not search results. Disappears once a
                       typed query takes over the list. */}
-                  <div className="flex items-baseline justify-between gap-2 border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-3 py-2">
+                  <div className="flex items-baseline justify-between gap-2 border-b border-border/50 px-3 py-2">
                     <span className="text-[10.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
                       {debounced.length >= 2 ? t("rail.dmSearchResults") : t("rail.dmSuggested")}
                     </span>

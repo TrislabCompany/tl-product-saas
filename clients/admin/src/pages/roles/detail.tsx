@@ -396,13 +396,13 @@ function PermissionEditor({ role, disabled }: { role: RoleDto; disabled: boolean
                   return (
                     <li
                       key={entry.name}
-                      className="border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] last:border-b-0"
+                      className="border-b border-border/50 last:border-b-0"
                     >
                       <label
                         className={cn(
                           "flex cursor-pointer items-start gap-3 px-4 py-3 text-[12.5px] transition-colors",
                           disabled && "cursor-not-allowed opacity-60",
-                          !disabled && checked && "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.04)] hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.07)]",
+                          !disabled && checked && "bg-primary/4 hover:bg-primary/7",
                           !disabled && !checked && "hover:bg-[var(--color-accent)]",
                         )}
                       >
@@ -438,12 +438,12 @@ function PermissionEditor({ role, disabled }: { role: RoleDto; disabled: boolean
                               {t(`perm.entry.${entry.name}`, { defaultValue: entry.description })}
                             </span>
                             {entry.root && (
-                              <span className="rounded-full bg-[oklch(from_var(--color-warning)_l_c_h_/_0.16)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warning)]">
+                              <span className="rounded-full bg-warning/16 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warning)]">
                                 {t("detail.perm.rootBadge")}
                               </span>
                             )}
                             {entry.basic && (
-                              <span className="rounded-full bg-[oklch(from_var(--color-info)_l_c_h_/_0.16)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--color-info)]">
+                              <span className="rounded-full bg-info/16 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--color-info)]">
                                 {t("detail.perm.basicBadge")}
                               </span>
                             )}
@@ -494,7 +494,7 @@ function DangerZone({ role, onDeleted }: { role: RoleDto; onDeleted: () => void 
       icon={Trash2}
       description={t("detail.danger.description")}
     >
-      <div className="space-y-4 rounded-lg border border-[var(--color-destructive)]/40 bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.04)] p-5">
+      <div className="space-y-4 rounded-lg border border-[var(--color-destructive)]/40 bg-destructive/4 p-5">
         <div>
           <p className="text-[13px] font-medium text-[var(--color-foreground)]">
             {t("detail.danger.confirmPre")} <code className="rounded bg-[var(--color-muted)] px-1 py-0.5 font-mono text-[12px]">{role.name}</code> {t("detail.danger.confirmPost")}

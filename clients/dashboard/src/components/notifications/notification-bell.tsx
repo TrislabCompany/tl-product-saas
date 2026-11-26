@@ -220,7 +220,7 @@ function NotificationRow({
         "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]",
         isUnread
-          ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.04)] hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]"
+          ? "bg-primary/4 hover:bg-primary/8"
           : "hover:bg-[var(--color-accent)]",
       )}
     >

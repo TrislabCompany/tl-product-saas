@@ -119,8 +119,8 @@ export function ExpiryBanner() {
         "border-b px-4 py-2.5 sm:px-6",
       )}
       style={{
-        borderColor: `oklch(from ${tone} l c h / 0.28)`,
-        backgroundColor: `oklch(from ${tone} l c h / 0.08)`,
+        borderColor: `color-mix(in oklab, ${tone} 28%, transparent)`,
+        backgroundColor: `color-mix(in oklab, ${tone} 8%, transparent)`,
       }}
     >
       <div className="flex min-w-0 items-center gap-2.5">
@@ -128,7 +128,7 @@ export function ExpiryBanner() {
           aria-hidden
           className="grid size-7 shrink-0 place-items-center rounded-lg"
           style={{
-            backgroundColor: `oklch(from ${tone} l c h / 0.14)`,
+            backgroundColor: `color-mix(in oklab, ${tone} 14%, transparent)`,
             color: tone,
           }}
         >
@@ -148,7 +148,7 @@ export function ExpiryBanner() {
           onClick={() => setDismissed(true)}
           aria-label={t("expiryBanner.dismissNotice")}
           title={t("expiryBanner.dismiss")}
-          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-[oklch(from_var(--color-foreground)_l_c_h_/_0.06)]"
+          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-foreground/6"
           style={{ color: tone }}
         >
           <X className="h-3.5 w-3.5" />

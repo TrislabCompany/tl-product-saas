@@ -54,6 +54,29 @@ test.describe("settings/appearance — theme + accent (client-side)", () => {
     expect(stored).toBe("dark");
   });
 
+  test("starts in the Trislab theme, and a chosen accent replaces its primary colour", async ({ page }) => {
+    await page.goto("/settings/appearance");
+    const primary = () =>
+      page.evaluate(() => getComputedStyle(document.body).getPropertyValue("--primary").trim());
+    const themePrimary = () =>
+      page.evaluate(() => getComputedStyle(document.body).getPropertyValue("--theme-primary").trim());
+
+    // framework-ui's theme.css: the orange accent, Inter.
+    expect(await primary()).toBe("#f97316");
+    expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toContain("Inter");
+    await expect(page.getByRole("button", { name: "Default accent" })).toHaveAttribute("aria-pressed", "true");
+
+    await page.getByRole("button", { name: "Rose accent" }).click();
+    await expect(page.locator("html")).toHaveClass(/accent-rose/);
+    expect(await primary()).not.toBe("#f97316");
+    // The default swatch keeps the theme's own colour.
+    expect(await themePrimary()).toBe("#f97316");
+
+    await page.getByRole("button", { name: "Default accent" }).click();
+    await expect(page.locator("html")).not.toHaveClass(/accent-/);
+    expect(await primary()).toBe("#f97316");
+  });
+
   test("opens the custom accent dialog and applies a brand colour", async ({ page }) => {
     await page.goto("/settings/appearance");
 

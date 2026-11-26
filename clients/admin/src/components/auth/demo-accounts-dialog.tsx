@@ -61,7 +61,7 @@ export function DemoAccountsDialog({ open, onOpenChange, onPick }: DemoAccountsD
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-75" />
               <span className="relative inline-flex size-1.5 rounded-full bg-[var(--color-primary)]" />
             </span>
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[oklch(from_var(--color-primary)_l_c_h_/_0.85)]">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-primary/85">
               {t("demo.badge")}
             </span>
           </div>
@@ -76,7 +76,7 @@ export function DemoAccountsDialog({ open, onOpenChange, onPick }: DemoAccountsD
         {/* Account list */}
         <div className="relative border-t border-[var(--color-border)]/60 bg-[var(--color-background)]/30 px-4 py-3">
           <div className="mb-2 flex items-baseline gap-2 px-2">
-            <span className="font-mono text-[9.5px] font-semibold uppercase tabular-nums tracking-[0.18em] text-[oklch(from_var(--color-primary)_l_c_h_/_0.55)]">
+            <span className="font-mono text-[9.5px] font-semibold uppercase tabular-nums tracking-[0.18em] text-primary/55">
               {t("demo.operatorAccounts")}
             </span>
             <div className="relative top-[-2px] h-px flex-1 bg-[var(--color-border)]/70" />

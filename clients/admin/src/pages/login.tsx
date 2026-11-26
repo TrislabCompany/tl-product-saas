@@ -144,15 +144,15 @@ export function LoginPage() {
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div
             className="absolute -top-[25%] -left-[15%] h-[70vw] w-[70vw] rounded-full blur-[140px]"
-            style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.05)" }}
+            style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 5%, transparent)" }}
           />
           <div
             className="absolute -bottom-[20%] -right-[10%] h-[55vw] w-[55vw] rounded-full blur-[120px]"
-            style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.07)" }}
+            style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 7%, transparent)" }}
           />
           <div
             className="absolute top-[10%] right-[5%] h-[30vw] w-[30vw] rounded-full blur-[80px]"
-            style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.025)" }}
+            style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 2.5%, transparent)" }}
           />
         </div>
 
@@ -166,7 +166,7 @@ export function LoginPage() {
                 Tris<span className="text-[var(--color-primary)]">lab</span>
               </span>
             </div>
-            <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+            <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
               <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
               <span>{t("tagline.platformAdmin")}</span>
               <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
@@ -174,7 +174,7 @@ export function LoginPage() {
           </div>
 
           {/* Form card */}
-          <div className="rounded-xl border border-[var(--color-border)] bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] shadow-[0_1px_3px_oklch(0_0_0_/_0.04),0_8px_24px_oklch(0_0_0_/_0.06)] backdrop-blur-xl">
+          <div className="rounded-xl border border-[var(--color-border)] bg-card/85 shadow-[0_1px_3px_color-mix(in_oklab,var(--shadow-color)_4%,transparent),0_8px_24px_color-mix(in_oklab,var(--shadow-color)_6%,transparent)] backdrop-blur-xl">
             <div className="px-6 py-7 sm:px-8 sm:py-9">
               {pending ? (
                 <TwoFactorStep
@@ -279,8 +279,8 @@ export function LoginPage() {
                         role="alert"
                         className={cn(
                           "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-                          "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-                          "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+                          "border-destructive/30",
+                          "bg-destructive/6",
                           "text-[var(--color-destructive)]",
                         )}
                       >
@@ -332,7 +332,7 @@ export function LoginPage() {
             <ShieldCheck className="size-3" />
             <span>{t("encrypted")}</span>
           </div>
-          <p className="mt-4 text-center text-[10px] font-medium uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]">
+          <p className="mt-4 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
             {t("login.footer")}
           </p>
         </div>

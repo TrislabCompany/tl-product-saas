@@ -244,7 +244,7 @@ function Row({
           onClick={onDelete}
           disabled={busy}
           aria-label={t("list.deleteAria", { url: sub.url })}
-          className="text-[var(--color-destructive)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)]"
+          className="text-[var(--color-destructive)] hover:bg-destructive/8"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

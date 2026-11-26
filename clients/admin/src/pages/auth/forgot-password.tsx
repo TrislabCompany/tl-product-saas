@@ -59,15 +59,15 @@ export function ForgotPasswordPage() {
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div
           className="absolute -top-[25%] -left-[15%] h-[70vw] w-[70vw] rounded-full blur-[140px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.05)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 5%, transparent)" }}
         />
         <div
           className="absolute -bottom-[20%] -right-[10%] h-[55vw] w-[55vw] rounded-full blur-[120px]"
-          style={{ backgroundColor: "oklch(from var(--color-saffron, var(--color-primary)) l c h / 0.07)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-saffron, var(--color-primary)) 7%, transparent)" }}
         />
         <div
           className="absolute top-[10%] right-[5%] h-[30vw] w-[30vw] rounded-full blur-[80px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.025)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 2.5%, transparent)" }}
         />
       </div>
 
@@ -81,7 +81,7 @@ export function ForgotPasswordPage() {
               Tris<span className="text-[var(--color-primary)]">lab</span>
             </span>
           </div>
-          <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+          <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
             <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
             <span>{t("tagline.starterKit")}</span>
             <span aria-hidden className="h-px w-6 bg-[var(--color-border)]" />
@@ -89,14 +89,14 @@ export function ForgotPasswordPage() {
         </div>
 
         {/* Form card */}
-        <div className="rounded-xl border border-[var(--color-border)] bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] shadow-[0_1px_3px_oklch(0_0_0_/_0.04),0_8px_24px_oklch(0_0_0_/_0.06)] backdrop-blur-xl">
+        <div className="rounded-xl border border-[var(--color-border)] bg-card/85 shadow-[0_1px_3px_color-mix(in_oklab,var(--shadow-color)_4%,transparent),0_8px_24px_color-mix(in_oklab,var(--shadow-color)_6%,transparent)] backdrop-blur-xl">
           <div className="px-6 py-7 sm:px-8 sm:py-9">
             {submitted ? (
               <div className="tl-enter space-y-5 text-center">
                 <div className="grid place-items-center">
                   <span
                     aria-hidden
-                    className="grid size-14 place-items-center rounded-2xl bg-[oklch(from_var(--color-success)_l_c_h_/_0.10)] text-[var(--color-success)]"
+                    className="grid size-14 place-items-center rounded-2xl bg-success/10 text-[var(--color-success)]"
                   >
                     <MailCheck className="size-6" />
                   </span>
@@ -166,7 +166,7 @@ export function ForgotPasswordPage() {
                       {t("forgot.email")}
                     </Label>
                     <div className="relative">
-                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]" />
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                       <Input
                         id="reset-email"
                         type="email"
@@ -189,8 +189,8 @@ export function ForgotPasswordPage() {
                       role="alert"
                       className={cn(
                         "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-                        "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-                        "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+                        "border-destructive/30",
+                        "bg-destructive/6",
                         "text-[var(--color-destructive)]",
                       )}
                     >

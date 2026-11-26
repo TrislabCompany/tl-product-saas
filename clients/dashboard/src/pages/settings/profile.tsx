@@ -185,7 +185,7 @@ export function ProfileSettings() {
       {profileQuery.isError && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-[13px] text-[var(--color-destructive)]"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-[13px] text-[var(--color-destructive)]"
         >
           <span>{t("profile.loadError")}</span>
         </div>

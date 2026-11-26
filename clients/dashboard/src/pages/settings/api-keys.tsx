@@ -20,7 +20,7 @@ export function ApiKeysSettings() {
       >
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
-            <KeyRound className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.4)]" />
+            <KeyRound className="size-6 text-muted-foreground/40" />
           </div>
           <h3 className="mb-1.5 font-display text-[17px] font-semibold text-[var(--color-foreground)]">
             {t("apiKeys.emptyTitle")}

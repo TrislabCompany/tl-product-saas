@@ -25,9 +25,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "placeholder:text-[var(--color-muted-foreground)]",
           "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
           "md:text-sm",
-          "dark:bg-[oklch(from_var(--color-input)_l_c_h_/_0.3)]",
-          "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
-          "aria-invalid:border-[var(--color-destructive)] aria-invalid:ring-[oklch(from_var(--color-destructive)_l_c_h_/_0.2)]",
+          "dark:bg-input/30",
+          "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "aria-invalid:border-[var(--color-destructive)] aria-invalid:ring-destructive/20",
           className,
         )}
         ref={ref}

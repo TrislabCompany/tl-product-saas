@@ -8,7 +8,7 @@ import { useCommandPalette } from "@/components/command-palette/command-palette"
  * NotFoundPage — calm centered "page not found" card.
  *
  * Mirrors the dentalOS empty-state vocabulary established in
- * entity-shell.tsx's EntityEmpty: a single muted-tile icon, an Outfit
+ * entity-shell.tsx's EntityEmpty: a single muted-tile icon, an display-face
  * headline, a soft body line, and the two primary affordances. Mounted
  * at the root via `path: "*"`, but still inside CommandPaletteProvider —
  * so we can offer "Open command palette" as a second action.
@@ -26,18 +26,18 @@ export function NotFoundPage() {
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div
           className="absolute -top-[25%] -left-[15%] h-[70vw] w-[70vw] rounded-full blur-[140px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.05)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 5%, transparent)" }}
         />
         <div
           className="absolute -bottom-[20%] -right-[10%] h-[55vw] w-[55vw] rounded-full blur-[120px]"
-          style={{ backgroundColor: "oklch(from var(--color-saffron) l c h / 0.07)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-saffron) 7%, transparent)" }}
         />
       </div>
 
       <div className="relative z-10 flex w-full max-w-[460px] flex-col items-center text-center tl-enter tl-enter-1">
         {/* Icon tile — same muted bg + size-14 rounded-2xl as EntityEmpty */}
         <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
-          <FileQuestion className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+          <FileQuestion className="size-6 text-muted-foreground/50" />
         </div>
 
         <h1 className="mb-2 font-display text-display-stat font-semibold tracking-tight text-[var(--color-foreground)]">
@@ -52,7 +52,7 @@ export function NotFoundPage() {
           className="mb-7 inline-flex max-w-full items-center gap-1.5 text-[12px] text-[var(--color-muted-foreground)]"
           title={requested}
         >
-          <span className="text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]">
+          <span className="text-muted-foreground/60">
             {t("notFound.requested")}
           </span>
           <span className="truncate text-[var(--color-foreground)]">{requested}</span>

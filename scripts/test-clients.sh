@@ -19,6 +19,8 @@ for app in "${apps[@]}"; do
   cd "$root/clients/$app"
   npm ci
   npm run lint
+  # No raw colour outside a theme.css (docs/theme.md).
+  npx framework-ui-check-colors src
   # Skips the download when this Chromium is already installed. --with-deps adds the system libraries on CI.
   if [ -n "${CI:-}" ]; then npx playwright install --with-deps chromium; else npx playwright install chromium; fi
   npx playwright test

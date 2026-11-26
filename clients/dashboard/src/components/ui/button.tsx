@@ -14,7 +14,7 @@ const buttonVariants = cva(
     "inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap",
     "rounded-md text-sm font-medium font-sans tracking-tight",
     "transition-all duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
-    "outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)] focus-visible:border-[var(--color-ring)]",
+    "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-[var(--color-ring)]",
     "disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     "active:scale-[0.98]",
@@ -23,7 +23,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:brightness-[1.05] hover:shadow-[0_4px_18px_-6px_oklch(from_var(--color-primary)_l_c_h_/_0.45)]",
+          "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:brightness-[1.05] hover:shadow-[0_4px_18px_-6px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]",
         destructive:
           "bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)] hover:brightness-[1.05]",
         outline: [
@@ -37,7 +37,7 @@ const buttonVariants = cva(
         link: "text-[var(--color-primary)] underline-offset-4 hover:underline",
         soft: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] hover:brightness-[1.06]",
         saffron:
-          "bg-[var(--color-saffron)] text-[var(--color-saffron-foreground)] hover:brightness-[1.05] hover:shadow-[0_4px_18px_-6px_oklch(from_var(--color-saffron)_l_c_h_/_0.45)]",
+          "bg-[var(--color-saffron)] text-[var(--color-saffron-foreground)] hover:brightness-[1.05] hover:shadow-[0_4px_18px_-6px_color-mix(in_oklab,var(--color-saffron)_45%,transparent)]",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

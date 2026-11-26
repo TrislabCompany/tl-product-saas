@@ -89,8 +89,8 @@ export function Select<T extends string = string>({
             // Interactions
             "transition-[border-color,box-shadow,background-color] duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
             "hover:border-[var(--color-border-strong)] hover:bg-[var(--color-accent)]",
-            "focus-visible:outline-none focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
-            "data-[state=open]:border-[var(--color-ring)] data-[state=open]:ring-[3px] data-[state=open]:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+            "focus-visible:outline-none focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "data-[state=open]:border-[var(--color-ring)] data-[state=open]:ring-[3px] data-[state=open]:ring-ring/50",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
         >
@@ -119,9 +119,9 @@ export function Select<T extends string = string>({
                 className={cn(
                   selected && [
                     // Rose-primary active state — tinted background + primary text
-                    "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]",
+                    "bg-primary/8",
                     "text-[var(--color-primary)]",
-                    "data-[highlighted]:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.12)]",
+                    "data-[highlighted]:bg-primary/12",
                     "data-[highlighted]:text-[var(--color-primary)]",
                   ],
                 )}

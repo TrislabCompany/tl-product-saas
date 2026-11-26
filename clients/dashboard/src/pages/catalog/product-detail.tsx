@@ -653,7 +653,7 @@ function NotFoundPanel() {
   const { t } = useTranslation("catalog");
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-8 py-16 text-center">
-      <div className="mb-5 grid size-16 place-items-center rounded-2xl bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]">
+      <div className="mb-5 grid size-16 place-items-center rounded-2xl bg-primary/8">
         <PackageX className="size-7 text-[var(--color-primary)]" />
       </div>
       <h3 className="mb-1.5 text-[17px] font-semibold text-[var(--color-foreground)]">
@@ -1148,7 +1148,7 @@ function StockDialog({
             </div>
 
             {willGoNegative && (
-              <div className="flex items-start gap-2 rounded-md bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)] px-3 py-2 text-[12.5px] text-[var(--color-destructive)]">
+              <div className="flex items-start gap-2 rounded-md bg-destructive/8 px-3 py-2 text-[12.5px] text-[var(--color-destructive)]">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
                   {t("stock.negativeDetailPrefix")}

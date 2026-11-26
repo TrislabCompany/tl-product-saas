@@ -398,7 +398,7 @@ function UsageBody({
       <div className="flex flex-col items-center gap-2 py-8 text-center">
         <span
           aria-hidden
-          className="grid size-8 place-items-center rounded-lg bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)]"
+          className="grid size-8 place-items-center rounded-lg bg-primary/10"
         >
           <Gauge className="size-3.5 text-[var(--color-primary)]" />
         </span>
@@ -425,7 +425,7 @@ function UsageRow({ row }: { row: UsageRowVm }) {
   const overUtilized = row.utilization >= 80;
   const overage = row.overage > 0;
   return (
-    <li className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] py-2.5 first:border-t-0 first:pt-0">
+    <li className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 border-t border-border/50 py-2.5 first:border-t-0 first:pt-0">
       <div className="flex min-w-0 items-center gap-2">
         <span className="truncate text-[12.5px] font-medium tracking-tight text-[var(--color-foreground)]">
           {row.resource}
@@ -515,7 +515,7 @@ function RecentInvoicesBody({
   }
 
   return (
-    <ul className="-my-1 divide-y divide-[oklch(from_var(--color-border)_l_c_h_/_0.5)]">
+    <ul className="-my-1 divide-y divide-border/50">
       {invoices.map((invoice) => (
         <li key={invoice.id}>
           <Link
@@ -524,7 +524,7 @@ function RecentInvoicesBody({
           >
             <span
               aria-hidden
-              className="grid size-8 shrink-0 place-items-center rounded-lg bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] text-[var(--color-primary)]"
+              className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-[var(--color-primary)]"
             >
               <Receipt className="size-3.5" />
             </span>

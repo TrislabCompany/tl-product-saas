@@ -82,7 +82,7 @@ export function RolesListPage() {
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("search.placeholder")}
           aria-label={t("search.aria")}
-          className="h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-3 text-[13px] outline-none transition-colors placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)] focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+          className="h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-3 text-[13px] outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50"
         />
       </div>
 
@@ -207,8 +207,8 @@ function RoleMobileCard({
               aria-hidden
               className="grid size-10 shrink-0 place-items-center rounded-lg"
               style={{
-                backgroundColor: "oklch(from var(--color-primary) l c h / 0.10)",
-                boxShadow: "inset 0 0 0 1px oklch(from var(--color-primary) l c h / 0.22)",
+                backgroundColor: "color-mix(in oklab, var(--color-primary) 10%, transparent)",
+                boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 22%, transparent)",
                 color: "var(--color-primary)",
               }}
             >
@@ -234,7 +234,7 @@ function RoleMobileCard({
         </div>
         {role.permissions != null && (
           <div className="mt-2 ml-[52px]">
-            <span className="inline-flex items-center rounded-full bg-[oklch(from_var(--color-info)_l_c_h_/_0.12)] px-2 py-0.5 text-[10.5px] font-medium text-[var(--color-info)]">
+            <span className="inline-flex items-center rounded-full bg-info/12 px-2 py-0.5 text-[10.5px] font-medium text-[var(--color-info)]">
               {t("permCount", { count: role.permissions.length })}
             </span>
           </div>
@@ -275,8 +275,8 @@ function RoleDesktopRow({
             aria-hidden
             className="grid size-9 shrink-0 place-items-center rounded-lg"
             style={{
-              backgroundColor: "oklch(from var(--color-primary) l c h / 0.10)",
-              boxShadow: "inset 0 0 0 1px oklch(from var(--color-primary) l c h / 0.22)",
+              backgroundColor: "color-mix(in oklab, var(--color-primary) 10%, transparent)",
+              boxShadow: "inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 22%, transparent)",
               color: "var(--color-primary)",
             }}
           >

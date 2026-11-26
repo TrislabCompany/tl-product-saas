@@ -70,7 +70,7 @@ export function Sidebar() {
       aria-label={t("shell.primaryNav")}
       className={cn(
         "hidden shrink-0 flex-col border-r border-[var(--color-border)]",
-        "bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] backdrop-blur-xl backdrop-saturate-150 md:flex",
+        "bg-card/85 backdrop-blur-xl backdrop-saturate-150 md:flex",
         "transition-[width] duration-[var(--duration-default)] ease-[var(--ease-out-cubic)]",
         collapsed ? "w-[52px]" : "w-[220px]",
       )}
@@ -97,7 +97,7 @@ export function Sidebar() {
               <span className="whitespace-nowrap font-display text-[15px] font-bold leading-none tracking-tight text-[var(--color-foreground)]">
                 Tris<span className="text-[var(--color-primary)]">lab</span>
               </span>
-              <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+              <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
                 {t("shell.appSubtitle")}
               </span>
             </div>

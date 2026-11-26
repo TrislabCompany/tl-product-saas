@@ -72,11 +72,11 @@ export function Select<T extends string = string>({
               ? "text-[var(--color-foreground)]"
               : "text-[var(--color-muted-foreground)]",
             "transition-[color,box-shadow,border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
-            "dark:bg-[oklch(from_var(--color-input)_l_c_h_/_0.3)]",
+            "dark:bg-input/30",
             "hover:border-[var(--color-border-strong)]",
-            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
-            "data-[state=open]:border-[var(--color-ring)] data-[state=open]:ring-[3px] data-[state=open]:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
-            "aria-invalid:border-[var(--color-destructive)] aria-invalid:ring-[oklch(from_var(--color-destructive)_l_c_h_/_0.2)]",
+            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "data-[state=open]:border-[var(--color-ring)] data-[state=open]:ring-[3px] data-[state=open]:ring-ring/50",
+            "aria-invalid:border-[var(--color-destructive)] aria-invalid:ring-destructive/20",
             "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
           )}
         >
@@ -106,9 +106,9 @@ export function Select<T extends string = string>({
                 onSelect={() => onValueChange(opt.value as T | "")}
                 className={cn(
                   selected && [
-                    "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]",
+                    "bg-primary/8",
                     "text-[var(--color-primary)]",
-                    "data-[highlighted]:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.12)]",
+                    "data-[highlighted]:bg-primary/12",
                     "data-[highlighted]:text-[var(--color-primary)]",
                   ],
                 )}

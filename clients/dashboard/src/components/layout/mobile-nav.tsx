@@ -104,7 +104,7 @@ export function MobileNavRoot() {
             className={cn(
               "brand-mark grid h-7 w-7 place-items-center rounded-md",
               "text-[11px] font-bold tracking-tight text-[var(--color-primary-foreground)]",
-              "shadow-[0_1px_0_oklch(1_0_0_/_0.18)_inset,0_4px_14px_-4px_oklch(from_var(--color-primary)_l_c_h_/_0.45)]",
+              "shadow-[0_1px_0_color-mix(in_oklab,var(--overlay-foreground)_18%,transparent)_inset,0_4px_14px_-4px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]",
             )}
           >
             T

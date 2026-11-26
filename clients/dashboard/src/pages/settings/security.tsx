@@ -330,7 +330,7 @@ function PasswordField({
           tabIndex={-1}
           aria-label={show ? t("security.password.hide") : t("security.password.show")}
           onClick={() => setShow((s) => !s)}
-          className="absolute right-1.5 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-md text-[var(--color-muted-foreground)] outline-none transition-colors hover:text-[var(--color-foreground)] focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+          className="absolute right-1.5 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-md text-[var(--color-muted-foreground)] outline-none transition-colors hover:text-[var(--color-foreground)] focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>
@@ -452,7 +452,7 @@ function ChangePasswordDialog({
       <DialogContent>
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.20)]">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 ring-1 ring-inset ring-primary/20">
               <KeyRound className="size-4 text-[var(--color-primary)]" />
             </span>
             <DialogTitle>{t("security.password.change")}</DialogTitle>
@@ -507,7 +507,7 @@ function ChangePasswordDialog({
             {localError && (
               <div
                 role="alert"
-                className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.40)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+                className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/8 px-3 py-2 text-sm text-[var(--color-destructive)]"
               >
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span className="leading-snug">{localError}</span>
@@ -634,10 +634,10 @@ function TwoFactorEnroll() {
     }).then((svg) => {
       if (cancelled) return;
       const themed = svg
-        .replace(/fill="#ffffff"/gi, 'fill="transparent"')
-        .replace(/fill="#FFFFFF"/gi, 'fill="transparent"')
-        .replace(/fill="#000000"/gi, 'fill="currentColor"')
-        .replace(/fill="#000"/gi, 'fill="currentColor"');
+        .replace(/fill="#ffffff"/gi, 'fill="transparent"') // raw-color-allowed: the fills of the QR code's SVG, matched to recolour it
+        .replace(/fill="#FFFFFF"/gi, 'fill="transparent"') // raw-color-allowed: the fills of the QR code's SVG, matched to recolour it
+        .replace(/fill="#000000"/gi, 'fill="currentColor"') // raw-color-allowed: the fills of the QR code's SVG, matched to recolour it
+        .replace(/fill="#000"/gi, 'fill="currentColor"'); // raw-color-allowed: the fills of the QR code's SVG, matched to recolour it
       setQr({ enrollment, svg: themed });
     });
     return () => {

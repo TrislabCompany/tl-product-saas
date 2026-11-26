@@ -1,0 +1,165 @@
+/* The starter's additions to the Trislab theme (docs/theme.md).
+
+   framework-ui's theme.css sets the colours, the font and the radius. This
+   file adds what the starter's components read on top of it: the shadows,
+   the warm second accent, the chart grid, two hover surfaces, and the accent
+   palettes a user can choose under Settings → Appearance. It is the
+   template's (shared); the product's own look is ../theme.css, loaded after
+   this one.
+
+   Every value here is derived from a theme variable where it can be, so a
+   product that restyles ../theme.css restyles these too. */
+
+:root {
+  /* A second, warm accent for gradient ends and hero numerals. */
+  --saffron: var(--warning);
+  --saffron-foreground: var(--warning-foreground);
+
+  --chart-grid: color-mix(in oklab, var(--border) 60%, transparent);
+
+  --surface-1-hover: var(--surface-4);
+  --surface-2-hover: var(--surface-1);
+
+  /* Shadows are cast in the colour of the darkest text, so they follow a restyle. */
+  --shadow-color: var(--tl-slate-900, #0f172a);
+  --shadow-xs: 0 1px 2px 0 color-mix(in oklab, var(--shadow-color) 5%, transparent);
+  --shadow-sm: 0 1px 2px 0 color-mix(in oklab, var(--shadow-color) 6%, transparent),
+               0 1px 3px 0 color-mix(in oklab, var(--shadow-color) 7%, transparent);
+  --shadow-md: 0 4px 6px -1px color-mix(in oklab, var(--shadow-color) 8%, transparent),
+               0 2px 4px -2px color-mix(in oklab, var(--shadow-color) 6%, transparent);
+  --shadow-lg: 0 10px 15px -3px color-mix(in oklab, var(--shadow-color) 10%, transparent),
+               0 4px 6px -4px color-mix(in oklab, var(--shadow-color) 6%, transparent);
+  --shadow-lift: 0 12px 32px -16px color-mix(in oklab, var(--shadow-color) 22%, transparent),
+                 0 4px 8px -4px color-mix(in oklab, var(--shadow-color) 12%, transparent);
+
+  /* A faint top-edge highlight, only on surfaces that opt in (surface-edge). */
+  --highlight-color: var(--background);
+  --highlight-top: inset 0 1px 0 color-mix(in oklab, var(--highlight-color) 14%, transparent);
+}
+
+.dark {
+  --shadow-color: #020617;
+  --shadow-sm: 0 1px 2px 0 color-mix(in oklab, var(--shadow-color) 20%, transparent),
+               0 1px 3px 0 color-mix(in oklab, var(--shadow-color) 24%, transparent);
+  --shadow-md: 0 4px 6px -1px color-mix(in oklab, var(--shadow-color) 28%, transparent),
+               0 2px 4px -2px color-mix(in oklab, var(--shadow-color) 20%, transparent);
+  --shadow-lg: 0 10px 15px -3px color-mix(in oklab, var(--shadow-color) 34%, transparent),
+               0 4px 6px -4px color-mix(in oklab, var(--shadow-color) 22%, transparent);
+  --shadow-lift: 0 16px 36px -18px color-mix(in oklab, var(--shadow-color) 55%, transparent),
+                 0 6px 12px -6px color-mix(in oklab, var(--shadow-color) 35%, transparent);
+
+  --highlight-color: var(--foreground);
+  --highlight-top: inset 0 1px 0 color-mix(in oklab, var(--highlight-color) 6%, transparent);
+}
+
+/* ── Accent palettes ─────────────────────────────────────────────────────
+   The default accent is the theme's own (Trislab orange, or the product's
+   in ../theme.css): no class. A user's choice under Settings → Appearance
+   puts one class accent-<id> on <html>, which sets the eleven --brand-*
+   stops; a custom accent (accent-custom) sets them inline from a hue. The
+   rules after the palettes turn the stops into the theme's variables. */
+.accent-rose {
+  --brand-50:   oklch(0.972 0.022  13);
+  --brand-100:  oklch(0.945 0.045  13);
+  --brand-200:  oklch(0.895 0.090  13);
+  --brand-300:  oklch(0.825 0.145  13);
+  --brand-400:  oklch(0.720 0.195  13);
+  --brand-500:  oklch(0.640 0.225  13);
+  --brand-600:  oklch(0.575 0.232  13);
+  --brand-700:  oklch(0.495 0.215  13);
+  --brand-800:  oklch(0.410 0.180  13);
+  --brand-900:  oklch(0.330 0.140  13);
+  --brand-950:  oklch(0.235 0.095  13);
+}
+.accent-indigo {
+  --brand-50:   oklch(0.972 0.020 268);
+  --brand-100:  oklch(0.945 0.040 268);
+  --brand-200:  oklch(0.895 0.078 268);
+  --brand-300:  oklch(0.825 0.130 268);
+  --brand-400:  oklch(0.720 0.180 268);
+  --brand-500:  oklch(0.620 0.210 268);
+  --brand-600:  oklch(0.555 0.220 268);
+  --brand-700:  oklch(0.485 0.205 268);
+  --brand-800:  oklch(0.405 0.175 268);
+  --brand-900:  oklch(0.325 0.135 268);
+  --brand-950:  oklch(0.230 0.090 268);
+}
+.accent-violet {
+  --brand-50:   oklch(0.972 0.020 305);
+  --brand-100:  oklch(0.945 0.040 305);
+  --brand-200:  oklch(0.895 0.078 305);
+  --brand-300:  oklch(0.825 0.130 305);
+  --brand-400:  oklch(0.720 0.180 305);
+  --brand-500:  oklch(0.620 0.210 305);
+  --brand-600:  oklch(0.555 0.220 305);
+  --brand-700:  oklch(0.485 0.205 305);
+  --brand-800:  oklch(0.405 0.175 305);
+  --brand-900:  oklch(0.325 0.135 305);
+  --brand-950:  oklch(0.230 0.090 305);
+}
+.accent-sky {
+  --brand-50:   oklch(0.972 0.020 232);
+  --brand-100:  oklch(0.945 0.040 232);
+  --brand-200:  oklch(0.895 0.078 232);
+  --brand-300:  oklch(0.825 0.130 232);
+  --brand-400:  oklch(0.720 0.170 232);
+  --brand-500:  oklch(0.620 0.180 232);
+  --brand-600:  oklch(0.555 0.180 232);
+  --brand-700:  oklch(0.485 0.170 232);
+  --brand-800:  oklch(0.405 0.150 232);
+  --brand-900:  oklch(0.325 0.115 232);
+  --brand-950:  oklch(0.230 0.078 232);
+}
+.accent-emerald {
+  --brand-50:   oklch(0.972 0.020 152);
+  --brand-100:  oklch(0.945 0.040 152);
+  --brand-200:  oklch(0.895 0.078 152);
+  --brand-300:  oklch(0.825 0.120 152);
+  --brand-400:  oklch(0.720 0.155 152);
+  --brand-500:  oklch(0.620 0.170 152);
+  --brand-600:  oklch(0.545 0.170 152);
+  --brand-700:  oklch(0.470 0.155 152);
+  --brand-800:  oklch(0.395 0.135 152);
+  --brand-900:  oklch(0.320 0.110 152);
+  --brand-950:  oklch(0.225 0.075 152);
+}
+.accent-amber {
+  --brand-50:   oklch(0.972 0.025  76);
+  --brand-100:  oklch(0.945 0.050  76);
+  --brand-200:  oklch(0.895 0.090  76);
+  --brand-300:  oklch(0.840 0.130  76);
+  --brand-400:  oklch(0.770 0.155  76);
+  --brand-500:  oklch(0.700 0.170  76);
+  --brand-600:  oklch(0.620 0.165  76);
+  --brand-700:  oklch(0.530 0.150  76);
+  --brand-800:  oklch(0.440 0.130  76);
+  --brand-900:  oklch(0.355 0.105  76);
+  --brand-950:  oklch(0.255 0.075  76);
+}
+
+/* The theme's own primary colour, resolved on <html> before a chosen accent
+   replaces --primary below <body>: the swatch of the default accent. */
+:root {
+  --theme-primary: var(--primary);
+}
+
+/* A chosen accent replaces the theme's primary colours for everything on the
+   page; the text on it is near-white in the same hue. */
+:root[class*="accent-"] body {
+  --primary: var(--brand-600);
+  --primary-foreground: oklch(from var(--brand-600) 0.990 0.005 h);
+  --primary-hover: var(--brand-700);
+  --primary-soft: color-mix(in oklab, var(--brand-600) 10%, transparent);
+  --primary-text: var(--brand-700);
+  --ring: var(--brand-500);
+  --chart-1: var(--brand-500);
+}
+:root.dark[class*="accent-"] body {
+  --primary: var(--brand-500);
+  --primary-foreground: oklch(from var(--brand-500) 0.990 0.005 h);
+  --primary-hover: var(--brand-400);
+  --primary-soft: color-mix(in oklab, var(--brand-500) 18%, transparent);
+  --primary-text: var(--brand-400);
+  --ring: var(--brand-400);
+  --chart-1: var(--brand-400);
+}

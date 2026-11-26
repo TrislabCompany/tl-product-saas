@@ -71,6 +71,7 @@ paths:
   - { path: .audit-accepted, ownership: product }
   - { path: .env.example, ownership: product }
   - { path: clients/*/package.json, ownership: product }
+  - { path: clients/*/src/styles/theme.css, ownership: product }
   - { path: clients/*/package-lock.json, ownership: product }
   - { path: src/Samples/**, ownership: product }
   - { path: src/Modules/**, ownership: product }

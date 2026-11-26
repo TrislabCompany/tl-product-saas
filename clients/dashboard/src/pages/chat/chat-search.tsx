@@ -103,7 +103,7 @@ export function ChatSearchOverlay({
               "placeholder:text-[var(--color-muted-foreground)]",
               "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
               "focus:border-[var(--color-primary)] focus:outline-none",
-              "focus:ring-2 focus:ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)]",
+              "focus:ring-2 focus:ring-primary/18",
             )}
           />
           {query.length > 0 && (
@@ -133,7 +133,7 @@ export function ChatSearchOverlay({
           className={cn(
             "absolute left-0 right-0 top-14 z-20 max-h-[60vh] overflow-y-auto",
             "border-b border-[var(--color-border)] bg-[var(--color-card)]",
-            "shadow-[0_18px_28px_-18px_oklch(0_0_0_/_0.18)]",
+            "shadow-[0_18px_28px_-18px_color-mix(in_oklab,var(--shadow-color)_18%,transparent)]",
           )}
         >
           {resultsQuery.isLoading ? (

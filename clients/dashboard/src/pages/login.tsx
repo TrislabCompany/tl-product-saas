@@ -274,8 +274,8 @@ export function LoginPage() {
                   role="alert"
                   className={cn(
                     "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-                    "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-                    "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+                    "border-destructive/30",
+                    "bg-destructive/6",
                     "text-[var(--color-destructive)]",
                   )}
                 >

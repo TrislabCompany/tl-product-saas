@@ -55,7 +55,7 @@ export const DropdownMenuItem = React.forwardRef<
       "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
       "data-[highlighted]:bg-[var(--color-accent)]",
       destructive
-        ? "text-[var(--color-destructive)] data-[highlighted]:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] data-[highlighted]:text-[var(--color-destructive)]"
+        ? "text-[var(--color-destructive)] data-[highlighted]:bg-destructive/10 data-[highlighted]:text-[var(--color-destructive)]"
         : "text-[var(--color-foreground)] data-[highlighted]:text-[var(--color-foreground)]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,

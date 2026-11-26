@@ -35,7 +35,7 @@ export function EmptyState({
       {Icon && (
         <span
           aria-hidden
-          className="relative grid h-14 w-14 place-items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-muted-foreground)] shadow-[inset_0_1px_0_oklch(1_0_0_/_0.55)]"
+          className="relative grid h-14 w-14 place-items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-muted-foreground)] shadow-[inset_0_1px_0_color-mix(in_oklab,var(--overlay-foreground)_55%,transparent)]"
         >
           <Icon className="h-5 w-5" />
           <span

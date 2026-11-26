@@ -155,7 +155,7 @@ function SessionRow({
         className={cn(
           "grid h-9 w-9 place-items-center rounded-full ring-1 ring-inset shrink-0",
           session.isCurrentSession
-            ? "bg-[var(--color-primary-soft,oklch(from_var(--color-accent-signal)_l_c_h_/_0.12))] text-[var(--color-accent-signal)] ring-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.30)]"
+            ? "bg-[var(--color-primary-soft,color-mix(in_oklab,var(--color-accent-signal)_12%,transparent))] text-[var(--color-accent-signal)] ring-accent-signal/30"
             : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)] ring-[var(--color-border)]",
         )}
       >

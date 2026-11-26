@@ -708,7 +708,7 @@ function ProfileRow({
   value: React.ReactNode;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] pb-2.5 last:border-b-0 last:pb-0">
+    <div className="flex items-baseline justify-between gap-3 border-b border-border/50 pb-2.5 last:border-b-0 last:pb-0">
       <div className="text-[11.5px] font-medium text-[var(--color-muted-foreground)]">
         {label}
       </div>

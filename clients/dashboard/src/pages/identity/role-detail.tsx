@@ -477,8 +477,8 @@ export function RoleDetailPage() {
                 className={cn(
                   "h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-9",
                   "text-[13px] outline-none transition-colors",
-                  "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]",
-                  "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+                  "placeholder:text-muted-foreground/70",
+                  "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 )}
               />
               {searchQuery && (
@@ -528,7 +528,7 @@ export function RoleDetailPage() {
         </div>
 
         {/* Summary strip — running count + expand/collapse-all */}
-        <div className="flex items-center justify-between gap-3 border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] bg-[var(--color-secondary)] px-5 py-2">
+        <div className="flex items-center justify-between gap-3 border-b border-border/50 bg-[var(--color-secondary)] px-5 py-2">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px]">
             <span className="font-mono font-semibold tabular-nums text-[var(--color-foreground)]">
               {pad2(totalSelected)} / {pad2(totalCatalog)}
@@ -747,7 +747,7 @@ function FilterChip({
         "inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-2.5 text-[11.5px] font-medium",
         "transition-colors duration-[var(--duration-fast)]",
         active
-          ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.30)]"
+          ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-inset ring-primary/30"
           : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]",
         disabled && "cursor-not-allowed opacity-40 hover:bg-transparent hover:text-[var(--color-muted-foreground)]",
       )}
@@ -757,9 +757,9 @@ function FilterChip({
         className={cn(
           "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
           active
-            ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.18)] text-[var(--color-primary)]"
+            ? "bg-primary/18 text-[var(--color-primary)]"
             : isWarning
-              ? "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.16)] text-[var(--color-warning)]"
+              ? "bg-warning/16 text-[var(--color-warning)]"
               : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
         )}
       >
@@ -836,8 +836,8 @@ function PermissionGroupCard({
         className={cn(
           "group/grouphdr flex w-full cursor-pointer items-center gap-3 px-5 py-3.5 text-left",
           "transition-colors duration-[var(--duration-fast)]",
-          "hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.03)]",
-          isExpanded && "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.02)]",
+          "hover:bg-primary/3",
+          isExpanded && "bg-primary/2",
         )}
       >
         {/* Group tri-state checkbox */}
@@ -854,7 +854,7 @@ function PermissionGroupCard({
             allOn
               ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
               : someOn
-                ? "border-[var(--color-primary)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.40)] text-[var(--color-primary-foreground)]"
+                ? "border-[var(--color-primary)] bg-primary/40 text-[var(--color-primary-foreground)]"
                 : "border-[var(--color-input)] hover:border-[var(--color-foreground)]/40",
             disabled && "cursor-not-allowed opacity-60",
           )}
@@ -939,7 +939,7 @@ function PermissionGroupCard({
 
       {/* Body — list of horizontal permission rows */}
       {isExpanded && (
-        <div className="border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)]">
+        <div className="border-t border-border/50">
           {visiblePermissions.map((perm) => {
             const checked = selected.has(perm.name);
             const dirty = checked !== initial.has(perm.name);
@@ -1015,7 +1015,7 @@ function PermissionRow({
         "transition-colors duration-[var(--duration-fast)]",
         disabled ? "cursor-not-allowed" : "cursor-pointer",
         checked
-          ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.04)] hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.07)]"
+          ? "bg-primary/4 hover:bg-primary/7"
           : !disabled
             ? "hover:bg-[var(--color-accent)]"
             : "",
@@ -1069,7 +1069,7 @@ function PermissionRow({
           <span
             className={cn(
               "rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em]",
-              "bg-[oklch(from_var(--color-saffron)_l_c_h_/_0.16)] text-[var(--color-saffron)]",
+              "bg-saffron/16 text-[var(--color-saffron)]",
             )}
             title={t("roleDetail.rootTitle")}
           >
@@ -1080,7 +1080,7 @@ function PermissionRow({
           <span
             className={cn(
               "rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em]",
-              "bg-[oklch(from_var(--color-info)_l_c_h_/_0.16)] text-[var(--color-info)]",
+              "bg-info/16 text-[var(--color-info)]",
             )}
           >
             {t("roleDetail.basicBadge")}
