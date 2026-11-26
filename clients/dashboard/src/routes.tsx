@@ -1,11 +1,12 @@
 import { lazy, Suspense, type ComponentType } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProtectedRoute } from "@/auth/protected-route";
+import { RouteGuard } from "@/auth/route-guard";
+import type { RouteGate } from "@/auth/route-gate";
+import { BRANDING_GATE, navGate } from "@/components/layout/nav-data";
 import { RouteError } from "@/components/route-error";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/cn";
+import { RouteFallback } from "@/components/route-fallback";
 import { loadNamespaces, type LazyNamespace } from "@/i18n";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -95,32 +96,6 @@ const MyFilesPage = lazyNamed(() => import("@/pages/files/my-files"), "MyFilesPa
 const ChatPage = lazyNamed(() => import("@/pages/chat/chat-page"), "ChatPage", ["chat"]); // [module:Chat]
 
 /**
- * RouteFallback — what shows while a lazy chunk is downloading. Mirrors
- * the resolved page's shape: a thin header line, an atmospheric hero
- * placeholder, and three card placeholders. Uses the modernized
- * `.skeleton` shimmer so it feels like part of the same surface family.
- */
-function RouteFallback() {
-  const { t } = useTranslation("common");
-  return (
-    <div className={cn("space-y-6 tl-enter")} role="status" aria-busy="true">
-      <span className="sr-only">{t("list.loading")}</span>
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-3 w-96 max-w-full" />
-      </div>
-      <Skeleton className="h-32 w-full rounded-[20px]" />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-      </div>
-    </div>
-  );
-}
-
-/**
  * Wrap a lazy route element in Suspense so each route boundary has its
  * own loading state. Returns a fresh Suspense per call — important so
  * that two routes sharing the same fallback don't share the same
@@ -128,6 +103,15 @@ function RouteFallback() {
  */
 function withSuspense(node: React.ReactNode) {
   return <Suspense fallback={<RouteFallback />}>{node}</Suspense>;
+}
+
+/**
+ * A page behind its permission gate: the gate of its menu item (navGate), so a
+ * typed address opens a page exactly when the menu shows it, as in the admin
+ * console. A Basic user gets the 403 view on an Admin page.
+ */
+function guarded(gate: RouteGate, node: React.ReactNode) {
+  return <RouteGuard {...gate}>{withSuspense(node)}</RouteGuard>;
 }
 
 export const router = createBrowserRouter([
@@ -186,34 +170,34 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: withSuspense(<OverviewPage />) },
           { path: "activity", element: withSuspense(<ActivityPage />) },
-          { path: "subscription", element: withSuspense(<SubscriptionPage />) },
-          { path: "wallet", element: withSuspense(<WalletPage />) },
-          { path: "invoices", element: withSuspense(<InvoicesPage />) },
-          { path: "invoices/:id", element: withSuspense(<InvoiceDetailPage />) },
-          { path: "system/health", element: withSuspense(<HealthPage />) },
-          { path: "system/audits", element: withSuspense(<AuditsPage />) },
-          { path: "system/trash", element: withSuspense(<TrashPage />) },
-          { path: "system/sessions", element: withSuspense(<SessionsPage />) },
-          { path: "files", element: withSuspense(<MyFilesPage />) },
-          { path: "chat", element: withSuspense(<ChatPage />) }, // [module:Chat]
-          { path: "chat/:channelId", element: withSuspense(<ChatPage />) }, // [module:Chat]
-          { path: "tickets", element: withSuspense(<TicketsPage />) }, // [module:Tickets]
-          { path: "tickets/:ticketId", element: withSuspense(<TicketDetailPage />) }, // [module:Tickets]
+          { path: "subscription", element: guarded(navGate("/subscription"), <SubscriptionPage />) },
+          { path: "wallet", element: guarded(navGate("/wallet"), <WalletPage />) },
+          { path: "invoices", element: guarded(navGate("/invoices"), <InvoicesPage />) },
+          { path: "invoices/:id", element: guarded(navGate("/invoices"), <InvoiceDetailPage />) },
+          { path: "system/health", element: guarded(navGate("/system/health"), <HealthPage />) },
+          { path: "system/audits", element: guarded(navGate("/system/audits"), <AuditsPage />) },
+          { path: "system/trash", element: guarded(navGate("/system/trash"), <TrashPage />) },
+          { path: "system/sessions", element: guarded(navGate("/system/sessions"), <SessionsPage />) },
+          { path: "files", element: guarded(navGate("/files"), <MyFilesPage />) },
+          { path: "chat", element: guarded(navGate("/chat"), <ChatPage />) }, // [module:Chat]
+          { path: "chat/:channelId", element: guarded(navGate("/chat"), <ChatPage />) }, // [module:Chat]
+          { path: "tickets", element: guarded(navGate("/tickets"), <TicketsPage />) }, // [module:Tickets]
+          { path: "tickets/:ticketId", element: guarded(navGate("/tickets"), <TicketDetailPage />) }, // [module:Tickets]
           { path: "identity", element: <Navigate to="/identity/users" replace /> },
-          { path: "identity/users", element: withSuspense(<UsersPage />) },
-          { path: "identity/users/:userId", element: withSuspense(<UserDetailPage />) },
-          { path: "identity/roles", element: withSuspense(<RolesPage />) },
-          { path: "identity/roles/:roleId", element: withSuspense(<RoleDetailPage />) },
-          { path: "identity/groups", element: withSuspense(<GroupsPage />) },
-          { path: "identity/groups/:groupId", element: withSuspense(<GroupDetailPage />) },
+          { path: "identity/users", element: guarded(navGate("/identity/users"), <UsersPage />) },
+          { path: "identity/users/:userId", element: guarded(navGate("/identity/users"), <UserDetailPage />) },
+          { path: "identity/roles", element: guarded(navGate("/identity/roles"), <RolesPage />) },
+          { path: "identity/roles/:roleId", element: guarded(navGate("/identity/roles"), <RoleDetailPage />) },
+          { path: "identity/groups", element: guarded(navGate("/identity/groups"), <GroupsPage />) },
+          { path: "identity/groups/:groupId", element: guarded(navGate("/identity/groups"), <GroupDetailPage />) },
           // [module:Catalog:begin]
           { path: "catalog", element: <Navigate to="/catalog/brands" replace /> },
-          { path: "catalog/brands", element: withSuspense(<BrandsPage />) },
-          { path: "catalog/categories", element: withSuspense(<CategoriesPage />) },
-          { path: "catalog/products", element: withSuspense(<ProductsPage />) },
+          { path: "catalog/brands", element: guarded(navGate("/catalog/brands"), <BrandsPage />) },
+          { path: "catalog/categories", element: guarded(navGate("/catalog/categories"), <CategoriesPage />) },
+          { path: "catalog/products", element: guarded(navGate("/catalog/products"), <ProductsPage />) },
           {
             path: "catalog/products/:productId",
-            element: withSuspense(<ProductDetailPage />),
+            element: guarded(navGate("/catalog/products"), <ProductDetailPage />),
           },
           // [module:Catalog:end]
           {
@@ -224,7 +208,7 @@ export const router = createBrowserRouter([
               { path: "profile", element: withSuspense(<ProfileSettings />) },
               { path: "security", element: withSuspense(<SecuritySettings />) },
               { path: "appearance", element: withSuspense(<AppearanceSettings />) },
-              { path: "branding", element: withSuspense(<BrandingSettings />) },
+              { path: "branding", element: guarded(BRANDING_GATE, <BrandingSettings />) },
               { path: "notifications", element: withSuspense(<NotificationsSettings />) },
               { path: "api-keys", element: withSuspense(<ApiKeysSettings />) },
             ],

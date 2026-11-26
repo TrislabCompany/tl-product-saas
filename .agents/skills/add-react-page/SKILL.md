@@ -19,8 +19,8 @@ The frontend slice. Read `.claude/rules/frontend/shared.md` plus the app file (`
 | Path constant | `const BASE = "/api/v1/..."` | inline the full path per call |
 | Forms | **react-hook-form + zod** | **hand-rolled** controlled inputs (no RHF/zod) |
 | List + create | separate routed pages (`list.tsx`, `create.tsx`) | one file with `<Dialog>` editors |
-| Route wrapper | `<RouteGuard perms={[…]}>` | `withSuspense(<X/>)` (no permission gate) |
-| Permissions | mirror in `src/lib/permissions.ts` | fetched from `GET /identity/permissions` (not JWT); nav gating via `perm`/`anyPerm` in `nav-data.ts`; no route guard — server 403 backstops |
+| Route wrapper | `<RouteGuard perms={[…]}>` | `withSuspense(<X/>)`, or `guarded(navGate("/x"), <X/>)` for a page behind a permission |
+| Permissions | mirror in `src/lib/permissions.ts` | fetched from `GET /identity/permissions` (not JWT); the gate is `perm`/`anyPerm` on the item in `nav-data.ts`, read by both the menu and the route (`navGate`); the server 403 backstops |
 
 Shared everywhere: types are **hand-written** (no codegen); `apiFetch<T>` from `@/lib/api-client`; `cn()` from `@/lib/cn`; `env.apiBase` from runtime `/config.json`; CVA `components/ui` + `components/list` primitives; Tailwind v4 CSS-first (tokens in `src/styles/globals.css`); `toast` from `sonner`; pages are **named exports**; `placeholderData: keepPreviousData` (v5).
 
@@ -147,6 +147,6 @@ hand (`.agents/rules/frontend/shared.md`, Translations).
 - [ ] English keys in `src/locales/en-US/{ns}.json` (sl-SI optional); every visible string, toast and `aria-label` through `t()`
 - [ ] Page is a **named export**; `useQuery` key hierarchical + `placeholderData: keepPreviousData`
 - [ ] Mutation passes data via `mutate(arg)`, invalidates in `onSuccess`
-- [ ] Route via `lazyNamed`; admin wraps in `<RouteGuard perms>`, dashboard in `withSuspense`
+- [ ] Route via `lazyNamed`; admin wraps in `<RouteGuard perms>`, dashboard in `withSuspense` or, behind a permission, `guarded(navGate(…))`
 - [ ] (admin) permission mirrored in `lib/permissions.ts`
 - [ ] Playwright test: seed + shell mocks + page mocks; `lint` + `build` + `test:e2e` green

@@ -43,6 +43,8 @@ const LOOKUP_HITS = [
 
 test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, TEST_USER);
+  // The ticket page is guarded with the Tickets menu item's permission (routes.tsx).
+  await mockJsonResponse(page, "**/api/v1/identity/permissions", ["Permissions.Tickets.View"]);
   await mockJsonResponse(page, "**/api/v1/identity/profile", {
     id: TEST_USER.sub,
     userName: "alice",

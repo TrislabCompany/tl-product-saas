@@ -1,5 +1,6 @@
 using App.Api.Platform;
 using Trislab.Framework.Eventing;
+using Trislab.Framework.Shared.Health;
 using Trislab.Framework.Shared.Multitenancy;
 using Trislab.Framework.Tenancy;
 using Trislab.Framework.Web;
@@ -143,9 +144,11 @@ app.UseTrislabPlatform(p =>
 });
 
 // The platform's probes: /healthz while the process runs, /readyz once every health check passes:
-// the module databases, Hangfire, and the cache when REDIS_URL is set.
+// the module databases, Hangfire, and the cache when REDIS_URL is set. The details-only checks
+// (storage) are left out, as in /api/health/ready: files fail while storage is down, but the rest
+// of the app works, so the platform must not take the API out of rotation for it.
 app.MapHealthChecks("/healthz", new HealthCheckOptions { Predicate = _ => false }).AllowAnonymous();
-app.MapHealthChecks("/readyz").AllowAnonymous();
+app.MapHealthChecks("/readyz", new HealthCheckOptions { Predicate = c => !c.Tags.Contains(HealthCheckTags.DetailsOnly) }).AllowAnonymous();
 
 // Called through a front end, shows that its /api proxy reaches the API.
 app.MapGet("/api/health/info", (IConfiguration config) => Results.Ok(new

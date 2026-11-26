@@ -178,5 +178,9 @@
   "userPicker.noMatch": "Noben uporabnik ne ustreza „{{term}}“.",
   "userPicker.results": "Rezultati iskanja",
   "tenantSwitch.title": "Organizacija",
-  "tenantSwitch.failed": "Organizacije ni bilo mogoče zamenjati. Poskusite znova."
+  "tenantSwitch.failed": "Organizacije ni bilo mogoče zamenjati. Poskusite znova.",
+  "routeGuard.resolving": "Preverjanje dovoljenj",
+  "forbidden.title": "Te strani ne morete odpreti",
+  "forbidden.body": "Vaša vloga v tej organizaciji je ne vključuje. Dostop vam lahko omogoči skrbnik organizacije.",
+  "forbidden.backHome": "Na začetek"
 }

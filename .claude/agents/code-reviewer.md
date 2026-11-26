@@ -10,44 +10,55 @@ conventions are defined in `.claude/rules/` and `AGENTS.md` — treat those as t
 playbook is the review procedure, not a second copy of the rules.
 
 ## Procedure
+
 1. `git diff HEAD` (and `git status`) to see what changed; group by area (backend module / BuildingBlocks / frontend).
 2. For each changed file, check it against the relevant rule file (`api-conventions.md`, `database.md`, `eventing.md`, `frontend/*`, …) and the checklist below.
 3. If the Roslyn navigator MCP is available, run `detect_antipatterns` and `get_diagnostics` (solution scope) for machine-found issues (broad `catch`, missing `CancellationToken`, EF `AsNoTracking`, logging interpolation) and fold them in — noting false positives (mutate-then-save queries don't want `AsNoTracking`; hosted-service `catch(Exception)` that logs + filters OCE is fine).
 4. Report with `file:line` refs and a concrete fix per finding.
 
 ## Checklist (high-signal)
-**Boundaries / structure**
+
+### Boundaries / structure
+
 - Cross-module references go only through `.Contracts` (never another module's runtime). Enforced by `Architecture.Tests`.
 - `src/BuildingBlocks/**` not modified without explicit approval (flag if it is).
 - New module → registered in **all four** places (Mediator + `moduleAssemblies` in Api **and** DbMigrator).
 
-**CQRS / Mediator (not MediatR)**
+### CQRS / Mediator (not MediatR)
+
 - Command/Query in the Contracts project; `using Mediator;` (`ICommand<T>`/`IQuery<T>`).
 - Handler `public sealed`, `ICommandHandler<,>`/`IQueryHandler<,>`, returns `ValueTask<T>`, `.ConfigureAwait(false)`, injects the `{X}DbContext` (no generic repository).
 - Every command + paginated query has a `{Name}Validator` (Architecture.Tests enforces).
 
-**Endpoints**
+### Endpoints
+
 - `internal static …Map{Feature}Endpoint`; `.RequirePermission(...)` (or deliberate `.AllowAnonymous()`); `.WithName`/`.WithSummary`. Returns `Results.Ok(...)`/`TypedResults`. `.WithIdempotency()` on replay-safe POSTs. No duplicate `IRequiredPermissionMetadata`.
 
-**Data**
+### Data
+
 - Entities: `sealed`, `Guid.CreateVersion7()`, private ctor + factory, behavior via methods. Marker interfaces use `CreatedOnUtc`/`IsDeleted`/`DeletedOnUtc`.
 - DbContext extends `BaseDbContext`, `base.OnModelCreating` last; **no manual tenant/soft-delete query filter**. Nav-collection children need `ValueGeneratedNever()`. `AsNoTracking` on read-only queries only (not read-then-save).
 
-**Cross-cutting**
+### Cross-cutting
+
 - **Logging** (`logging.md`) — no `$"..."` interpolation in log calls; the level fits (Error only when a person must act); no secrets, tokens, bodies or personal data (e-mail, names, IPs) in a log line; an exception logged once, with the exception object.
 - `CancellationToken` propagated into EF/IO calls.
 - Cross-module events go via the Outbox (`IOutboxWriter.AddAsync`), not a direct bus publish. The only sanctioned exception is Chat mentions, which carries its reason in a comment.
 
-**Contracts** (`api-conventions.md`)
+### Contracts (`api-conventions.md`)
+
 - Endpoints, `.Contracts` and integration events only gained fields; a rename, removal or type change is a new version or a new event type.
 
-**Tests** (`testing.md`)
+### Tests (`testing.md`)
+
 - Every behaviour change has a test that fails without it; a bug fix has the reproducing test.
 
-**Frontend** (`frontend/*` rules)
-- Hand-written types + `apiFetch`; mutation data passed via `mutate(arg)`; query keys hierarchical; admin gates routes with `RouteGuard` + mirrors the permission; dashboard uses `withSuspense`.
+### Frontend (`frontend/*` rules)
+
+- Hand-written types + `apiFetch`; mutation data passed via `mutate(arg)`; query keys hierarchical; admin gates routes with `RouteGuard` + mirrors the permission; dashboard uses `withSuspense`, and `guarded(navGate(…))` for a page behind a permission.
 
 ## Commands
+
 ```bash
 git diff HEAD
 grep -rn "MediatR\|IRequest<\|IRequestHandler<" src/Modules/ src/Samples/ --include="*.cs"   # must be empty
@@ -55,7 +66,8 @@ dotnet build src/App.slnx 2>&1 | grep -E "warning|error"               # 0 expec
 ```
 
 ## Output
-```
+
+```text
 ## Code Review
 
 ### Passed
