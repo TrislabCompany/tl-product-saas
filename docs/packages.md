@@ -20,7 +20,7 @@ A project reference to a framework module is a package reference here, so the ho
 <TrislabFrameworkVersion>0.2.0</TrislabFrameworkVersion>
 ```
 
-The npm package is pinned to the same version in each client's `package.json` (`"@trislabcompany/framework-ui": "0.2.0"`, no range) and in its lockfile. Renovate raises all of them in one pull request per framework release ([upgrading/README.md](upgrading/README.md#the-framework-version-is-separate)).
+The npm package is pinned to the same version in each client's `package.json` (`"@trislabcompany/framework-ui": "0.2.0"`, no range) and in its lockfile. In this template Renovate raises all of them in one pull request per framework release; in a product only the template update does ([upgrading/README.md](upgrading/README.md#the-framework-version)).
 
 ## 3. The feed and the token
 

@@ -39,6 +39,7 @@ test('what decides the tests runs every part', () => {
   assert.deepEqual(parts('scripts/affected-tests.mjs'), Object.keys(PARTS));
   assert.deepEqual(parts('.github/workflows/ci.yml'), Object.keys(PARTS));
   assert.deepEqual(parts('scripts/affected-tests.test.mjs'), ['scripts']);
+  assert.deepEqual(parts('scripts/update-from-template.mjs'), ['scripts']);
 });
 
 test('files that app-ci, their own workflow or the manifest check cover run no test', () => {

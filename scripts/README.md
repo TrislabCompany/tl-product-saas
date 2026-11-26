@@ -9,6 +9,7 @@ Repetitive work is done by scripts. Each prints a summary and its errors, never 
 | `bash scripts/smoke-test.sh` | Before a push that touches the host, the migrator, a module registration or the seed, and in `ci / ci`: starts a throw-away Postgres, runs the migrator (`apply --seed`, `seed-demo`), starts the API and signs in as the demo admins. Needs Docker, the .NET SDK and `PACKAGES_TOKEN` |
 | `bash scripts/test-clients.sh [app...]` | Before a push that touches a React app, and in `ci / ci`: lints each app, or only the ones named, and runs its Playwright tests against its dev server, with every API call mocked. Needs Node and `PACKAGES_TOKEN` |
 | `pwsh scripts/check-template-manifest.ps1` | After adding or moving a file or a skill in the template, and in `ci / ci`: every path has an ownership in `template-manifest.yaml`, every skill has a pointer. Passes at once in a product repository |
+| `node scripts/update-from-template.mjs` | Taking the next template release: without options it says what the update brings; `--apply --report <file>` applies it by the ownership in the template's manifest, bumps `.template-version` and writes the PR body with the conflicts and suggestions. The [`update-from-template` skill](../.agents/skills/update-from-template/SKILL.md) runs it ([upgrading/README.md](../docs/upgrading/README.md)). Platform-owned, the same in every template |
 
 ## The tags `init-product` reads
 

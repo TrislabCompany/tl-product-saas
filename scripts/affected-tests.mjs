@@ -21,7 +21,7 @@ export const PARTS = {
   admin: ['bash scripts/test-clients.sh admin'],
   dashboard: ['bash scripts/test-clients.sh dashboard'],
   smoke: ['bash scripts/smoke-test.sh'],
-  scripts: ['node --test scripts/affected-tests.test.mjs'],
+  scripts: ['node --test scripts/affected-tests.test.mjs scripts/update-from-template.test.mjs'],
 };
 
 // path pattern -> the parts it needs ([] = none, 'all' = every part). `*` matches within one folder, `**` across folders.
@@ -55,6 +55,8 @@ export const RULES = [
   // What decides the tests themselves runs everything.
   ['scripts/affected-tests.mjs', 'all'],
   ['scripts/affected-tests.test.mjs', ['scripts']],
+  ['scripts/update-from-template.mjs', ['scripts']],
+  ['scripts/update-from-template.test.mjs', ['scripts']],
   ['.github/workflows/ci.yml', 'all'],
   // The API, its modules and the samples, their build settings and the SDK: the .NET tests and the smoke test.
   ['src/**', ['api', 'smoke']],
