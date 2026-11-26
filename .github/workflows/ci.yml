@@ -4,7 +4,7 @@ name: ci
 # with Trivy and checks platform.yaml, on every PR and every push to main.
 # Pushes nothing. All steps live in the reusable workflow in tl-platform,
 # pinned by tag; the job is named ci like the one it calls, so the required
-# check is `ci / ci`. Change only the test command here.
+# check is `ci / ci`. Change only the commands here.
 #
 # The Trislab framework packages come from GitHub Packages. The organisation
 # secret PACKAGES_READ_TOKEN reads them (falling back to the workflow's token,
@@ -14,11 +14,21 @@ name: ci
 #
 # The test command, in order:
 #  1. the template manifest check (passes at once in a product repository);
-#  2. dotnet test: the unit tests, Architecture.Tests and the integration tests,
-#     which start their own throw-away containers;
-#  3. lint and the Playwright tests of each React app (scripts/test-clients.sh;
-#     its build runs in the image build);
-#  4. the smoke test: the app starts, migrates and seeds in multi-tenant mode.
+#  2. scripts/affected-tests.mjs, which on a PR runs only the parts the PR
+#     affects, and on a push to main all of them (docs/getting-started.md
+#     section 6):
+#     - dotnet test: the unit tests, Architecture.Tests and the integration
+#       tests, which start their own throw-away containers;
+#     - lint and the Playwright tests of each React app (scripts/test-clients.sh;
+#       its build runs in the image build);
+#     - the smoke test: the app starts, migrates and seeds in multi-tenant mode.
+#
+# A PR that changes only documentation builds and tests nothing: it lints the
+# changed Markdown and runs the docs command, the template manifest check.
+#
+# After a push to main, the job main-failure-issue keeps one issue "main is
+# failing: ci / ci" (label ci-main) open while the check fails on main, and
+# closes it on the next green run.
 
 on:
   pull_request:
@@ -32,8 +42,20 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: TrislabCompany/tl-platform/.github/workflows/app-ci.yml@app-workflows/v0.4.0
+    uses: TrislabCompany/tl-platform/.github/workflows/app-ci.yml@app-workflows/v0.6.0
     secrets:
       packages-token: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
     with:
-      test-command: pwsh scripts/check-template-manifest.ps1 && dotnet test src/App.slnx && bash scripts/test-clients.sh && bash scripts/smoke-test.sh
+      test-command: pwsh scripts/check-template-manifest.ps1 && node scripts/affected-tests.mjs
+      docs-command: pwsh scripts/check-template-manifest.ps1
+
+  main-failure-issue:
+    needs: [ci]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+    uses: TrislabCompany/tl-platform/.github/workflows/main-failure-issue.yml@app-workflows/v0.6.0
+    with:
+      result: ${{ needs.ci.result }}

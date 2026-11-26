@@ -66,6 +66,7 @@ paths:
   - { path: .template-version, ownership: product }
   - { path: platform.yaml, ownership: product }
   - { path: .trivyignore, ownership: product }
+  - { path: .audit-accepted, ownership: product }
   - { path: .env.example, ownership: product }
   - { path: clients/*/package.json, ownership: product }
   - { path: clients/*/package-lock.json, ownership: product }
