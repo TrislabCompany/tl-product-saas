@@ -57,5 +57,10 @@
   },
   "engines": {
     "node": "^20.19.0 || >=22.13.0"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y-x": {
+      "minimatch": "11.0.9"
+    }
   }
 }
