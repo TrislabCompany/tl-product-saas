@@ -6,21 +6,20 @@ const VALID_LINK =
   "/reset-password?token=ABC123def&email=alice@acme.com&tenant=acme";
 
 test.describe("reset-password page", () => {
-  test("guards against malformed links (missing token/email/tenant)", async ({ page }) => {
+  test("guards against malformed links (missing token or email)", async ({ page }) => {
     await page.goto("/reset-password");
     await expect(page.getByRole("heading", { name: /this link is incomplete/i })).toBeVisible();
     // Should offer a recovery path, not a dead-end.
     await expect(page.getByRole("link", { name: /request a new link/i })).toBeVisible();
   });
 
-  test("renders the form when token + email + tenant are present", async ({ page }) => {
+  test("renders the form when token + email are present", async ({ page }) => {
     await page.goto(VALID_LINK);
 
     // The redesigned AuthShell drops the editorial eyebrow — assert on
-    // the visible headline + echoed email/tenant + field labels.
+    // the visible headline + echoed email + field labels.
     await expect(page.getByRole("heading", { name: /set a new password/i })).toBeVisible();
     await expect(page.getByText("alice@acme.com")).toBeVisible();
-    await expect(page.getByText(/on acme/i)).toBeVisible();
     await expect(page.getByLabel("New password")).toBeVisible();
     await expect(page.getByLabel("Confirm password")).toBeVisible();
   });
@@ -80,6 +79,19 @@ test.describe("reset-password page", () => {
     expect(headers.tenant).toBe("acme");
 
     // Redirects to /login on success.
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
+  test("a link without a tenant works and sends no tenant header (users are global)", async ({ page }) => {
+    const captured = captureRequest(page, "**/api/v1/identity/reset-password");
+
+    await page.goto("/reset-password?token=ABC123def&email=alice@acme.com");
+    await page.getByLabel("New password").fill("VeryStrong!Passw0rd");
+    await page.getByLabel("Confirm password").fill("VeryStrong!Passw0rd");
+    await page.getByRole("button", { name: /set new password/i }).click();
+
+    const { headers } = await captured.value();
+    expect(headers.tenant).toBeUndefined();
     await expect(page).toHaveURL(/\/login$/);
   });
 

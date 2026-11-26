@@ -1,6 +1,6 @@
 {
   "title": "Stanje sistema",
-  "description": "Sprotne preiskave procesa in odvisnosti. Samodejno se osvežijo vsakih {{seconds}} sekund. Končne točke preiskav ({{live}} {{ready}}) so brez overitve, da jih lahko berejo uravnalniki obremenitve in nadzor razpoložljivosti.",
+  "description": "Sprotni pregledi procesa in odvisnosti. Samodejno se osvežijo vsakih {{seconds}} sekund. Preiskava delovanja ({{live}}) je brez overitve za uravnalnike obremenitve in nadzor razpoložljivosti; celotno poročilo ({{ready}}) zahteva Health.View.",
   "refresh": "Osveži",
   "status.healthy": "Zdravo",
   "status.degraded": "Poslabšano",
@@ -19,8 +19,8 @@
   "error.readiness": "Preiskava pripravljenosti ni uspela.",
   "probe.liveness.title": "Delovanje",
   "probe.liveness.description": "Proces teče in streže zahtevkom. Zunanje odvisnosti se ne preverjajo.",
-  "probe.readiness.title": "Pripravljenost",
-  "probe.readiness.description": "Vsi registrirani pregledi odvisnosti morajo sporočiti stanje Zdravo, da preiskava vrne 200. Odgovor 503 odstrani API iz skupine uravnalnika obremenitve.",
+  "probe.readiness.title": "Vsi pregledi",
+  "probe.readiness.description": "Vsi registrirani pregledi odvisnosti s podrobnostmi, tudi tisti, ki jih preiskava pripravljenosti izpusti (shramba datotek). Anonimna preiskava pripravljenosti vrne samo skupno stanje.",
   "probing": "Preiskava …",
   "noChecks": "Pregledi odvisnosti niso sporočeni.",
   "noChecksDetail": "Preiskava se je odzvala s stanjem {{status}}.",

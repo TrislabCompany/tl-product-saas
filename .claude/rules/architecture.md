@@ -11,7 +11,7 @@ Modular Monolith + Vertical Slice Architecture (VSA). Read this before adding/mo
 
 ## Layers & dependency direction
 
-```
+```text
 Host (composition root)  →  Modules.{Name} (runtime)  →  Modules.{Name}.Contracts (public API)
                          →  BuildingBlocks (shared framework)
 ```
@@ -23,7 +23,7 @@ Host (composition root)  →  Modules.{Name} (runtime)  →  Modules.{Name}.Cont
 
 ## Module = runtime + Contracts
 
-```
+```text
 Modules.Identity/            ← runtime (internal): handlers, services, domain, data
 Modules.Identity.Contracts/  ← public: ICommand/IQuery types, DTOs, events, service interfaces
 ```
@@ -34,7 +34,7 @@ Cross-module communication: through Contracts service interfaces or integration 
 
 Each feature is a vertical slice in `Features/v{version}/{Area}/{Feature}/`:
 
-```
+```text
 Features/v1/Users/RegisterUser/
 ├── RegisterUserEndpoint.cs          # minimal API endpoint
 ├── RegisterUserCommandHandler.cs    # CQRS handler (public sealed)
@@ -62,7 +62,7 @@ public sealed class IdentityModule : IModule
 }
 ```
 
-**Tenancy modes.** Every module declares `SupportedTenancyModes` (`TenancyModes.All`, or `Multitenant` when it needs the tenant catalog, as Multitenancy and SubscriptionsUsage do). `ModuleLoader.AddModules` throws at start-up, naming the module and `TenancyOptions:Mode`, when a module is registered in a mode it doesn't support. A host that serves both modes passes its assembly list through `ModuleLoader.SelectSupported(mode, assemblies)`. A module that supports single-tenant mode must not reference `Modules.Multitenancy` or its `.Contracts` (`Architecture.Tests` checks it), and must not assume a tenant catalog: read the tenant through `IMultiTenantContextAccessor<AppTenantInfo>`, which both modes fill. Data is stamped with the tenant in both modes.
+**Tenancy modes.** Every module declares `SupportedTenancyModes` (`TenancyModes.All`, or `Multitenant` when it needs the tenant catalog, as Multitenancy and SubscriptionsUsage do). `ModuleLoader.AddModules` throws at start-up, naming the module and `TenancyOptions:Mode`, when a module is registered in a mode it doesn't support. A host that serves both modes passes its assembly list through `ModuleLoader.SelectSupported(mode, assemblies)`. A module that supports single-tenant mode must not reference `Modules.Multitenancy` or its `.Contracts` (`Architecture.Tests` checks it), and must not assume a tenant catalog: read the tenant through `ITenantAccessor`, which both modes fill. Data is stamped with the tenant in both modes.
 
 `ModuleLoader.AddModules` (`src/BuildingBlocks/Web/Modules/ModuleLoader.cs`) discovers `[TrislabModule]` attributes, orders by `Order` then name, instantiates each, and calls `ConfigureServices`. Endpoints map under `api/v{version:apiVersion}/{module}`.
 

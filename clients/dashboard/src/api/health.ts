@@ -1,3 +1,5 @@
+import { apiFetch } from "@/lib/api-client";
+
 export type HealthStatus = "Healthy" | "Degraded" | "Unhealthy";
 
 export type HealthEntry = {
@@ -18,35 +20,28 @@ export type HealthSnapshot = HealthResult & {
   fetchedAt: string;
   /** Round-trip from request start to response parse, in ms. */
   roundTripMs: number;
-  /** HTTP status. 200 = healthy, 503 = degraded/unhealthy (still has payload). */
+  /** HTTP status of the report (200 whenever it was produced). */
   httpStatus: number;
 };
 
 /**
- * Fetch the readiness report. Anonymous endpoint — bypasses apiFetch's
- * auth/refresh dance. We accept both 200 and 503 because the API now
- * returns the same JSON shape for both (so we can show *which* check
- * failed). Network errors propagate as exceptions.
+ * Fetch the health report with every check's details (`GET /api/health/details`, Health.View: a tenant's Admins
+ * and the operator). The anonymous probes (`/api/health/ready`) answer the overall status only. The details
+ * endpoint answers 200 whatever the status, since the caller asked for the report, not a probe answer.
  */
-export async function getReadiness(signal?: AbortSignal): Promise<HealthSnapshot> {
+export async function getHealthDetails(signal?: AbortSignal): Promise<HealthSnapshot> {
   const t0 = performance.now();
-  const url = `/api/health/ready`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { Accept: "application/json" },
+  let httpStatus = 0;
+  const body = await apiFetch<HealthResult>(`/api/health/details`, {
     signal,
+    onResponse: (response) => {
+      httpStatus = response.status;
+    },
   });
-  const roundTripMs = performance.now() - t0;
-
-  if (response.status !== 200 && response.status !== 503) {
-    throw new Error(`Health endpoint returned ${response.status}`);
-  }
-
-  const body = (await response.json()) as HealthResult;
   return {
     ...body,
     fetchedAt: new Date().toISOString(),
-    roundTripMs,
-    httpStatus: response.status,
+    roundTripMs: performance.now() - t0,
+    httpStatus,
   };
 }

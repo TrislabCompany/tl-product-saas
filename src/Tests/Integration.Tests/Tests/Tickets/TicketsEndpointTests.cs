@@ -294,12 +294,11 @@ public abstract class TicketsEndpointTestsBase
     private async Task SoftDeleteTicketAsync(Guid ticketId)
     {
         using var scope = _factory.Services.CreateScope();
-        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
         var tenant = await store.GetAsync(_factory.TenantId)
             ?? throw new InvalidOperationException("Root tenant not found.");
 
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
         var ticket = await dbContext.Tickets.FirstAsync(t => t.Id == ticketId);

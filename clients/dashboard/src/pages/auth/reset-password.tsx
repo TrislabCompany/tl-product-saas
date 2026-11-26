@@ -1,22 +1,14 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
-import {
-  AlertCircle,
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
+import { AlertCircle, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/auth/use-auth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { AuthHeadline, AuthShell } from "@/components/auth/auth-shell";
+import { NewPasswordFields } from "@/components/auth/new-password-fields";
+import { MIN_PASSWORD_LENGTH, isNewPasswordReady } from "@/lib/password";
 import { resetPassword } from "@/api/identity";
 import { ApiRequestError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
@@ -25,46 +17,15 @@ import { cn } from "@/lib/cn";
  * Reset-password — step 2 of the reset flow. The user lands here from a
  * link emailed by the forgot-password endpoint:
  *
- *   /reset-password?token=<urlencoded>&email=<urlencoded>&tenant=<id>
+ *   /reset-password?token=<urlencoded>&email=<urlencoded>[&tenant=<id>]
  *
- * Token + email + tenant come from URL; password comes from the form.
+ * Token + email come from the URL, and the tenant when the reset was asked
+ * for inside one (users are global, so usually not); the password comes from
+ * the form.
  * On success we toast and redirect to /login (existing JWTs stay valid
  * until natural expiry — a fresh sign-in under the new password is the
  * cleanest UX).
  */
-
-type Strength = "weak" | "fair" | "strong";
-
-function scorePassword(value: string): Strength | null {
-  if (value.length === 0) return null;
-  if (value.length < 8) return "weak";
-
-  let score = 0;
-  if (/[a-z]/.test(value)) score++;
-  if (/[A-Z]/.test(value)) score++;
-  if (/\d/.test(value)) score++;
-  if (/[^A-Za-z0-9]/.test(value)) score++;
-  if (value.length >= 12) score++;
-
-  if (score <= 2) return "weak";
-  if (score === 3) return "fair";
-  return "strong";
-}
-
-const STRENGTH_META: Record<Strength, { fill: string; bar: string }> = {
-  weak: {
-    fill: "bg-[var(--color-destructive)]",
-    bar: "w-1/3",
-  },
-  fair: {
-    fill: "bg-[var(--color-warning)]",
-    bar: "w-2/3",
-  },
-  strong: {
-    fill: "bg-[var(--color-success)]",
-    bar: "w-full",
-  },
-};
 
 export function ResetPasswordPage() {
   const { t } = useTranslation("auth");
@@ -72,18 +33,16 @@ export function ResetPasswordPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-  // All three are required for the server call. We treat the page as
-  // "malformed link" if any are missing rather than letting the user
-  // submit a doomed request.
+  // Token and email are required for the server call. We treat the page as
+  // "malformed link" if either is missing rather than letting the user
+  // submit a doomed request. The tenant is optional.
   const token = params.get("token") ?? "";
   const email = params.get("email") ?? "";
-  const tenant = params.get("tenant") ?? "";
+  const tenant = params.get("tenant") ?? undefined;
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   // Keep the error in sync with the form: typing after an error should
   // clear it rather than persist a stale message under the new input.
@@ -96,7 +55,6 @@ export function ResetPasswordPage() {
     setError(null);
   };
 
-  const strength = useMemo(() => scorePassword(password), [password]);
   const matches = password.length > 0 && password === confirm;
 
   const mutation = useMutation({
@@ -120,7 +78,7 @@ export function ResetPasswordPage() {
     return <Navigate to="/" replace />;
   }
 
-  const malformed = !token || !email || !tenant;
+  const malformed = !token || !email;
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,7 +86,7 @@ export function ResetPasswordPage() {
       setError(t("reset.errMismatch"));
       return;
     }
-    if (password.length < 8) {
+    if (password.length < MIN_PASSWORD_LENGTH) {
       setError(t("reset.errTooShort"));
       return;
     }
@@ -155,10 +113,9 @@ export function ResetPasswordPage() {
             <AuthHeadline lead={t("reset.incompleteLead")} accent={t("reset.incompleteAccent")} />
             <p className="text-[13px] leading-relaxed text-[var(--color-muted-foreground)]">
               {t("reset.incompletePre")}{" "}
-              <span className="text-[var(--color-foreground)]">{t("reset.fieldToken")}</span>,{" "}
-              <span className="text-[var(--color-foreground)]">{t("reset.fieldEmail")}</span>,{" "}
+              <span className="text-[var(--color-foreground)]">{t("reset.fieldToken")}</span>{" "}
               {t("reset.or")}{" "}
-              <span className="text-[var(--color-foreground)]">{t("reset.fieldTenant")}</span>.{" "}
+              <span className="text-[var(--color-foreground)]">{t("reset.fieldEmail")}</span>.{" "}
               {t("reset.incompletePost")}
             </p>
           </div>
@@ -181,112 +138,19 @@ export function ResetPasswordPage() {
             <AuthHeadline lead={t("reset.titleLead")} accent={t("reset.titleAccent")} />
             <p className="text-[13px] text-[var(--color-muted-foreground)]">
               {t("reset.subtitlePre")}{" "}
-              <span className="text-[var(--color-foreground)]">{email}</span> {t("reset.subtitleMid")}{" "}
-              <span className="text-[var(--color-foreground)]">{tenant}</span>{t("reset.subtitlePost")}
+              <span className="text-[var(--color-foreground)]">{email}</span>{t("reset.subtitlePost")}
             </p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-5" noValidate aria-describedby={error ? "reset-error" : undefined}>
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="new-password"
-                className="block text-[11.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-              >
-                {t("reset.newPassword")}
-              </Label>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => onPasswordChange(e.target.value)}
-                  placeholder={t("reset.newPasswordPlaceholder")}
-                  required
-                  autoComplete="new-password"
-                  autoFocus
-                  minLength={8}
-                  aria-invalid={error ? true : undefined}
-                  aria-describedby={error ? "reset-error" : undefined}
-                  className="h-11 pr-11 text-[14px]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? t("reset.hidePassword") : t("reset.showPassword")}
-                  className="absolute right-3.5 top-1/2 grid h-6 w-6 -translate-y-1/2 cursor-pointer place-items-center rounded text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
-                >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
-
-              {strength && (
-                <div className="tl-enter flex items-center gap-2 pt-1.5">
-                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--color-muted)]">
-                    <div
-                      className={cn(
-                        "h-full transition-all duration-200",
-                        STRENGTH_META[strength].fill,
-                        STRENGTH_META[strength].bar,
-                      )}
-                    />
-                  </div>
-                  <span className="min-w-[3.5rem] text-right text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                    {t(`reset.strength_${strength}`)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="confirm-password"
-                className="block text-[11.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-              >
-                {t("reset.confirmPassword")}
-              </Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showConfirm ? "text" : "password"}
-                  value={confirm}
-                  onChange={(e) => onConfirmChange(e.target.value)}
-                  placeholder={t("reset.confirmPasswordPlaceholder")}
-                  required
-                  autoComplete="new-password"
-                  minLength={8}
-                  aria-invalid={error ? true : undefined}
-                  aria-describedby={error ? "reset-error" : undefined}
-                  className="h-11 pr-11 text-[14px]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm((v) => !v)}
-                  aria-label={showConfirm ? t("reset.hidePassword") : t("reset.showPassword")}
-                  className="absolute right-3.5 top-1/2 grid h-6 w-6 -translate-y-1/2 cursor-pointer place-items-center rounded text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
-                >
-                  {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
-
-              {confirm.length > 0 && (
-                <div
-                  className={cn(
-                    "flex items-center gap-1.5 pt-1 text-[11.5px]",
-                    matches
-                      ? "text-[var(--color-success)]"
-                      : "text-[var(--color-muted-foreground)]",
-                  )}
-                >
-                  <Check
-                    className={cn(
-                      "size-3.5",
-                      matches ? "opacity-100" : "opacity-40",
-                    )}
-                  />
-                  <span>{matches ? t("reset.matches") : t("reset.notMatchYet")}</span>
-                </div>
-              )}
-            </div>
+            <NewPasswordFields
+              password={password}
+              confirm={confirm}
+              onPasswordChange={onPasswordChange}
+              onConfirmChange={onConfirmChange}
+              errorId={error ? "reset-error" : undefined}
+              autoFocus
+            />
 
             {error && (
               <div
@@ -307,7 +171,7 @@ export function ResetPasswordPage() {
             <div className="pt-1.5">
               <Button
                 type="submit"
-                disabled={mutation.isPending || !matches || password.length < 8}
+                disabled={mutation.isPending || !isNewPasswordReady(password, confirm)}
                 className="group h-11 w-full text-[14px] font-semibold"
               >
                 {mutation.isPending ? (

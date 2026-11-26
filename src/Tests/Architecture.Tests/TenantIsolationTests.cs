@@ -61,7 +61,7 @@ public sealed class TenantIsolationTests
 
         violations.ShouldBeEmpty(
             "Every entity in a BaseDbContext-derived DbContext must be tenant-isolated. " +
-            "Apply via builder.IsMultiTenant() in EF config, OR opt out by implementing " +
+            "Apply via builder.IsMultiTenant<string>() in EF config, OR opt out by implementing " +
             "Trislab.Framework.Core.Domain.IGlobalEntity (only for entities that are genuinely " +
             "platform-wide, like BillingPlan or ImpersonationGrant). " +
             $"Violations:\n  {string.Join("\n  ", violations)}");
@@ -103,7 +103,7 @@ public sealed class TenantIsolationTests
         });
 
         var ctor = dbContextType.GetConstructor([
-            typeof(IMultiTenantContextAccessor<AppTenantInfo>),
+            typeof(ITenantAccessor),
             optionsType,
             typeof(IOptions<DatabaseOptions>),
             typeof(IHostEnvironment),
@@ -111,20 +111,20 @@ public sealed class TenantIsolationTests
             $"{dbContextType.Name} does not have the expected BaseDbContext constructor signature.");
 
         return (DbContext)ctor.Invoke([
-            new StubAccessor(),
+            new FixedTenant(new AppTenantInfo("arch", "arch", string.Empty, "arch@arch", "arch")),
             options,
             settings,
             new StubEnvironment(),
         ]);
     }
 
-    private sealed class StubAccessor : IMultiTenantContextAccessor<AppTenantInfo>
+    private sealed class FixedTenant(AppTenantInfo tenant) : ITenantAccessor
     {
-        public IMultiTenantContext<AppTenantInfo> MultiTenantContext { get; set; } =
-            new MultiTenantContext<AppTenantInfo>(
-                new AppTenantInfo("arch", "arch", string.Empty, "arch@arch", "arch"));
+        public AppTenantInfo? TenantInfo => tenant;
 
-        IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
+        public bool IsResolved => true;
+
+        public IDisposable Use(AppTenantInfo? tenant) => throw new NotSupportedException("The model tests use one tenant.");
     }
 
     private sealed class StubEnvironment : IHostEnvironment

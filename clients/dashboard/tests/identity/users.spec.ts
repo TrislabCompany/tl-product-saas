@@ -37,6 +37,8 @@ test.describe("identity/users — list", () => {
     await installShellMocks(page);
     // The role filter combobox loads the role list on mount.
     await mockJsonResponse(page, "**/api/v1/identity/roles", ROLES);
+    // The pending invitations below the list; none unless a test says otherwise.
+    await mockJsonResponse(page, "**/api/v1/identity/invitations", []);
   });
 
   test("renders the heading and a user row from the mock data", async ({ page }) => {
@@ -65,7 +67,7 @@ test.describe("identity/users — list", () => {
       page.getByRole("heading", { name: "No users yet", level: 2 }),
     ).toBeVisible();
     await expect(
-      page.getByText(/register the first member to seed this tenant/i),
+      page.getByText(/invite the first member to this tenant/i),
     ).toBeVisible();
   });
 
@@ -84,19 +86,68 @@ test.describe("identity/users — list", () => {
     await expect(page.getByText("Carol Smith")).toHaveCount(0);
   });
 
-  test("opens the Register member dialog", async ({ page }) => {
+  test("invites an address: the dialog posts the e-mail and names, and sets no password", async ({ page }) => {
     await mockJsonResponse(page, "**/api/v1/identity/users/search**", paged(USERS));
+    const invited: unknown[] = [];
+    await page.route("**/api/v1/identity/invitations", async (route) => {
+      if (route.request().method() === "POST") {
+        invited.push(route.request().postDataJSON());
+        await route.fulfill({ status: 202, contentType: "application/json", body: "{}" });
+        return;
+      }
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
 
     await page.goto("/identity/users");
-    await page.getByRole("button", { name: /register user/i }).first().click();
+    await page.getByRole("button", { name: /invite user/i }).first().click();
 
     const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(
-      dialog.getByRole("heading", { name: /register a member/i }),
-    ).toBeVisible();
-    await expect(dialog.getByLabel("First name")).toBeVisible();
-    await expect(dialog.getByLabel("Username")).toBeVisible();
+    await expect(dialog.getByRole("heading", { name: /invite a member/i })).toBeVisible();
+    // Users are global: the owner chooses the password when accepting.
+    await expect(dialog.getByLabel("Password")).toHaveCount(0);
+    await expect(dialog.getByLabel("Username")).toHaveCount(0);
+
+    await dialog.getByLabel("Email").fill("dana@acme.com");
+    await dialog.getByLabel("First name").fill("Dana");
+    await dialog.getByRole("button", { name: /send invitation/i }).click();
+
+    await expect(dialog).toBeHidden();
+    expect(invited).toEqual([{ email: "dana@acme.com", firstName: "Dana" }]);
+  });
+
+  test("lists pending invitations and revokes one", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/users/search**", paged(USERS));
+    await mockJsonResponse(page, "**/api/v1/identity/invitations", [
+      {
+        id: "33333333-3333-3333-3333-333333333333",
+        email: "erin@acme.com",
+        status: "Pending",
+        createdOnUtc: "2026-11-20T10:00:00Z",
+        expiresOnUtc: "2026-11-27T10:00:00Z",
+      },
+      {
+        id: "44444444-4444-4444-4444-444444444444",
+        email: "frank@acme.com",
+        status: "Accepted",
+        createdOnUtc: "2026-11-19T10:00:00Z",
+        expiresOnUtc: "2026-11-26T10:00:00Z",
+        acceptedOnUtc: "2026-11-20T09:00:00Z",
+      },
+    ]);
+    const revoke = page.waitForRequest(
+      (r) => r.url().endsWith("/api/v1/identity/invitations/33333333-3333-3333-3333-333333333333") && r.method() === "DELETE",
+    );
+    await page.route("**/api/v1/identity/invitations/*", (route) => route.fulfill({ status: 204 }));
+
+    await page.goto("/identity/users");
+
+    const pending = page.getByRole("region", { name: /pending invitations/i });
+    await expect(pending.getByText("erin@acme.com")).toBeVisible();
+    // An accepted invitation is a member now, in the list above.
+    await expect(pending.getByText("frank@acme.com")).toHaveCount(0);
+
+    await pending.getByRole("button", { name: /revoke the invitation of erin@acme\.com/i }).click();
+    await revoke;
   });
 });
 

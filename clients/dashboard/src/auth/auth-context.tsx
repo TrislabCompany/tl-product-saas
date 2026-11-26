@@ -2,7 +2,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState, type 
 import { useQueryClient } from "@tanstack/react-query";
 import { tokenStore } from "@/auth/token-store";
 import { decodeJwt, isTokenExpired, type JwtClaims } from "@/auth/jwt";
-import { issueToken } from "@/auth/api";
+import { issueToken, selectTenant, switchTenant as switchTenantRequest, type SignInResponse, type TenantMembership } from "@/auth/api";
 import { refreshAccessToken } from "@/lib/api-client";
 import { endImpersonation, getMyPermissions, startImpersonation } from "@/api/identity";
 
@@ -23,6 +23,11 @@ export type ImpersonationInfo = {
   actorName?: string;
 };
 
+/** What a sign-in ended in: a session, or a tenant to choose first (an account in several tenants, no default). */
+export type LoginResult =
+  | { status: "signedIn" }
+  | { status: "selectTenant"; selectionToken: string; tenants: TenantMembership[] };
+
 export type AuthContextValue = {
   user: AuthUser | null;
   isAuthenticated: boolean;
@@ -41,7 +46,11 @@ export type AuthContextValue = {
   permissionsHydrated: boolean;
   /** Truthy iff the current access token carries act_sub (impersonation mode). */
   impersonation: ImpersonationInfo | null;
-  login: (input: { email: string; password: string; tenant: string; twoFactorCode?: string }) => Promise<void>;
+  login: (input: { email: string; password: string; tenant?: string; twoFactorCode?: string }) => Promise<LoginResult>;
+  /** Finishes a sign-in that answered `selectTenant`. */
+  chooseTenant: (input: { selectionToken: string; tenant: string; setDefault: boolean }) => Promise<void>;
+  /** Moves the session to another tenant of the signed-in account. */
+  switchTenant: (input: { tenant: string; setDefault: boolean }) => Promise<void>;
   logout: () => void;
   /** Re-fetch the permission set for the signed-in user (e.g. after a role change). */
   refreshPermissions: () => Promise<void>;
@@ -220,37 +229,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = useCallback(
-    async (input: { email: string; password: string; tenant: string; twoFactorCode?: string }) => {
-      tokenStore.setTenant(input.tenant);
-      // Stale permissions from a previous user must not leak into the new
-      // session — clear before issuing the token so the hydration effect
-      // re-fetches from scratch.
-      tokenStore.setPermissions([]);
-      setPermissionsHydrated(false);
-      const tokens = await issueToken(input);
+  // Installs the tokens of a sign-in, a tenant choice or a switch.
+  const install = useCallback(
+    (response: SignInResponse) => {
+      if (!response.accessToken || !response.refreshToken) {
+        throw new Error("The sign-in answered without tokens.");
+      }
       // Defence-in-depth: even though the API rejects root-tenant logins
       // submitted with X-Trislab-App=dashboard, double-check the issued token
       // so a future API regression can't quietly drop a root token into
       // a tenant-dashboard session.
-      const claims = decodeJwt(tokens.accessToken);
-      if (claims?.tenant === "root") {
+      const claims = decodeJwt(response.accessToken);
+      const tenant = response.tenant ?? claims?.tenant;
+      if (tenant === "root") {
         tokenStore.clear();
         throw new Error(
           "SuperAdmin accounts must use the admin app. Sign in there instead.",
         );
       }
-      tokenStore.setTokens(tokens.accessToken, tokens.refreshToken);
-      // Drop any cached query state from before login. Without this, a
-      // failed pre-login probe (e.g. OverviewPage's billing fetch
-      // firing during the brief window before ProtectedRoute redirects
-      // to /login, or a stale error from a previous session) sticks in
-      // the react-query cache as a 401 and renders as an ErrorBand on
-      // the next page — react-query's retry config blocks auto-retries
-      // for 401, so the stale error would never refetch on its own.
+      // Stale permissions from a previous user or tenant must not leak into the
+      // new session: clear them so the hydration effect re-fetches from scratch.
+      tokenStore.setPermissions([]);
+      setPermissionsHydrated(false);
+      lastHydratedSubject.current = null;
+      if (tenant) tokenStore.setTenant(tenant);
+      tokenStore.setTokens(response.accessToken, response.refreshToken);
+      // Drop any cached query state from before. Without this, a failed
+      // pre-login probe, or the previous tenant's data after a switch, sticks
+      // in the react-query cache (retries are off for 401) and renders on the
+      // next page.
       queryClient.clear();
     },
     [queryClient],
+  );
+
+  const login = useCallback(
+    async (input: { email: string; password: string; tenant?: string; twoFactorCode?: string }): Promise<LoginResult> => {
+      const response = await issueToken(input);
+      if (response.tenantSelectionRequired && response.selectionToken) {
+        return { status: "selectTenant", selectionToken: response.selectionToken, tenants: response.tenants ?? [] };
+      }
+      install(response);
+      return { status: "signedIn" };
+    },
+    [install],
+  );
+
+  const chooseTenant = useCallback(
+    async (input: { selectionToken: string; tenant: string; setDefault: boolean }) => {
+      install(await selectTenant(input));
+    },
+    [install],
+  );
+
+  const switchTenant = useCallback(
+    async (input: { tenant: string; setDefault: boolean }) => {
+      install(await switchTenantRequest(input));
+    },
+    [install],
   );
 
   const logout = useCallback(() => {
@@ -332,12 +368,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       permissionsHydrated,
       impersonation,
       login,
+      chooseTenant,
+      switchTenant,
       logout,
       beginImpersonation,
       stopImpersonation,
       refreshPermissions,
     }),
-    [user, isInitializing, permissionsHydrated, impersonation, login, logout, beginImpersonation, stopImpersonation, refreshPermissions],
+    [user, isInitializing, permissionsHydrated, impersonation, login, chooseTenant, switchTenant, logout, beginImpersonation, stopImpersonation, refreshPermissions],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

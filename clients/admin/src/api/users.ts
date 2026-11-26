@@ -39,19 +39,21 @@ export type SearchUsersParams = {
   tenantId?: string;
 };
 
-export type RegisterUserInput = {
-  firstName: string;
-  lastName: string;
+/** An invitation into the operator's tenant, root (`POST/GET /identity/invitations`). */
+export type InvitationDto = {
+  id: string;
   email: string;
-  userName: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber?: string;
+  status: string;
+  createdOnUtc: string;
+  expiresOnUtc: string;
+  acceptedOnUtc?: string | null;
+  revokedOnUtc?: string | null;
 };
 
-export type RegisterUserResponse = {
-  userId: string;
-  message?: string;
+export type InviteUserInput = {
+  email: string;
+  firstName?: string;
+  lastName?: string;
 };
 
 const BASE = "/api/v1/identity/users";
@@ -165,11 +167,21 @@ export async function getUserRoles(id: string): Promise<UserRoleDto[]> {
   return apiFetch<UserRoleDto[]>(`${BASE}/${encodeURIComponent(id)}/roles`);
 }
 
-export async function registerUser(input: RegisterUserInput): Promise<RegisterUserResponse> {
-  return apiFetch<RegisterUserResponse>(`${IDENTITY}/register`, {
+// Users are global: an operator invites an address into root, and its owner accepts the e-mailed link
+// with their own password (or, for an existing account, signs in and accepts).
+export async function inviteUser(input: InviteUserInput): Promise<void> {
+  await apiFetch<InvitationDto>(`${IDENTITY}/invitations`, {
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+export async function listInvitations(): Promise<InvitationDto[]> {
+  return (await apiFetch<InvitationDto[] | null>(`${IDENTITY}/invitations`)) ?? [];
+}
+
+export async function revokeInvitation(id: string): Promise<void> {
+  await apiFetch<void>(`${IDENTITY}/invitations/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
 export async function toggleUserStatus(id: string, activateUser: boolean): Promise<void> {
@@ -192,19 +204,15 @@ export async function assignUserRoles(id: string, roles: UserRoleDto[]): Promise
 // -----------------------------
 
 /**
- * Step 1 of the forgot-password flow. Server resolves the user by
- * (email, tenant), generates a reset token, and emails them the link.
+ * Step 1 of the forgot-password flow. Server resolves the user by e-mail
+ * (users are global), generates a reset token, and emails them the link.
  * Server always returns 200 regardless of whether the email exists —
  * never leak account presence to the UI.
  */
-export async function requestPasswordReset(input: {
-  email: string;
-  tenant: string;
-}): Promise<void> {
+export async function requestPasswordReset(input: { email: string }): Promise<void> {
   await apiFetch<string>(`${IDENTITY}/forgot-password`, {
     method: "POST",
     skipAuth: true,
-    headers: { tenant: input.tenant },
     body: JSON.stringify({ email: input.email }),
   });
 }
@@ -218,12 +226,13 @@ export async function resetPassword(input: {
   email: string;
   password: string;
   token: string;
-  tenant: string;
+  /** Only when the link names one: users are global. */
+  tenant?: string;
 }): Promise<void> {
   await apiFetch<string>(`${IDENTITY}/reset-password`, {
     method: "POST",
     skipAuth: true,
-    headers: { tenant: input.tenant },
+    headers: input.tenant ? { tenant: input.tenant } : {},
     body: JSON.stringify({
       email: input.email,
       password: input.password,
@@ -233,22 +242,19 @@ export async function resetPassword(input: {
 }
 
 /**
- * Confirm-email link landing. Server expects (userId, code, tenant) as
- * query parameters from the registration email.
+ * Confirm-email link landing. The link carries (userId, code, tenant); the owner sets the account's password
+ * here, which proves the address. The tenant goes in the header the endpoint reads.
  */
 export async function confirmEmail(input: {
   userId: string;
   code: string;
   tenant: string;
+  password: string;
 }): Promise<string> {
-  const qs = new URLSearchParams({
-    userId: input.userId,
-    code: input.code,
-    tenant: input.tenant,
-  }).toString();
-  return apiFetch<string>(`${IDENTITY}/confirm-email?${qs}`, {
-    method: "GET",
+  return apiFetch<string>(`${IDENTITY}/confirm-email`, {
+    method: "POST",
     skipAuth: true,
     headers: { tenant: input.tenant },
+    body: JSON.stringify({ userId: input.userId, code: input.code, password: input.password }),
   });
 }

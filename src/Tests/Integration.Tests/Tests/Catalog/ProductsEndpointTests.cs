@@ -1,3 +1,4 @@
+using Trislab.Modules.Identity.Data;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
 using Trislab.Framework.Shared.Multitenancy;
@@ -514,10 +515,9 @@ public abstract class ProductsEndpointTestsBase
 
         using var scope = _factory.Services.CreateScope();
         var tenant = await scope.ServiceProvider
-            .GetRequiredService<IMultiTenantStore<AppTenantInfo>>()
+            .GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>()
             .GetAsync(_factory.TenantId);
-        scope.ServiceProvider.GetRequiredService<IMultiTenantContextSetter>()
-            .MultiTenantContext = new MultiTenantContext<AppTenantInfo>(tenant);
+        using var tenantUse = scope.ServiceProvider.GetRequiredService<ITenantAccessor>().Use(tenant);
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<TrislabUser>>();
         var user = new TrislabUser
@@ -527,11 +527,15 @@ public abstract class ProductsEndpointTestsBase
             Email = email,
             UserName = handle,
             EmailConfirmed = true,
-            IsActive = true,
         };
         var result = await userManager.CreateAsync(user, password);
         result.Succeeded.ShouldBeTrue(
             $"Seeding active user failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+
+        // Users are global; the membership puts the account in the tenant, as an accepted invitation would.
+        var identity = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        identity.TenantMemberships.Add(TenantMembership.CreateAccepted(user.Id, _factory.TenantId));
+        await identity.SaveChangesAsync();
         return (email, password);
     }
 

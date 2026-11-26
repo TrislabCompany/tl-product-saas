@@ -12,6 +12,7 @@ import {
   AuditSeverity,
   auditPredicate,
   listAudits,
+  listMyAudits,
   severityRank,
   type AuditSummaryDto,
 } from "@/api/audits";
@@ -39,6 +40,8 @@ import { describe, formatNumber, formatRelative } from "@/lib/list-helpers";
 
 /** Mirrors the permission GET /api/v1/audits enforces server-side. */
 const AUDIT_VIEW_PERMISSION = "Permissions.AuditTrails.View";
+// Every member's own activity (GET /audits/mine), a Basic permission.
+const AUDIT_VIEW_OWN_PERMISSION = "Permissions.AuditTrails.ViewOwn";
 const HISTORY_PAGE_SIZE = 25;
 const MAX_LIVE_EVENTS = 200;
 
@@ -149,6 +152,8 @@ export function ActivityPage() {
 
   const canViewHistory =
     permissionsHydrated && (user?.permissions.includes(AUDIT_VIEW_PERMISSION) ?? false);
+  const canViewOwnHistory =
+    permissionsHydrated && (user?.permissions.includes(AUDIT_VIEW_OWN_PERMISSION) ?? false);
 
   const liveItems = useMemo(() => events.slice(0, MAX_LIVE_EVENTS), [events]);
   const isLive = status === "connected";
@@ -160,7 +165,13 @@ export function ActivityPage() {
         title={t("title")}
         total={eventCount}
         unit="event"
-        description={canViewHistory ? t("descriptionWithHistory") : t("descriptionLiveOnly")}
+        description={
+          canViewHistory
+            ? t("descriptionWithHistory")
+            : canViewOwnHistory
+              ? t("descriptionWithOwnHistory")
+              : t("descriptionLiveOnly")
+        }
       >
         {isLive ? (
           <Badge variant="success">{t("status.streaming")}</Badge>
@@ -176,7 +187,9 @@ export function ActivityPage() {
       {!permissionsHydrated ? (
         <EntityListLoading rows={3} desktopColumns={HISTORY_GRID} />
       ) : canViewHistory ? (
-        <HistorySection />
+        <HistorySection scope="tenant" />
+      ) : canViewOwnHistory ? (
+        <HistorySection scope="mine" />
       ) : (
         <LiveOnlyNotice />
       )}
@@ -341,12 +354,13 @@ function LiveDesktopRow({ ev, isLast }: { ev: SseEvent; isLast: boolean }) {
 //  tenant would otherwise hammer GET /audits.
 // ───────────────────────────────────────────────────────────────────────
 
-function HistorySection() {
+/** "tenant": the tenant's trail (Admins); "mine": the user's own events. */
+function HistorySection({ scope }: { scope: "tenant" | "mine" }) {
   const { t } = useTranslation(["activity", "audits"]);
   const history = useQuery({
-    queryKey: ["audits", "activity-history"],
+    queryKey: ["audits", "activity-history", scope],
     queryFn: ({ signal }) =>
-      listAudits(
+      (scope === "tenant" ? listAudits : listMyAudits)(
         {
           pageNumber: 1,
           pageSize: HISTORY_PAGE_SIZE,
@@ -367,7 +381,11 @@ function HistorySection() {
         id="activity-history-heading"
         icon={History}
         title={t("history.title")}
-        caption={t("history.caption", { size: HISTORY_PAGE_SIZE })}
+        caption={
+          scope === "tenant"
+            ? t("history.caption", { size: HISTORY_PAGE_SIZE })
+            : t("history.captionMine", { size: HISTORY_PAGE_SIZE })
+        }
       >
         <Button
           variant="outline"
@@ -379,12 +397,14 @@ function HistorySection() {
           <RefreshCw className={history.isFetching ? "animate-spin" : undefined} />
           {t("history.refresh")}
         </Button>
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/system/audits">
-            <ScrollText />
-            {t("history.auditTrail")}
-          </Link>
-        </Button>
+        {scope === "tenant" && (
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/system/audits">
+              <ScrollText />
+              {t("history.auditTrail")}
+            </Link>
+          </Button>
+        )}
       </SectionHeading>
 
       {history.isError && (

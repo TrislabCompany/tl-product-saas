@@ -221,24 +221,12 @@ public abstract class ChatChannelsTestsBase
         return await response.DeserializeAsync<Guid>();
     }
 
-    private static async Task<string> RegisterUserAsync(HttpClient adminClient, string prefix)
+    private async Task<string> RegisterUserAsync(HttpClient adminClient, string prefix)
     {
-        var unique = Guid.NewGuid().ToString("N")[..8];
-        var email = $"{prefix}-{unique}@example.com";
-        var userName = $"{prefix}-{unique}";
-        const string password = "Test@1234!";
-
-        var response = await adminClient.PostAsJsonAsync($"{TestConstants.IdentityBasePath}/register", new
-        {
-            firstName = prefix,
-            lastName = "Test",
-            email,
-            userName,
-            password,
-            confirmPassword = password,
-        });
-        response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        var registered = await response.DeserializeAsync<RegisterResult>();
+        var registered = await TestUsers.InviteAndAcceptAsync(_factory, adminClient, prefix, firstName: prefix, lastName: "Test");
+        var email = registered.Email;
+        var userName = registered.UserName;
+        var password = registered.Password;
         return registered.UserId;
     }
 

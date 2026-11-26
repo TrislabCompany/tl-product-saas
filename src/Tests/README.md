@@ -1,10 +1,10 @@
 # Architecture Tests
 
-This folder contains solution-wide architecture tests for the Trislab .NET 10 Starter Kit. The goal is to automatically enforce layering, dependency, and naming rules as the codebase evolves.
+This folder contains solution-wide architecture tests for the Trislab .NET 11 Starter Kit. The goal is to automatically enforce layering, dependency, and naming rules as the codebase evolves.
 
 ## Project
 
-- `Architecture.Tests` targets `net10.0` and lives under `src/Tests/Architecture.Tests`.
+- `Architecture.Tests` targets `net11.0` and lives under `src/Tests/Architecture.Tests`.
 - Test dependencies are limited to xUnit v3 (`xunit.v3.mtp-off`), `Shouldly`, and `AutoFixture`, with versions defined in `src/Directory.Packages.props`.
 
 ## What Is Covered

@@ -12,7 +12,7 @@ import {
   updateChannel,
   type ChannelDto,
 } from "@/api/chat";
-import { searchUsers, type UserDto } from "@/api/identity";
+import { MIN_USER_SEARCH, pickUsers, type UserDto } from "@/api/identity";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -409,8 +409,8 @@ function AddMembersRow({ channel }: { channel: ChannelDto }) {
 
   const usersQuery = useQuery({
     queryKey: ["chat", "settings-add-search", debounced],
-    queryFn: () => searchUsers({ search: debounced, pageSize: 8, isActive: true }),
-    enabled: debounced.length >= 2,
+    queryFn: () => pickUsers(debounced, 8),
+    enabled: debounced.length >= MIN_USER_SEARCH,
     staleTime: 30_000,
   });
 

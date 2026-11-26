@@ -4,7 +4,7 @@
 # by digest; Renovate bumps them from roadmap phase 12 on. The build context
 # is clients/dashboard (platform.yaml).
 
-FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS build
+FROM node:24.22.3-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5 AS build
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 # @trislabcompany/framework-ui comes from GitHub Packages (.npmrc). The token is a BuildKit secret, never part of a layer.

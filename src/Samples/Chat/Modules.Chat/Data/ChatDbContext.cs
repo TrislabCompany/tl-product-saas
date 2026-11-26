@@ -14,10 +14,10 @@ public sealed class ChatDbContext : BaseDbContext
     public const string Schema = "chat";
 
     public ChatDbContext(
-        IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor,
+        ITenantAccessor tenants,
         DbContextOptions<ChatDbContext> options,
         IOptions<DatabaseOptions> settings,
-        IHostEnvironment environment) : base(multiTenantContextAccessor, options, settings, environment) { }
+        IHostEnvironment environment) : base(tenants, options, settings, environment) { }
 
     public DbSet<ChatChannel> Channels => Set<ChatChannel>();
     public DbSet<Message> Messages => Set<Message>();

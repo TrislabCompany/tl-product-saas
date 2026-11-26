@@ -9,7 +9,7 @@ import {
   listMyChannels,
   type ChannelDto,
 } from "@/api/chat";
-import { searchUsers, type UserDto } from "@/api/identity";
+import { MIN_USER_SEARCH, pickUsers, type UserDto } from "@/api/identity";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -466,7 +466,7 @@ function NewDmDialog({
   const [debounced, setDebounced] = useState("");
   const queryClient = useQueryClient();
 
-  // 250ms debounce — cheap server-side searchUsers call but no need to fire
+  // 250ms debounce — cheap server-side lookup call but no need to fire
   // on every keystroke.
   useEffect(() => {
     const t = setTimeout(() => setDebounced(query.trim()), 250);
@@ -484,24 +484,14 @@ function NewDmDialog({
     }
   }
 
-  // Two queries layered: a "suggested" list that fires the moment the dialog
-  // opens (no search filter, just first page of active tenant users), and an
-  // explicit search-by-typed-query list that takes over once the operator
-  // starts typing. The empty-search query is cached for 5 minutes so opening
-  // and closing the dialog is instant; the active search refetches more often.
-  const suggestedQuery = useQuery({
-    queryKey: ["chat", "user-suggested"],
-    queryFn: () => searchUsers({ pageSize: 12, isActive: true }),
-    enabled: open,
-    staleTime: 5 * 60_000,
-  });
-  const searchQuery = useQuery({
+  // A search over the people the caller may pick (Users.Pick, the lookup): there is no
+  // "everyone" list for a member, so the list fills once two characters are typed.
+  const activeQuery = useQuery({
     queryKey: ["chat", "user-search", debounced],
-    queryFn: () => searchUsers({ search: debounced, pageSize: 12, isActive: true }),
-    enabled: open && debounced.length >= 2,
+    queryFn: () => pickUsers(debounced, 12),
+    enabled: open && debounced.length >= MIN_USER_SEARCH,
     staleTime: 30_000,
   });
-  const activeQuery = debounced.length >= 2 ? searchQuery : suggestedQuery;
 
   const createDmMutation = useMutation({
     mutationFn: (userIds: string[]) => findOrCreateDm(userIds),
@@ -560,7 +550,7 @@ function NewDmDialog({
                   label={
                     debounced.length >= 2
                       ? t("rail.dmNoMatch", { term: debounced })
-                      : t("rail.dmNoTeammates")
+                      : t("rail.dmTypeToSearch")
                   }
                 />
               ) : (

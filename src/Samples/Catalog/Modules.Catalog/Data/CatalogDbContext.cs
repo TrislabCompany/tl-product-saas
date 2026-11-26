@@ -14,10 +14,10 @@ public sealed class CatalogDbContext : BaseDbContext
     public const string Schema = "catalog";
 
     public CatalogDbContext(
-        IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor,
+        ITenantAccessor tenants,
         DbContextOptions<CatalogDbContext> options,
         IOptions<DatabaseOptions> settings,
-        IHostEnvironment environment) : base(multiTenantContextAccessor, options, settings, environment) { }
+        IHostEnvironment environment) : base(tenants, options, settings, environment) { }
 
     public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<Category> Categories => Set<Category>();

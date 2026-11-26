@@ -50,8 +50,9 @@ export function ResetPasswordPage() {
 
   const token = params.get("token") ?? "";
   const email = params.get("email") ?? "";
-  const tenant = params.get("tenant") ?? "";
-  const malformed = !token || !email || !tenant;
+  // The tenant is optional: users are global, so a reset asked for anonymously names none.
+  const tenant = params.get("tenant") ?? undefined;
+  const malformed = !token || !email;
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -141,10 +142,9 @@ export function ResetPasswordPage() {
                   </h1>
                   <p className="text-[13px] leading-relaxed text-[var(--color-muted-foreground)]">
                     {t("reset.incompletePre")}{" "}
-                    <span className="text-[var(--color-foreground)]">{t("reset.fieldToken")}</span>,{" "}
-                    <span className="text-[var(--color-foreground)]">{t("reset.fieldEmail")}</span>,{" "}
+                    <span className="text-[var(--color-foreground)]">{t("reset.fieldToken")}</span>{" "}
                     {t("reset.or")}{" "}
-                    <span className="text-[var(--color-foreground)]">{t("reset.fieldTenant")}</span>.{" "}
+                    <span className="text-[var(--color-foreground)]">{t("reset.fieldEmail")}</span>.{" "}
                     {t("reset.incompletePost")}
                   </p>
                 </div>
@@ -170,9 +170,7 @@ export function ResetPasswordPage() {
                   </h1>
                   <p className="text-[13px] text-[var(--color-muted-foreground)]">
                     {t("reset.subtitlePre")}{" "}
-                    <span className="text-[var(--color-foreground)]">{email}</span>{" "}
-                    {t("reset.subtitleMid")}{" "}
-                    <span className="text-[var(--color-foreground)]">{tenant}</span>
+                    <span className="text-[var(--color-foreground)]">{email}</span>
                     {t("reset.subtitlePost")}
                   </p>
                 </div>

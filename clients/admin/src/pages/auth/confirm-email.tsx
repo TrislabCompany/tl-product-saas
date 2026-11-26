@@ -1,23 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
-import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircle, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { confirmEmail } from "@/api/users";
 import { ApiRequestError } from "@/lib/api-client";
 
+const MIN_PASSWORD_LENGTH = 8;
+
 type Status =
-  | { kind: "loading" }
+  | { kind: "form" }
   | { kind: "success"; message: string }
   | { kind: "error"; message: string };
 
 /**
  * Confirm-email landing — admin variant.
  *
- * Same shape as the dashboard's: auto-fire GET on mount, surface stable
- * success or failure state with recovery affordances. Uses the unified
- * centered-card auth shell so the page reads as part of the same surface
- * as the login and other auth pages.
+ * Same shape as the dashboard's: the owner sets the account's password, which
+ * proves the address, and the confirmation and the password go to the server
+ * together (POST /confirm-email). Then a stable success or failure state with
+ * recovery affordances, in the unified centered-card auth shell.
  */
 export function ConfirmEmailPage() {
   const { t } = useTranslation("auth");
@@ -27,38 +32,47 @@ export function ConfirmEmailPage() {
   const tenant = params.get("tenant") ?? "";
   const malformed = !userId || !code || !tenant;
 
-  const [fetchStatus, setStatus] = useState<Status>({ kind: "loading" });
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [result, setResult] = useState<Status>({ kind: "form" });
   // A malformed link never fires the request — its error state is derived.
-  const status: Status = malformed
-    ? { kind: "error", message: t("confirm.malformed") }
-    : fetchStatus;
+  const status: Status = malformed ? { kind: "error", message: t("confirm.malformed") } : result;
+  const ready = password.length >= MIN_PASSWORD_LENGTH && password === confirm;
 
-  useEffect(() => {
-    if (malformed) return;
-    let cancelled = false;
-    void confirmEmail({ userId, code, tenant })
-      .then((message) => {
-        if (cancelled) return;
-        setStatus({
-          kind: "success",
-          message:
-            typeof message === "string" && message.length > 0
-              ? message
-              : t("confirm.successFallback"),
-        });
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const detail =
-          err instanceof ApiRequestError
-            ? err.problem?.detail ?? err.problem?.title ?? err.message
-            : (err as Error).message;
-        setStatus({ kind: "error", message: detail });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [userId, code, tenant, malformed, t]);
+  const mutation = useMutation({
+    mutationFn: () => confirmEmail({ userId, code, tenant, password }),
+    onSuccess: (message) =>
+      setResult({
+        kind: "success",
+        message: typeof message === "string" && message.length > 0 ? message : t("confirm.successFallback"),
+      }),
+    onError: (err: unknown) => {
+      const detail =
+        err instanceof ApiRequestError
+          ? err.problem?.detail ?? err.problem?.title ?? err.message
+          : (err as Error).message;
+      // A rejected password can be fixed in the form; anything else ends the link.
+      if (err instanceof ApiRequestError && err.status === 400) setFormError(detail);
+      else setResult({ kind: "error", message: detail });
+    },
+  });
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (password !== confirm) {
+      setFormError(t("reset.errMismatch"));
+      return;
+    }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setFormError(t("reset.errTooShort"));
+      return;
+    }
+    setFormError(null);
+    mutation.mutate();
+  };
+
+  const labelClass = "block text-[11.5px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]";
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--color-background)] px-5 py-8 sm:py-12">
@@ -98,26 +112,71 @@ export function ConfirmEmailPage() {
         {/* Status card */}
         <div className="rounded-xl border border-[var(--color-border)] bg-[oklch(from_var(--color-card)_l_c_h_/_0.85)] shadow-[0_1px_3px_oklch(0_0_0_/_0.04),0_8px_24px_oklch(0_0_0_/_0.06)] backdrop-blur-xl">
           <div className="px-6 py-7 sm:px-8 sm:py-9">
-            {status.kind === "loading" && (
-              <div className="space-y-5 text-center">
-                <div className="grid place-items-center">
-                  <span
-                    aria-hidden
-                    className="grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)] text-[var(--color-muted-foreground)]"
-                  >
-                    <Loader2 className="size-6 animate-spin" />
-                  </span>
-                </div>
-                <div>
+            {status.kind === "form" && (
+              <>
+                <div className="mb-6">
                   <h1 className="mb-1.5 font-display text-[22px] font-semibold tracking-tight text-[var(--color-foreground)]">
-                    {t("confirm.verifyingTitleLead")}{" "}
-                    <span className="text-[var(--color-primary)]">{t("confirm.verifyingTitleAccent")}</span>
+                    {t("confirm.formTitleLead")}{" "}
+                    <span className="text-[var(--color-primary)]">{t("confirm.formTitleAccent")}</span>
                   </h1>
                   <p className="text-[13px] leading-relaxed text-[var(--color-muted-foreground)]">
-                    {t("confirm.verifyingBody")}
+                    {t("confirm.formBody")}
                   </p>
                 </div>
-              </div>
+                <form onSubmit={onSubmit} className="space-y-5" noValidate aria-describedby={formError ? "confirm-error" : undefined}>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="new-password" className={labelClass}>
+                      {t("confirm.password")}
+                    </Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setFormError(null);
+                      }}
+                      autoComplete="new-password"
+                      autoFocus
+                      minLength={MIN_PASSWORD_LENGTH}
+                      required
+                      className="h-11 text-[14px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="confirm-password" className={labelClass}>
+                      {t("confirm.confirmPassword")}
+                    </Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirm}
+                      onChange={(e) => {
+                        setConfirm(e.target.value);
+                        setFormError(null);
+                      }}
+                      autoComplete="new-password"
+                      minLength={MIN_PASSWORD_LENGTH}
+                      required
+                      className="h-11 text-[14px]"
+                    />
+                  </div>
+                  {formError && (
+                    <div
+                      id="confirm-error"
+                      role="alert"
+                      className="tl-enter flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+                    >
+                      <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                      <span className="leading-snug">{formError}</span>
+                    </div>
+                  )}
+                  <Button type="submit" disabled={mutation.isPending || !ready} className="group h-11 w-full text-[14px] font-semibold">
+                    {mutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+                    <span>{mutation.isPending ? t("confirm.submitting") : t("confirm.submit")}</span>
+                  </Button>
+                </form>
+              </>
             )}
 
             {status.kind === "success" && (

@@ -1,6 +1,6 @@
 # This repository
 
-> `tl-product-saas`: the thin multi-tenant starter of every Trislab SaaS product, and the framework's multi-tenant test app. A .NET 10 host and two React 19 apps on the packages of `tl-framework` (`README.md`, `docs/`).
+> `tl-product-saas`: the thin multi-tenant starter of every Trislab SaaS product, and the framework's multi-tenant test app. A .NET 11 host and two React 19 apps on the packages of `tl-framework` (`README.md`, `docs/`).
 
 ## Role
 
@@ -36,7 +36,7 @@ This file is the map. Detailed conventions live in `.claude/rules/`. Each rule h
 
 A **multi-tenant modular monolith** (Vertical Slice Architecture) backend with two **React + Vite** front ends, built on the framework's packages. The host references `Trislab.Framework.*` and `Trislab.Modules.*` at one version, `TrislabFrameworkVersion` in `src/Directory.Packages.props`; nothing of the framework is copied here ([docs/packages.md](docs/packages.md)).
 
-- **Backend:** .NET 10, EF Core 10, PostgreSQL, Redis, JWT and ASP.NET Identity, Finbuckle multitenancy, Hangfire, OpenAPI/Scalar, Serilog and OpenTelemetry, .NET Aspire.
+- **Backend:** .NET 11, EF Core 11, PostgreSQL, Redis, JWT and ASP.NET Identity, Finbuckle multitenancy, Hangfire, OpenAPI/Scalar, Serilog and OpenTelemetry, .NET Aspire.
 - **Front ends:** `clients/admin` (operator-facing) and `clients/dashboard` (tenant-facing): React 19, Vite 8, TypeScript 6, TanStack Query v5, React Router 7, Radix + Tailwind v4, i18n from `@trislabcompany/framework-ui`.
 
 ## Repo map

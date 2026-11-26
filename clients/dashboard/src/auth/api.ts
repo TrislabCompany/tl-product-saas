@@ -1,33 +1,74 @@
 import { ApiRequestError, apiFetch } from "@/lib/api-client";
 
-export type TokenResponse = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresAt: string;
-  refreshTokenExpiresAt: string;
+/** A tenant the signed-in account is a member of (`GET /identity/profile/tenants`, and a sign-in that needs a choice). */
+export type TenantMembership = {
+  id: string;
+  name?: string | null;
+  isDefault: boolean;
 };
+
+/**
+ * What `POST /token/issue`, `/token/select` and `/token/switch` answer. Users are global: either the tokens of the
+ * tenant the server opened (`tenant`), or, for an account in several tenants with no default, the list to choose
+ * from and a short-lived `selectionToken` to send with the choice.
+ */
+export type SignInResponse = {
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  refreshTokenExpiresAt?: string | null;
+  tenant?: string | null;
+  tenantSelectionRequired: boolean;
+  selectionToken?: string | null;
+  tenants?: TenantMembership[] | null;
+};
+
+// X-Trislab-App tells the API this credential request comes from the tenant dashboard. The server uses it to keep
+// operator (root) accounts out: a root account signing in with X-Trislab-App=dashboard gets 403, not a token.
+const APP_HEADER = { "X-Trislab-App": "dashboard" } as const;
 
 export function issueToken(input: {
   email: string;
   password: string;
-  tenant: string;
+  /** Optional: the tenant to open when the account is a member there (a demo account's tenant). */
+  tenant?: string;
   /** Authenticator (TOTP) code — sent only on the second step of a 2FA sign-in. */
   twoFactorCode?: string;
 }) {
-  return apiFetch<TokenResponse>("/api/v1/identity/token/issue", {
+  return apiFetch<SignInResponse>("/api/v1/identity/token/issue", {
     method: "POST",
     body: JSON.stringify({
       email: input.email,
       password: input.password,
       ...(input.twoFactorCode ? { twoFactorCode: input.twoFactorCode } : {}),
     }),
-    // X-Trislab-App tells the API this credential request originated from the
-    // tenant dashboard. The server uses it to enforce the SuperAdmin / app
-    // boundary — a root-tenant login submitted with X-Trislab-App=dashboard is
-    // rejected with 403 instead of receiving a usable token.
-    headers: { tenant: input.tenant, "X-Trislab-App": "dashboard" },
+    headers: { ...APP_HEADER, ...(input.tenant ? { tenant: input.tenant } : {}) },
     skipAuth: true,
   });
+}
+
+/** Finishes a sign-in that needed a tenant choice. */
+export function selectTenant(input: { selectionToken: string; tenant: string; setDefault: boolean }) {
+  return apiFetch<SignInResponse>("/api/v1/identity/token/select", {
+    method: "POST",
+    body: JSON.stringify(input),
+    headers: { ...APP_HEADER },
+    skipAuth: true,
+  });
+}
+
+/** Moves the signed-in session to another tenant of the same account. */
+export function switchTenant(input: { tenant: string; setDefault: boolean }) {
+  return apiFetch<SignInResponse>("/api/v1/identity/token/switch", {
+    method: "POST",
+    body: JSON.stringify(input),
+    headers: { ...APP_HEADER },
+  });
+}
+
+/** The tenants the signed-in account belongs to. */
+export function getMyTenants() {
+  return apiFetch<TenantMembership[]>("/api/v1/identity/profile/tenants");
 }
 
 // Stable ProblemDetails `code`s the token endpoint sets for the second factor

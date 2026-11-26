@@ -5,7 +5,7 @@ import { ImageIcon, Loader2, Paperclip, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { ChannelType, sendMessage, type ChannelTypeValue, type MessageDto } from "@/api/chat";
 import { getFileDownloadUrl, Visibility } from "@/api/files";
-import { searchUsers, type UserDto } from "@/api/identity";
+import { MIN_USER_SEARCH, pickUsers, type UserDto } from "@/api/identity";
 import { useRealtime } from "@/realtime/realtime-context";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
 import { cn } from "@/lib/cn";
@@ -137,8 +137,8 @@ export function Composer({
 
   const mentionUsersQuery = useQuery({
     queryKey: ["chat", "mention-search", debouncedQuery],
-    queryFn: () => searchUsers({ search: debouncedQuery, pageSize: 6, isActive: true }),
-    enabled: debouncedQuery.length >= 2,
+    queryFn: () => pickUsers(debouncedQuery, 6),
+    enabled: debouncedQuery.length >= MIN_USER_SEARCH,
     staleTime: 30_000,
   });
 

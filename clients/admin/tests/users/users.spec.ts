@@ -109,129 +109,87 @@ test.describe("users directory list", () => {
   });
 });
 
-test.describe("users create form", () => {
-  test("renders the identity + credential fields and the create action", async ({ page }) => {
-    // /users/new now redirects to /users — creation is a modal dialog opened
-    // from the list's "New user" trigger.
+test.describe("users invite form", () => {
+  test.beforeEach(async ({ page }) => {
+    // Need the list to render so the "Invite operator" trigger is present.
     await mockJsonResponse(
       page,
       "**/api/v1/identity/users/search**",
       paged(USERS, { pageSize: 12, totalCount: 2 }),
     );
-    await page.goto("/users");
-    await page.getByRole("button", { name: "New user", exact: true }).click();
-
-    const dialog = page.getByRole("dialog");
-    await expect(
-      dialog.getByRole("heading", { name: "New account", exact: true }),
-    ).toBeVisible({ timeout: 10_000 });
-
-    await expect(dialog.getByLabel(/^First name/)).toBeVisible();
-    await expect(dialog.getByLabel(/^Last name/)).toBeVisible();
-    await expect(dialog.getByLabel(/^Username/)).toBeVisible();
-    await expect(dialog.getByLabel(/^Email/)).toBeVisible();
-    await expect(dialog.getByLabel(/^Password/, { exact: false })).toBeVisible();
-    await expect(dialog.getByLabel(/^Confirm password/)).toBeVisible();
-
-    await expect(
-      dialog.getByRole("button", { name: "Create account", exact: true }),
-    ).toBeVisible();
   });
 
-  test("filling the form and submitting POSTs to /register", async ({ page }) => {
-    await page.route("**/api/v1/identity/register", async (route) => {
-      if (route.request().method() !== "POST") {
-        await route.fallback();
+  test("the dialog asks for the address and names, never a password", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/invitations", []);
+    await page.goto("/users");
+    await page.getByRole("button", { name: "Invite operator", exact: true }).click();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("heading", { name: "Invite an operator", exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(dialog.getByLabel(/^Email/)).toBeVisible();
+    await expect(dialog.getByLabel(/^First name/)).toBeVisible();
+    // Users are global: the owner chooses the password when accepting.
+    await expect(dialog.getByLabel(/password/i)).toHaveCount(0);
+    await expect(dialog.getByLabel(/^Username/)).toHaveCount(0);
+  });
+
+  test("submitting POSTs the invitation", async ({ page }) => {
+    const invited: unknown[] = [];
+    await page.route("**/api/v1/identity/invitations", async (route) => {
+      if (route.request().method() === "POST") {
+        invited.push(route.request().postDataJSON());
+        await route.fulfill({ status: 202, headers: { "Content-Type": "application/json" }, body: "{}" });
         return;
       }
-      await route.fulfill({
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "u-new", message: "Confirmation email queued." }),
-      });
+      await route.fulfill({ status: 200, headers: { "Content-Type": "application/json" }, body: "[]" });
     });
-    // Success navigates to the new user's detail page — mock its loads.
-    await mockJsonResponse(page, "**/api/v1/identity/users/u-new", {
-      ...USERS[0],
-      id: "u-new",
-      userName: "m.chen",
-    });
-    await mockJsonResponse(page, "**/api/v1/identity/users/u-new/roles", []);
-    await mockJsonResponse(page, "**/api/v1/identity/users/u-new/sessions", []);
-    // Need the list to render so the "New user" dialog trigger is present.
-    await mockJsonResponse(
-      page,
-      "**/api/v1/identity/users/search**",
-      paged(USERS, { pageSize: 12, totalCount: 2 }),
-    );
 
     await page.goto("/users");
-    await page.getByRole("button", { name: "New user", exact: true }).click();
-
+    await page.getByRole("button", { name: "Invite operator", exact: true }).click();
     const dialog = page.getByRole("dialog");
-    await expect(dialog.getByLabel(/^First name/)).toBeVisible({ timeout: 10_000 });
-
-    await dialog.getByLabel(/^First name/).fill("Mei");
-    await dialog.getByLabel(/^Last name/).fill("Chen");
-    await dialog.getByLabel(/^Username/).fill("m.chen");
     await dialog.getByLabel(/^Email/).fill("m.chen@root.com");
-    await dialog.getByLabel(/^Password/, { exact: false }).first().fill("Sup3rSecret!");
-    await dialog.getByLabel(/^Confirm password/).fill("Sup3rSecret!");
+    await dialog.getByLabel(/^First name/).fill("Mei");
+    await dialog.getByRole("button", { name: "Send invitation", exact: true }).click();
 
-    const reqPromise = page.waitForRequest(
-      (r) => r.url().endsWith("/api/v1/identity/register") && r.method() === "POST",
-      { timeout: 5_000 },
-    );
-    await dialog.getByRole("button", { name: "Create account", exact: true }).click();
-    const req = await reqPromise;
-
-    const body = JSON.parse(req.postData() ?? "{}");
-    expect(body).toMatchObject({
-      firstName: "Mei",
-      lastName: "Chen",
-      userName: "m.chen",
-      email: "m.chen@root.com",
-      password: "Sup3rSecret!",
-      confirmPassword: "Sup3rSecret!",
-    });
+    await expect(dialog).toBeHidden();
+    expect(invited).toEqual([{ email: "m.chen@root.com", firstName: "Mei" }]);
   });
 
-  test("client-side validation blocks submit on an invalid username", async ({ page }) => {
+  test("an invalid address is blocked before any request", async ({ page }) => {
     let posted = false;
-    await page.route("**/api/v1/identity/register", async (route) => {
+    await page.route("**/api/v1/identity/invitations", async (route) => {
       if (route.request().method() === "POST") posted = true;
-      await route.fulfill({
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "x" }),
-      });
+      await route.fulfill({ status: 200, headers: { "Content-Type": "application/json" }, body: "[]" });
     });
 
-    // Need the list to render so the "New user" dialog trigger is present.
-    await mockJsonResponse(
-      page,
-      "**/api/v1/identity/users/search**",
-      paged(USERS, { pageSize: 12, totalCount: 2 }),
-    );
+    await page.goto("/users");
+    await page.getByRole("button", { name: "Invite operator", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel(/^Email/).fill("not-an-address");
+    await dialog.getByRole("button", { name: "Send invitation", exact: true }).click();
+
+    await expect(dialog.getByText("Enter a valid email.")).toBeVisible();
+    expect(posted).toBe(false);
+  });
+
+  test("pending invitations are listed and can be revoked", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/invitations", [
+      {
+        id: "33333333-3333-3333-3333-333333333333",
+        email: "pending@root.com",
+        status: "Pending",
+        createdOnUtc: "2026-11-20T10:00:00Z",
+        expiresOnUtc: "2026-11-27T10:00:00Z",
+      },
+    ]);
+    await page.route("**/api/v1/identity/invitations/*", (route) => route.fulfill({ status: 204 }));
+    const revoke = page.waitForRequest((r) => r.url().includes("/invitations/33333333") && r.method() === "DELETE");
 
     await page.goto("/users");
-    await page.getByRole("button", { name: "New user", exact: true }).click();
-
-    const dialog = page.getByRole("dialog");
-    await expect(dialog.getByLabel(/^First name/)).toBeVisible({ timeout: 10_000 });
-
-    // Leave email blank so native email validation doesn't pre-empt zod.
-    // Username "1x" violates the start-with-a-letter / length rule.
-    await dialog.getByLabel(/^First name/).fill("Mei");
-    await dialog.getByLabel(/^Last name/).fill("Chen");
-    await dialog.getByLabel(/^Username/).fill("1x");
-    await dialog.getByLabel(/^Password/, { exact: false }).first().fill("Sup3rSecret!");
-    await dialog.getByLabel(/^Confirm password/).fill("Sup3rSecret!");
-
-    await dialog.getByRole("button", { name: "Create account", exact: true }).click();
-
-    await expect(dialog.getByText(/Start with a letter\./i)).toBeVisible();
-    expect(posted).toBe(false);
+    const pending = page.getByRole("region", { name: /pending invitations/i });
+    await expect(pending.getByText("pending@root.com")).toBeVisible();
+    await pending.getByRole("button", { name: /revoke the invitation of pending@root\.com/i }).click();
+    await revoke;
   });
 });
 

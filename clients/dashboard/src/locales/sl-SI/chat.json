@@ -56,7 +56,7 @@
   "rail.dmSearching": "Iskanje …",
   "rail.dmLoadingPeople": "Nalaganje oseb …",
   "rail.dmNoMatch": "Nihče ne ustreza iskanju „{{term}}“.",
-  "rail.dmNoTeammates": "V vašem najemniku še ni sodelavcev.",
+  "rail.dmTypeToSearch": "Vnesite vsaj dve črki imena.",
   "rail.dmSearchResults": "Rezultati iskanja",
   "rail.dmSuggested": "Predlagano",
 

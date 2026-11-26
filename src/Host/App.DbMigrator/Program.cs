@@ -270,7 +270,7 @@ try
     // `seed-demo` short-circuits this: it provisions its own demo tenants inline (Step 3 below).
     if (!cli.CatalogOnly && cli.Command != "seed-demo")
     {
-        var tenantStore = host.Services.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var tenantStore = host.Services.GetRequiredService<IMultiTenantStore<AppTenantInfo, string>>();
 
         var allTenants = (await tenantStore.GetAllAsync().ConfigureAwait(false)).ToList();
         var tenants = string.IsNullOrEmpty(cli.Tenant)

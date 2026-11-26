@@ -4,17 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, Search, UserCheck, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { searchUsers, type UserDto } from "@/api/identity";
+import { MIN_USER_SEARCH, pickUsers, type UserDto } from "@/api/identity";
 import { cn } from "@/lib/cn";
 
 /**
- * UserPicker — debounced typeahead over /identity/users/search. Replaces
+ * UserPicker — debounced typeahead over /identity/users/lookup. Replaces
  * raw GUID inputs for any "pick a user" affordance (ticket assignment,
  * webhook subscription targeting, etc.).
  *
  * Behaviours:
  * - Selected user renders as a chip above the input, with a clear button.
- * - Typing 1+ characters fires a 250ms-debounced search; results render
+ * - Typing 2+ characters fires a 250ms-debounced search; results render
  *   in a dropdown beneath the input.
  * - Keyboard: Esc clears the dropdown; clicking outside closes it.
  * - Empty `value` is communicated to the caller via `onChange(null)`.
@@ -80,8 +80,8 @@ export function UserPicker({
 
   const resultsQuery = useQuery({
     queryKey: ["identity", "users", "search", debounced],
-    queryFn: () => searchUsers({ search: debounced, pageNumber: 1, pageSize: 8 }),
-    enabled: debounced.length > 0 && open,
+    queryFn: () => pickUsers(debounced, 8),
+    enabled: debounced.length >= MIN_USER_SEARCH && open,
     staleTime: 30_000,
   });
 
@@ -211,7 +211,7 @@ export function UserPicker({
                             u.id}
                         </div>
                         <div className="truncate font-mono text-[10.5px] text-[var(--color-muted-foreground)]">
-                          {u.email ?? u.id}
+                          {u.email ?? (u.userName ? `@${u.userName}` : u.id)}
                         </div>
                       </div>
                     </button>

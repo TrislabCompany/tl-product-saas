@@ -3,11 +3,11 @@ import { mockJsonResponse } from "../helpers/api-mocks";
 import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
 import { installShellMocks } from "../helpers/shell-mocks";
 
-// The readiness probe lives at the ORIGIN (no /api/v1 prefix) and is
-// fetched anonymously by src/api/health.ts → `${env.apiBase}/health/ready`.
-// In the test config apiBase is "" (see public/config.json), so the call
-// resolves same-origin to /health/ready.
-const READY = "**/health/ready";
+// The page reads the health report with every check's details at the ORIGIN
+// (no /api/v1 prefix): src/api/health.ts → `${env.apiBase}/api/health/details`,
+// signed in with Health.View. The anonymous probes (/api/health/ready) answer the
+// overall status only. The details endpoint answers 200 whatever the status.
+const READY = "**/api/health/details";
 
 function readiness(
   status: "Healthy" | "Degraded" | "Unhealthy",

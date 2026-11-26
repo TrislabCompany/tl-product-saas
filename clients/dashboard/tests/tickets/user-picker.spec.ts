@@ -23,32 +23,23 @@ const TICKET = {
   deletedBy: null,
 };
 
-const SEARCH_HITS = {
-  items: [
-    {
-      id: "00000000-0000-0000-0000-000000000222",
-      userName: "bob",
-      firstName: "Bob",
-      lastName: "Patel",
-      email: "bob@acme.com",
-      isActive: true,
-      emailConfirmed: true,
-    },
-    {
-      id: "00000000-0000-0000-0000-000000000333",
-      userName: "carol",
-      firstName: "Carol",
-      lastName: "Smith",
-      email: "carol@acme.com",
-      isActive: true,
-      emailConfirmed: true,
-    },
-  ],
-  pageNumber: 1,
-  pageSize: 8,
-  totalCount: 2,
-  totalPages: 1,
-};
+// GET /identity/users/lookup: what every member may see to pick a user (Users.Pick). No e-mail.
+const LOOKUP_HITS = [
+  {
+    id: "00000000-0000-0000-0000-000000000222",
+    userName: "bob",
+    firstName: "Bob",
+    lastName: "Patel",
+    imageUrl: null,
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000333",
+    userName: "carol",
+    firstName: "Carol",
+    lastName: "Smith",
+    imageUrl: null,
+  },
+];
 
 test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, TEST_USER);
@@ -65,11 +56,7 @@ test.beforeEach(async ({ page }) => {
   await mockJsonResponse(page, `**/api/v1/tickets/${TICKET_ID}`, TICKET);
   // listTicketComments returns a plain array, not a paged response.
   await mockJsonResponse(page, `**/api/v1/tickets/${TICKET_ID}/comments**`, []);
-  await mockJsonResponse(
-    page,
-    "**/api/v1/identity/users/search**",
-    SEARCH_HITS,
-  );
+  await mockJsonResponse(page, "**/api/v1/identity/users/lookup**", LOOKUP_HITS);
 });
 
 test.describe("ticket assignee — user picker", () => {
@@ -79,35 +66,52 @@ test.describe("ticket assignee — user picker", () => {
 
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByPlaceholder(/search by name or email/i)).toBeVisible();
+    await expect(dialog.getByPlaceholder(/search by name/i)).toBeVisible();
   });
 
-  test("typing fires a debounced search and renders results", async ({ page }) => {
+  test("typing fires a debounced lookup and renders results", async ({ page }) => {
     await page.goto(`/tickets/${TICKET_ID}`);
     await page.getByRole("button", { name: /^Assign$/i }).first().click();
     const dialog = page.getByRole("dialog");
 
-    await dialog.getByPlaceholder(/search by name or email/i).fill("bob");
+    const lookup = page.waitForRequest((r) => r.url().includes("/api/v1/identity/users/lookup"));
+    await dialog.getByPlaceholder(/search by name/i).fill("bob");
+    // The picker goes through the lookup (Users.Pick), never the Admin-only user search.
+    expect(new URL((await lookup).url()).searchParams.get("search")).toBe("bob");
 
     // Debounce is 250ms — give the listbox time to materialise.
     await expect(dialog.getByRole("listbox")).toBeVisible({ timeout: 3_000 });
     await expect(dialog.getByRole("option").first()).toContainText(/bob patel/i);
-    await expect(dialog.getByRole("option").first()).toContainText(/bob@acme\.com/i);
+    await expect(dialog.getByRole("option").first()).toContainText("@bob");
   });
 
-  test("picking a result fills the selected chip with name + email", async ({ page }) => {
+  test("one typed character searches nobody (the lookup needs two)", async ({ page }) => {
+    let lookups = 0;
+    await page.route("**/api/v1/identity/users/lookup**", async (route) => {
+      // The page also looks up the reporter's name by id; count the searches only.
+      if (new URL(route.request().url()).searchParams.has("search")) lookups++;
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
+    await page.goto(`/tickets/${TICKET_ID}`);
+    await page.getByRole("button", { name: /^Assign$/i }).first().click();
+
+    await page.getByRole("dialog").getByPlaceholder(/search by name/i).fill("b");
+    await page.waitForTimeout(600);
+    expect(lookups).toBe(0);
+  });
+
+  test("picking a result fills the selected chip with the name", async ({ page }) => {
     await page.goto(`/tickets/${TICKET_ID}`);
     await page.getByRole("button", { name: /^Assign$/i }).first().click();
     const dialog = page.getByRole("dialog");
 
-    await dialog.getByPlaceholder(/search by name or email/i).fill("bob");
+    await dialog.getByPlaceholder(/search by name/i).fill("bob");
     await dialog.getByRole("option", { name: /bob patel/i }).click();
 
-    // Dropdown closes; chip with name + email is now visible above the
+    // Dropdown closes; the chip with the name is now visible above the
     // input, with a clear button.
     await expect(dialog.getByRole("listbox")).not.toBeVisible();
     await expect(dialog.getByText("Bob Patel")).toBeVisible();
-    await expect(dialog.getByText("bob@acme.com")).toBeVisible();
     await expect(dialog.getByRole("button", { name: /clear/i })).toBeVisible();
   });
 
@@ -122,7 +126,7 @@ test.describe("ticket assignee — user picker", () => {
     await page.getByRole("button", { name: /^Assign$/i }).first().click();
     const dialog = page.getByRole("dialog");
 
-    await dialog.getByPlaceholder(/search by name or email/i).fill("bob");
+    await dialog.getByPlaceholder(/search by name/i).fill("bob");
     await dialog.getByRole("option", { name: /bob patel/i }).click();
 
     const reqPromise = page.waitForRequest(
@@ -148,7 +152,7 @@ test.describe("ticket assignee — user picker", () => {
     await page.getByRole("button", { name: /^Assign$/i }).first().click();
     const dialog = page.getByRole("dialog");
 
-    await dialog.getByPlaceholder(/search by name or email/i).fill("bob");
+    await dialog.getByPlaceholder(/search by name/i).fill("bob");
     await dialog.getByRole("option", { name: /bob patel/i }).click();
     await dialog.getByRole("button", { name: /clear/i }).click();
 

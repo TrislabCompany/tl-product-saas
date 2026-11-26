@@ -13,7 +13,7 @@ namespace Integration.Tests.Tests.Health;
 /// gate added when API-side auto-migration was removed. Asserts that the check returns
 /// <c>Unhealthy</c> against an unmigrated database and <c>Healthy</c> after the schema is
 /// brought to head (the exact transition <c>App.DbMigrator</c> performs in production).
-/// Uses a real Postgres testcontainer + an in-memory <see cref="IMultiTenantStore{TTenantInfo}"/>
+/// Uses a real Postgres testcontainer + an in-memory <see cref="IMultiTenantStore{TTenantInfo, TId}"/>
 /// to keep the test independent of the shared <c>TrislabWebApplicationFactory</c> — avoiding
 /// the global Hangfire state that would otherwise leak across test classes.
 /// </summary>
@@ -88,15 +88,16 @@ public sealed class TenantMigrationsHealthCheckTests : IAsyncLifetime
 
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSingleton<IMultiTenantStore<AppTenantInfo>>(new SingleTenantStore());
-        services.AddScoped<IMultiTenantContextSetter, FakeMultiTenantContextSetter>();
+        services.AddSingleton<IMultiTenantStore<AppTenantInfo, string>>(new SingleTenantStore());
+        services.AddSingleton<ITenantContext<AppTenantInfo, string>>(new AmbientTenantContext<AppTenantInfo, string>());
+        services.AddSingleton<ITenantAccessor, AmbientTenantAccessor>();
         services.AddDbContext<TenantDbContext>(opts =>
             opts.UseNpgsql(connectionString, b => b.MigrationsHistoryTable("__EFMigrationsHistory", TenantDbContext.Schema)));
         return services.BuildServiceProvider();
     }
 
     /// <summary>Minimal in-memory tenant store — returns one tenant for the test.</summary>
-    private sealed class SingleTenantStore : IMultiTenantStore<AppTenantInfo>
+    private sealed class SingleTenantStore : IMultiTenantStore<AppTenantInfo, string>
     {
         private readonly AppTenantInfo _tenant = new(
             MultitenancyConstants.Root.Id,
@@ -105,23 +106,14 @@ public sealed class TenantMigrationsHealthCheckTests : IAsyncLifetime
             MultitenancyConstants.Root.EmailAddress,
             issuer: MultitenancyConstants.Root.Issuer);
 
-        public Task<bool> AddAsync(AppTenantInfo tenantInfo) => Task.FromResult(true);
-        public Task<bool> RemoveAsync(string identifier) => Task.FromResult(true);
-        public Task<bool> UpdateAsync(AppTenantInfo tenantInfo) => Task.FromResult(true);
-        public Task<AppTenantInfo?> GetByIdentifierAsync(string identifier) => Task.FromResult<AppTenantInfo?>(_tenant);
-        public Task<AppTenantInfo?> GetAsync(string id) => Task.FromResult<AppTenantInfo?>(_tenant);
-        public Task<IEnumerable<AppTenantInfo>> GetAllAsync() => Task.FromResult<IEnumerable<AppTenantInfo>>([_tenant]);
-        public Task<IEnumerable<AppTenantInfo>> GetAllAsync(int take, int skip) => Task.FromResult<IEnumerable<AppTenantInfo>>([_tenant]);
+        public Task<bool> AddAsync(AppTenantInfo tenantInfo, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public Task<bool> UpdateAsync(AppTenantInfo tenantInfo, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public Task<AppTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default) => Task.FromResult<AppTenantInfo?>(_tenant);
+        public Task<AppTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default) => Task.FromResult<AppTenantInfo?>(_tenant);
+        public Task<IEnumerable<AppTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default) => Task.FromResult<IEnumerable<AppTenantInfo>>([_tenant]);
+        public Task<IEnumerable<AppTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default) => Task.FromResult<IEnumerable<AppTenantInfo>>([_tenant]);
     }
 
-    /// <summary>
-    /// Fake <see cref="IMultiTenantContextSetter"/> that just records the value. The health
-    /// check writes to this before resolving <see cref="TenantDbContext"/>; reads of the
-    /// context are not exercised by <c>GetPendingMigrationsAsync</c>.
-    /// </summary>
-    private sealed class FakeMultiTenantContextSetter : IMultiTenantContextSetter
-    {
-        public IMultiTenantContext MultiTenantContext { get; set; } = new MultiTenantContext<AppTenantInfo>(
-            new AppTenantInfo("placeholder", "placeholder", string.Empty, "x@x", null));
-    }
 }

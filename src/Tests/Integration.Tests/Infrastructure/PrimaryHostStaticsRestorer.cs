@@ -1,17 +1,14 @@
 using Trislab.Modules.Auditing;
-using Hangfire;
 using Microsoft.Extensions.Hosting;
 
 namespace Integration.Tests.Infrastructure;
 
 /// <summary>
-/// Two pieces of state are process-wide rather than per host: Hangfire's <see cref="JobStorage.Current"/>
-/// (<c>HangfireService</c> enqueues through the static <c>BackgroundJob</c> API) and the static <c>Audit</c>
-/// publisher (set by <see cref="AuditingConfigurator"/> on start). A derived host built with
-/// <c>WithWebHostBuilder</c> points both at its own storage and audit channel, and when it is disposed
-/// they are left pointing at a dead store and a channel nobody reads: later enqueues throw
-/// <c>ObjectDisposedException</c> and request audits are silently lost.
-/// When any host from <see cref="TrislabWebApplicationFactory"/> stops, this points both back at the shared host.
+/// The static <c>Audit</c> publisher is process-wide rather than per host: <see cref="AuditingConfigurator"/> sets it
+/// on start. A derived host built with <c>WithWebHostBuilder</c> points it at its own audit channel, and when it is
+/// disposed it is left pointing at a channel nobody reads, so request audits are silently lost. When any host from
+/// <see cref="TrislabWebApplicationFactory"/> stops, this points it back at the shared host. (Hangfire needs no such
+/// restore: each host resolves its own storage, activator and filters from DI.)
 /// </summary>
 internal sealed class PrimaryHostStaticsRestorer : IHostedService
 {
@@ -19,12 +16,6 @@ internal sealed class PrimaryHostStaticsRestorer : IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        var primaryStorage = TrislabWebApplicationFactory.PrimaryJobStorage;
-        if (primaryStorage is not null && !ReferenceEquals(JobStorage.Current, primaryStorage))
-        {
-            JobStorage.Current = primaryStorage;
-        }
-
         if (TrislabWebApplicationFactory.PrimaryAuditingConfigurator is { } configurator)
         {
             await configurator.StartAsync(cancellationToken);

@@ -81,14 +81,10 @@ async function runRefresh(): Promise<void> {
 
   // Server's RefreshTokenCommand requires both `token` (the current, possibly
   // expired access token, used to cross-check the subject) and `refreshToken`.
-  // Tenant header must match the token's tenant or refresh fails.
-  const tenant = tokenStore.getTenant() ?? env.defaultTenant;
+  // No tenant header: the session that holds the refresh token names the tenant.
   const response = await fetch(`${env.apiBase}/api/v1/identity/token/refresh`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(tenant ? { tenant } : {}),
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token: accessToken, refreshToken }),
     signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
   });
@@ -158,7 +154,9 @@ export async function apiFetch<T = unknown>(
     }
   }
 
-  const tenant = tokenStore.getTenant() ?? env.defaultTenant;
+  // The signed-in session's tenant (root). Users are global, so an anonymous call
+  // (sign-in, password reset) sends none unless its caller sets one.
+  const tenant = tokenStore.getTenant();
   if (tenant && !mergedHeaders.has("tenant")) {
     mergedHeaders.set("tenant", tenant);
   }

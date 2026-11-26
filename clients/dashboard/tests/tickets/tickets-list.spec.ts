@@ -46,7 +46,7 @@ test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, TEST_USER);
   await installShellMocks(page);
   // The create dialog can search users; keep it empty + harmless.
-  await mockJsonResponse(page, "**/api/v1/identity/users/search**", paged([]));
+  await mockJsonResponse(page, "**/api/v1/identity/users/lookup**", []);
   // Default tickets list — registered AFTER the shell so it wins.
   await mockJsonResponse(page, "**/api/v1/tickets**", paged(TICKETS));
 });
