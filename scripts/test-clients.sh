@@ -4,11 +4,17 @@
 # uses two workers and two retries.
 #
 # Locally: bash scripts/test-clients.sh, with PACKAGES_TOKEN set for the framework packages (docs/getting-started.md).
+# With app names (bash scripts/test-clients.sh admin), only those; scripts/affected-tests.mjs passes the apps a change
+# affects.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 
-for app in admin dashboard; do
+apps=("$@")
+[ ${#apps[@]} -gt 0 ] || apps=(admin dashboard)
+
+for app in "${apps[@]}"; do
+  [ -d "$root/clients/$app" ] || { echo "test-clients: no app clients/$app" >&2; exit 1; }
   echo "== clients/$app"
   cd "$root/clients/$app"
   npm ci

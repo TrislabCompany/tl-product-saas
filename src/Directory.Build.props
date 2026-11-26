@@ -18,6 +18,14 @@
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
 
+		<!-- NuGet audit: every package, direct and transitive, against the advisories of every severity. A finding stays a
+		     warning (NU1901 to NU1904), so a new advisory never fails an unrelated build; the daily audit catches it
+		     (docs/getting-started.md, section 7). -->
+		<NuGetAudit>true</NuGetAudit>
+		<NuGetAuditMode>all</NuGetAuditMode>
+		<NuGetAuditLevel>low</NuGetAuditLevel>
+		<WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+
 		<!-- Docs -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);CS1591;MSG0005;CA1054;CA1056</NoWarn>

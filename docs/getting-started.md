@@ -101,10 +101,24 @@ The demo password is public: it is in the dashboard's code. That is why `SEED_DE
 ## 6. Run the tests
 
 ```sh
-dotnet test src/App.slnx
+node scripts/affected-tests.mjs             # the tests this branch affects, compared with origin/main
+node scripts/affected-tests.mjs --dry-run   # only which parts, and why
+node scripts/affected-tests.mjs --all       # everything
 ```
 
-This is the command `ci / ci` runs. Docker must run: the integration tests start their own throw-away containers.
+The script has these parts, and runs the ones the changed paths need, by the rules at the top of the script:
+
+| Part | Runs | For a change to |
+| --- | --- | --- |
+| `api` | `dotnet test src/App.slnx` | `src/`, `global.json`, `nuget.config` |
+| `admin`, `dashboard` | `bash scripts/test-clients.sh <app>`: the app's lint and its Playwright tests, with the API mocked | `clients/<app>/` |
+| `smoke` | `bash scripts/smoke-test.sh` | `src/`, `global.json`, `nuget.config` |
+
+Documentation runs no part. A path no rule knows runs every part, so a new folder is tested until it gets its rule; a product adds its own folders there. Docker must run for `api` and `smoke`: the integration tests and the smoke test start their own throw-away containers.
+
+`ci / ci` runs the same script. On a PR it runs the parts the PR affects, after the template manifest check; a PR that changes only documentation runs no test, only the Markdown lint and the manifest check. A push to `main`, the merge, runs everything, and a failure there opens the issue "main is failing: ci / ci".
+
+The .NET tests:
 
 | Tests | Where | What they check |
 | --- | --- | --- |
@@ -127,3 +141,7 @@ To build one image yourself, as the pipeline does:
 docker build -f src/Host/App.Api/Dockerfile .
 docker build -f clients/dashboard/Dockerfile clients/dashboard
 ```
+
+## 7. Vulnerable dependencies
+
+Every restore audits every NuGet package, direct and transitive, against the known advisories (`NuGetAuditMode` `all` in `src/Directory.Build.props`). A finding stays a warning, so an advisory published today doesn't fail a PR that changes something else. The daily `audit` workflow checks the NuGet and npm packages, and fails on an advisory of moderate severity or higher. A failure opens the issue "main is failing: audit". Fix it in its own PR, or accept the advisory in `.audit-accepted` with a reason and an expiry date.
