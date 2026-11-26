@@ -4,8 +4,8 @@ import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
 
 // The API-keys backend (/api/v1/identity/api-keys) isn't built yet — the
 // page renders an honest "coming soon" state so existing nav-links don't
-// 404. There's no list/create/regenerate/delete to exercise. Specs assert
-// the placeholder copy + the "View roadmap" affordance instead.
+// 404. There's no list/create/regenerate/delete to exercise. The spec asserts
+// the placeholder copy instead.
 test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, TEST_USER);
   await installShellMocks(page);
@@ -26,11 +26,5 @@ test.describe("settings/api-keys — placeholder", () => {
     await expect(
       page.getByText(/personal access tokens and service-to-service api keys/i),
     ).toBeVisible();
-  });
-
-  test("exposes a 'View roadmap' button", async ({ page }) => {
-    await page.goto("/settings/api-keys");
-
-    await expect(page.getByRole("button", { name: /view roadmap/i })).toBeVisible();
   });
 });

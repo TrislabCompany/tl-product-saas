@@ -16,7 +16,8 @@ name: ci
 #  1. the template manifest check (passes at once in a product repository);
 #  2. dotnet test: the unit tests, Architecture.Tests and the integration tests,
 #     which start their own throw-away containers;
-#  3. lint of each React app (its build runs in the image build);
+#  3. lint and the Playwright tests of each React app (scripts/test-clients.sh;
+#     its build runs in the image build);
 #  4. the smoke test: the app starts, migrates and seeds in multi-tenant mode.
 
 on:
@@ -35,4 +36,4 @@ jobs:
     secrets:
       packages-token: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
     with:
-      test-command: pwsh scripts/check-template-manifest.ps1 && dotnet test src/App.slnx && for dir in clients/admin clients/dashboard; do (cd "$dir" && npm ci && npm run lint) || exit 1; done && bash scripts/smoke-test.sh
+      test-command: pwsh scripts/check-template-manifest.ps1 && dotnet test src/App.slnx && bash scripts/test-clients.sh && bash scripts/smoke-test.sh
