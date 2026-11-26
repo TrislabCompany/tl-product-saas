@@ -49,7 +49,7 @@ A **multi-tenant modular monolith** (Vertical Slice Architecture) backend with t
 | `src/Samples/{Name}` | The samples Catalog, Tickets and Chat, each a runtime project, its `.Contracts` and its tests: patterns to copy. They are modules of this host like any other. |
 | `src/Tests/` | `Architecture.Tests` (NetArchTest) and `Integration.Tests` (Testcontainers, needs Docker). |
 | `clients/admin`, `clients/dashboard` | The two React apps, each with its Dockerfile and `docker/` (nginx, `/config.json`). |
-| `scripts/` | `init-product.ps1`, `affected-tests.mjs`, `smoke-test.sh`, `test-clients.sh`, `check-template-manifest.ps1` ([scripts/README.md](scripts/README.md)). |
+| `scripts/` | `init-product.ps1`, `affected-tests.mjs`, `smoke-test.sh`, `test-clients.sh`, `check-template-manifest.ps1`, `update-from-template.mjs` ([scripts/README.md](scripts/README.md)). |
 | `template-manifest.yaml` | The ownership of every path, for `update-from-template` ([docs/template-releases.md](docs/template-releases.md)). Deleted by `init-product`. |
 | `docs/` | Getting started, architecture, configuration, deployment, modules, packages, template releases. |
 | `platform.yaml`, `.github/workflows/` | The images and app sizing for the platform; `ci.yml` (the check `ci / ci`), `deploy.yml`, `release.yml`. |

@@ -22,7 +22,7 @@ The template's `template-manifest.yaml` gives every path one ownership. An updat
 
 | Ownership | For example | What an update does | You |
 | --- | --- | --- | --- |
-| `platform` | `.github/workflows/*`, `renovate.json`, `CLAUDE.md`, `platform.schema.json`, `scripts/check-template-manifest.ps1`, the skills `release` and `update-from-template`, this page | Replaces the file with the template's | Don't edit it; ask the platform team for a change in the template |
+| `platform` | `.github/workflows/*`, `renovate.json`, `CLAUDE.md`, `platform.schema.json`, `scripts/check-template-manifest.ps1`, the update script (`scripts/update-from-template.mjs`), the skills `release` and `update-from-template`, this page | Replaces the file with the template's | Don't edit it; ask the platform team for a change in the template |
 | `shared` | `AGENTS.md` outside its template block, `.claude/rules/`, the other skills, the rest of `docs/`, `src/Host/`, `src/Directory.*.props` (the framework version), `src/Tests/`, `clients/` | Merges the template's change into your file and lists every conflict | Adapt it as you need; resolve the listed conflicts in the PR |
 | `product` | `src/Modules/`, a kept sample in `src/Samples/`, `README.md`, `CODEOWNERS`, `platform.yaml`, the clients' `package.json` and lockfiles | Nothing; the template's change is shown in the PR as a suggestion | Yours |
 | `template-only` | The template's release skill and notes, `init-product` and `template-manifest.yaml` | Never copied | — |
@@ -39,8 +39,8 @@ When a template release adds a skill with the name of one of yours, the update s
 - Its body lists the changes by ownership, the conflicts, the suggestions for your files, and the upgrade steps done or left to you.
 - `ci / ci` must pass, as on every PR. Review it like any other change; the merge deploys to dev, and the change reaches production with the next release and promotion.
 - The canary repository takes each release first. Other repositories follow once the canary's update is merged and deployed.
-- From roadmap phase 15, Renovate opens these PRs from `.template-version`. Until then the platform team opens them, or you run the skill: ask your coding agent to "update from the template".
+- `node scripts/update-from-template.mjs` does the routine part. Without options it says what the next update brings and changes nothing. With `--apply --report <file>` it chooses the release, copies the `platform` files, merges the `shared` ones, rewrites the template block of `AGENTS.md`, bumps `.template-version` and writes the PR body with the conflicts, the suggestions and the upgrade steps. Your coding agent runs it when you ask it to "update from the template", then resolves the conflicts and does the upgrade steps.
 
-## The framework version is separate
+## The framework version
 
-The packages of `tl-framework` that this repository uses are pinned by one property, `TrislabFrameworkVersion` in `src/Directory.Packages.props`. Renovate raises it, one pull request per framework release ([packages.md](../packages.md)). A template release pins a framework version that the starter has been tested and smoke-tested on in the sandbox; take the template's update and the framework's in order, MINOR by MINOR, never skipping one. Where a framework release needs a change of the host or the migrator, the template's release notes say so under "Upgrade steps".
+In the webapp and SaaS templates, the packages of `tl-framework` are pinned by one property, `TrislabFrameworkVersion` in `src/Directory.Packages.props`. In the template itself, Renovate raises it with each framework release. In this repository it moves only with a template update: each template release pins a framework version that the starter was tested on, together with the host changes it needs, and Renovate leaves it alone here. Take the updates in order, one minor at a time, never skipping one.

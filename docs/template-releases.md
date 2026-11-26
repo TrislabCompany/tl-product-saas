@@ -37,7 +37,7 @@ The rules of `template-only` and `sample` come first in `template-manifest.yaml`
 
 ## Changing the template
 
-Every change is a PR to `main`, and `ci / ci` must pass. `update-from-template` and `docs/upgrading/README.md` have the same process in all three templates, apart from `metadata.owner` and the examples of the ownership table: change them in all three together. The `release` skill and `docs/deployment.md` describe how a product built from this template is deployed and released.
+Every change is a PR to `main`, and `ci / ci` must pass. `update-from-template`, `scripts/update-from-template.mjs` (with its tests) and `docs/upgrading/README.md` have the same process in all three templates, apart from `metadata.owner` and the examples of the ownership table: change them in all three together. The `release` skill and `docs/deployment.md` describe how a product built from this template is deployed and released.
 
 A framework release does not change the template by itself. Renovate raises `TrislabFrameworkVersion` in a pull request here; once `ci / ci` and the sandbox deploy pass on it, the framework release has passed its gate, and the next template release pins it.
 
