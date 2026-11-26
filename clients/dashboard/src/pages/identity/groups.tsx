@@ -157,7 +157,7 @@ export function GroupsPage() {
       {query.isError && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-[var(--color-destructive)]"
         >
           <span>{describe(query.error)}</span>
         </div>
@@ -279,7 +279,7 @@ function DesktopGroupRow({
           <EntityStatusBadge tone="default">{t("groupsList.system")}</EntityStatusBadge>
         )}
         {!group.isDefault && !group.isSystemGroup && (
-          <span className="text-[12px] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]">
+          <span className="text-[12px] text-muted-foreground/50">
             —
           </span>
         )}

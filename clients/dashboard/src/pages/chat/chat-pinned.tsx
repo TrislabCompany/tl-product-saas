@@ -52,10 +52,10 @@ export function ChatPinnedBar({
           aria-label={t("pinned.countAria", { count: pinned.length })}
           className={cn(
             "flex w-full shrink-0 cursor-pointer items-center gap-2 px-4 py-1.5 text-[12px]",
-            "border-b border-[var(--color-border)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.06)]",
+            "border-b border-[var(--color-border)] bg-primary/6",
             "text-[var(--color-muted-foreground)]",
             "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
-            "hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] hover:text-[var(--color-foreground)]",
+            "hover:bg-primary/10 hover:text-[var(--color-foreground)]",
           )}
         >
           <Pin className="h-3.5 w-3.5 shrink-0 text-[var(--color-primary)]" aria-hidden />

@@ -134,7 +134,7 @@ function ChatToast({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 50% 80% at 0% 50%, oklch(from var(--color-primary) l c h / 0.10), transparent 65%)",
+            "radial-gradient(ellipse 50% 80% at 0% 50%, color-mix(in oklab, var(--color-primary) 10%, transparent), transparent 65%)",
         }}
       />
 
@@ -147,7 +147,7 @@ function ChatToast({
         className={cn(
           "relative flex w-full items-start gap-3 p-3 pr-9 text-left",
           "cursor-pointer transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
-          "hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.04)]",
+          "hover:bg-primary/4",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]",
         )}
       >

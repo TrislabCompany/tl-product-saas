@@ -24,7 +24,7 @@ export function RouteError() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(36rem 24rem at 50% 110%, oklch(from var(--color-destructive) l c h / 0.10), transparent 70%)",
+            "radial-gradient(36rem 24rem at 50% 110%, color-mix(in oklab, var(--color-destructive) 10%, transparent), transparent 70%)",
         }}
       />
 

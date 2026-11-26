@@ -231,7 +231,7 @@ export function Message({
             isFlashing && "ring-2 ring-[var(--color-primary)]",
             message.isPinned &&
               !isFlashing &&
-              "ring-1 ring-[oklch(from_var(--color-primary)_l_c_h_/_0.35)]",
+              "ring-1 ring-primary/35",
           )}
         >
           {/* Reply context preview — quotes the parent so the reader can tell
@@ -328,7 +328,7 @@ function ReplyContextPreview({
     "border-l-[var(--color-primary)]",
     onClick && [
       "cursor-pointer rounded-sm transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
-      "hover:bg-[oklch(from_var(--color-foreground)_l_c_h_/_0.04)]",
+      "hover:bg-foreground/4",
     ],
   );
 
@@ -468,7 +468,7 @@ function AttachmentTile({ attachment }: { attachment: MessageAttachmentDto }) {
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 px-2.5 py-1.5",
-            "bg-gradient-to-t from-[oklch(0_0_0_/_0.55)] to-transparent",
+            "bg-gradient-to-t from-[color-mix(in_oklab,var(--shadow-color)_55%,transparent)] to-transparent",
             "text-[11px] font-medium text-[var(--color-overlay-foreground)]",
             "opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover/att:opacity-100",
           )}
@@ -921,7 +921,7 @@ const ActionButton = forwardRef<
         "grid h-7 w-7 cursor-pointer place-items-center rounded-md",
         "transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
         destructive
-          ? "text-[var(--color-destructive)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)]"
+          ? "text-[var(--color-destructive)] hover:bg-destructive/10"
           : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]",
         className,
       )}

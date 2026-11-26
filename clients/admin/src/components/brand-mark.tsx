@@ -29,7 +29,7 @@ export function BrandMark({ className }: { className?: string }) {
         <span className="whitespace-nowrap font-display text-[15px] font-bold leading-none tracking-tight text-[var(--color-foreground)]">
           Tris<span className="text-[var(--color-primary)]">lab</span>
         </span>
-        <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+        <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
           {t("brandMark.appName")}
         </span>
       </div>

@@ -36,7 +36,7 @@ export const DialogOverlay = React.forwardRef<
     ref={ref}
     data-slot="dialog-overlay"
     className={cn(
-      "fixed inset-0 z-50 bg-[oklch(0_0_0_/_0.4)] backdrop-blur-[6px]",
+      "fixed inset-0 z-50 bg-[color-mix(in_oklab,var(--shadow-color)_40%,transparent)] backdrop-blur-[6px]",
       "data-[state=open]:animate-tl-overlay-in data-[state=closed]:animate-tl-overlay-out",
       className,
     )}
@@ -87,9 +87,9 @@ export const DialogContent = React.forwardRef<
           aria-label={t("dialog.close")}
           className={cn(
             "absolute top-3.5 right-3.5 size-9 rounded-lg flex items-center justify-center",
-            "text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)] hover:text-[var(--color-foreground)]",
+            "text-muted-foreground/60 hover:text-[var(--color-foreground)]",
             "hover:bg-[var(--color-accent)] transition-colors cursor-pointer outline-none",
-            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+            "focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50",
             "[&_svg]:pointer-events-none [&_svg]:shrink-0",
           )}
         >

@@ -84,8 +84,8 @@ export function RenewTenantDialog({
             <span
               aria-hidden
               className="grid h-9 w-9 shrink-0 place-items-center rounded-xl
-                bg-[oklch(from_var(--color-primary)_l_c_h_/_0.12)] text-[var(--color-primary)]
-                ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)]"
+                bg-primary/12 text-[var(--color-primary)]
+                ring-1 ring-inset ring-primary/18"
             >
               <CalendarClock className="h-[18px] w-[18px]" />
             </span>

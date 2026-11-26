@@ -164,7 +164,7 @@ function applyAccent(id: string, customSpec: CustomAccentSpec) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   // Strip any existing accent-* class then add the new one. The default
-  // (indigo) lives in :root so it needs no class.
+  // ("theme", the product's own primary colour) needs no class.
   root.className = root.className
     .split(/\s+/)
     .filter((c) => !c.startsWith(ACCENT_CLASS_PREFIX))
@@ -172,9 +172,10 @@ function applyAccent(id: string, customSpec: CustomAccentSpec) {
 
   if (id === CUSTOM_ACCENT_ID) {
     // Custom accent — inline-style the eleven --brand-* stops from the
-    // current spec. Inline styles win over the accent-* class rules so
-    // we don't need to add any class.
+    // current spec; the class accent-custom turns them into --primary
+    // (styles/starter/theme.css).
     applyCustomBrandInlineStyles(root, customSpec);
+    root.classList.add(`${ACCENT_CLASS_PREFIX}${CUSTOM_ACCENT_ID}`);
     return;
   }
 

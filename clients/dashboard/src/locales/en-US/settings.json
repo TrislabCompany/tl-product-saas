@@ -64,7 +64,7 @@
   "appearance.accent.description": "Pick the brand colour used for primary actions, charts, and highlights across the dashboard.",
   "appearance.accent.ariaLabel": "{{label}} accent",
   "appearance.font.title": "Font",
-  "appearance.font.description": "The UI typeface. Mono code blocks always use JetBrains Mono.",
+  "appearance.font.description": "The UI typeface. Code blocks always use a monospace font.",
   "appearance.font.ariaLabel": "{{label}} font",
   "appearance.font.sample": "Aa",
   "appearance.density.title": "Density",

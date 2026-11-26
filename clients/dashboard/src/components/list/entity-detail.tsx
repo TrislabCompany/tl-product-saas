@@ -74,7 +74,7 @@ export function EntityDetailHero({
         className="h-1 w-full"
         style={{
           background:
-            "linear-gradient(90deg, var(--color-primary), oklch(from var(--color-primary) l c h / 0.8), var(--color-saffron))",
+            "linear-gradient(90deg, var(--color-primary), color-mix(in oklab, var(--color-primary) 80%, transparent), var(--color-saffron))",
         }}
       />
 
@@ -155,7 +155,7 @@ export function EntityDetailAvatar({
     <div
       className={cn(
         "grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl",
-        "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]",
+        "bg-primary/8",
         "sm:size-14 sm:rounded-2xl",
         className,
       )}
@@ -187,27 +187,27 @@ export type EntityDetailStatTone = "default" | "success" | "primary" | "warning"
 
 const STAT_TONES: Record<EntityDetailStatTone, { bg: string; icon: string; value: string }> = {
   default: {
-    bg: "bg-[oklch(from_var(--color-muted)_l_c_h_/_0.5)]",
+    bg: "bg-muted/50",
     icon: "text-[var(--color-muted-foreground)]",
     value: "text-[var(--color-foreground)]",
   },
   primary: {
-    bg: "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.08)]",
+    bg: "bg-primary/8",
     icon: "text-[var(--color-primary)]",
     value: "text-[var(--color-primary)]",
   },
   success: {
-    bg: "bg-[oklch(from_var(--color-success)_l_c_h_/_0.08)]",
+    bg: "bg-success/8",
     icon: "text-[var(--color-success)]",
     value: "text-[var(--color-success)]",
   },
   warning: {
-    bg: "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.08)]",
+    bg: "bg-warning/8",
     icon: "text-[var(--color-warning)]",
     value: "text-[var(--color-warning)]",
   },
   danger: {
-    bg: "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)]",
+    bg: "bg-destructive/8",
     icon: "text-[var(--color-destructive)]",
     value: "text-[var(--color-destructive)]",
   },
@@ -305,11 +305,11 @@ export function EntityDetailSection({
       )}
     >
       {title && (
-        <div className="flex items-center justify-between gap-3 border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="flex items-center justify-between gap-3 border-b border-border/50 px-5 py-3">
           <div className="min-w-0">
             <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-foreground)]">
               {Icon && (
-                <Icon className="size-3.5 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+                <Icon className="size-3.5 text-muted-foreground/50" />
               )}
               {title}
             </h2>
@@ -324,7 +324,7 @@ export function EntityDetailSection({
       )}
       <div className={cn(padded && "px-5 py-5")}>{children}</div>
       {footer && (
-        <div className="border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="border-t border-border/50 px-5 py-3">
           {footer}
         </div>
       )}

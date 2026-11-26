@@ -144,7 +144,7 @@ export function UsersListPage() {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t("search.placeholder")}
             aria-label={t("search.aria")}
-            className="h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-3 font-mono text-[12.5px] outline-none transition-colors placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)] focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+            className="h-9 w-full rounded-md border border-[var(--color-input)] bg-transparent pl-9 pr-3 font-mono text-[12.5px] outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-[var(--color-ring)] focus-visible:ring-[3px] focus-visible:ring-ring/50"
           />
         </div>
 
@@ -357,7 +357,7 @@ function UserMobileCard({
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10.5px] font-medium",
               user.isActive
-                ? "bg-[oklch(from_var(--color-success)_l_c_h_/_0.12)] text-[var(--color-success)]"
+                ? "bg-success/12 text-[var(--color-success)]"
                 : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
             )}
           >
@@ -367,8 +367,8 @@ function UserMobileCard({
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10.5px] font-medium",
               user.emailConfirmed
-                ? "bg-[oklch(from_var(--color-info)_l_c_h_/_0.12)] text-[var(--color-info)]"
-                : "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.12)] text-[var(--color-warning)]",
+                ? "bg-info/12 text-[var(--color-info)]"
+                : "bg-warning/12 text-[var(--color-warning)]",
             )}
           >
             {user.emailConfirmed ? t("badge.emailConfirmed") : t("badge.emailPending")}
@@ -441,7 +441,7 @@ function UserDesktopRow({
             className={cn(
               "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-medium",
               user.isActive
-                ? "bg-[oklch(from_var(--color-success)_l_c_h_/_0.12)] text-[var(--color-success)]"
+                ? "bg-success/12 text-[var(--color-success)]"
                 : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
             )}
           >
@@ -451,8 +451,8 @@ function UserDesktopRow({
             className={cn(
               "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-medium",
               user.emailConfirmed
-                ? "bg-[oklch(from_var(--color-info)_l_c_h_/_0.12)] text-[var(--color-info)]"
-                : "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.12)] text-[var(--color-warning)]",
+                ? "bg-info/12 text-[var(--color-info)]"
+                : "bg-warning/12 text-[var(--color-warning)]",
             )}
           >
             {user.emailConfirmed ? t("badge.confirmed") : t("badge.pending")}

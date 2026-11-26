@@ -352,7 +352,7 @@ function ConfigureStep({
               "w-full resize-y rounded-md border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm",
               "transition-[border-color,background-color,box-shadow] duration-[var(--duration-fast)]",
               "hover:border-[var(--color-border-strong)]",
-              "focus-visible:outline-none focus-visible:border-[var(--color-accent-signal)] focus-visible:ring-2 focus-visible:ring-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.25)] focus-visible:bg-[var(--color-surface-2)]",
+              "focus-visible:outline-none focus-visible:border-[var(--color-accent-signal)] focus-visible:ring-2 focus-visible:ring-accent-signal/25 focus-visible:bg-[var(--color-surface-2)]",
             )}
           />
           <p className="flex items-center justify-between text-[11px] text-[var(--color-muted-foreground)]">
@@ -370,7 +370,7 @@ function ConfigureStep({
           </p>
         </div>
 
-        <div className="flex items-start gap-2 rounded-md border border-[var(--color-warning)]/40 bg-[oklch(from_var(--color-warning)_l_c_h_/_0.08)] px-3 py-2.5 text-xs text-[var(--color-foreground)]">
+        <div className="flex items-start gap-2 rounded-md border border-[var(--color-warning)]/40 bg-warning/8 px-3 py-2.5 text-xs text-[var(--color-foreground)]">
           <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-warning)]" />
           <div>
             <strong className="font-medium">{t("dialog.configure.warningStrong")}</strong>

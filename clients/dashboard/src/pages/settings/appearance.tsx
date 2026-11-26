@@ -289,7 +289,7 @@ function AccentCard({
       <div
         className="mb-3 h-12 w-full overflow-hidden rounded-lg shadow-[var(--shadow-xs),var(--highlight-top)]"
         style={{
-          background: `linear-gradient(180deg, ${option.swatch} 0%, ${option.swatch} 65%, oklch(from ${option.swatch} l c h / 0.18) 65%, oklch(from ${option.swatch} l c h / 0.18) 100%)`,
+          background: `linear-gradient(180deg, ${option.swatch} 0%, ${option.swatch} 65%, color-mix(in oklab, ${option.swatch} 18%, transparent) 65%, color-mix(in oklab, ${option.swatch} 18%, transparent) 100%)`,
         }}
         aria-hidden
       />
@@ -325,7 +325,7 @@ function FontCard({
         className={cn(
           "mb-3 grid h-12 w-full place-items-center rounded-lg border",
           active
-            ? "border-[var(--color-primary)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.06)]"
+            ? "border-[var(--color-primary)] bg-primary/6"
             : "border-[var(--color-border)] bg-[var(--color-muted)]",
         )}
         style={{ fontFamily: option.family }}
@@ -356,7 +356,7 @@ function specToSwatch(spec: CustomAccentSpec): string {
   // template's L+C and just swaps the hue/chroma scale.
   const c = (0.220 * Math.max(0.4, Math.min(1.4, spec.c))).toFixed(3);
   const h = (((spec.h % 360) + 360) % 360).toFixed(0);
-  return `oklch(0.555 ${c} ${h})`;
+  return `oklch(0.555 ${c} ${h})`; // raw-color-allowed: the swatch of a custom accent, from the hue the user picks
 }
 
 function CustomAccentCard({
@@ -386,7 +386,7 @@ function CustomAccentCard({
       <div
         className="mb-3 h-12 w-full overflow-hidden rounded-lg shadow-[var(--shadow-xs),var(--highlight-top)]"
         style={{
-          background: `linear-gradient(180deg, ${swatch} 0%, ${swatch} 65%, oklch(from ${swatch} l c h / 0.18) 65%, oklch(from ${swatch} l c h / 0.18) 100%)`,
+          background: `linear-gradient(180deg, ${swatch} 0%, ${swatch} 65%, color-mix(in oklab, ${swatch} 18%, transparent) 65%, color-mix(in oklab, ${swatch} 18%, transparent) 100%)`,
         }}
         aria-hidden
       />
@@ -463,7 +463,7 @@ function CustomAccentDialog({
               className="relative h-8 overflow-hidden rounded-lg border border-[var(--color-border)]"
               style={{
                 background:
-                  "linear-gradient(90deg, oklch(0.62 0.18 0), oklch(0.62 0.18 30), oklch(0.62 0.18 60), oklch(0.62 0.18 90), oklch(0.62 0.18 120), oklch(0.62 0.18 150), oklch(0.62 0.18 180), oklch(0.62 0.18 210), oklch(0.62 0.18 240), oklch(0.62 0.18 270), oklch(0.62 0.18 300), oklch(0.62 0.18 330), oklch(0.62 0.18 360))",
+                  "linear-gradient(90deg, oklch(0.62 0.18 0), oklch(0.62 0.18 30), oklch(0.62 0.18 60), oklch(0.62 0.18 90), oklch(0.62 0.18 120), oklch(0.62 0.18 150), oklch(0.62 0.18 180), oklch(0.62 0.18 210), oklch(0.62 0.18 240), oklch(0.62 0.18 270), oklch(0.62 0.18 300), oklch(0.62 0.18 330), oklch(0.62 0.18 360))", // raw-color-allowed: the hue ribbon of the custom accent picker
               }}
             >
               <input
@@ -473,7 +473,7 @@ function CustomAccentDialog({
                 step={1}
                 value={Math.round(draft.h)}
                 onChange={(e) => setDraft((d) => ({ ...d, h: Number(e.target.value) }))}
-                className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-1.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-[oklch(0_0_0_/_0.4)] [&::-webkit-slider-thumb]:bg-[var(--color-overlay-foreground)] [&::-webkit-slider-thumb]:shadow-[0_2px_6px_-2px_oklch(0_0_0_/_0.4)] [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-1.5 [&::-moz-range-thumb]:rounded-sm [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-[oklch(0_0_0_/_0.4)] [&::-moz-range-thumb]:bg-[var(--color-overlay-foreground)]"
+                className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-1.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-[color-mix(in_oklab,var(--shadow-color)_40%,transparent)] [&::-webkit-slider-thumb]:bg-[var(--color-overlay-foreground)] [&::-webkit-slider-thumb]:shadow-[0_2px_6px_-2px_color-mix(in_oklab,var(--shadow-color)_40%,transparent)] [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-1.5 [&::-moz-range-thumb]:rounded-sm [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-[color-mix(in_oklab,var(--shadow-color)_40%,transparent)] [&::-moz-range-thumb]:bg-[var(--color-overlay-foreground)]"
                 aria-label={t("appearance.custom.hue")}
               />
             </div>
@@ -495,7 +495,7 @@ function CustomAccentDialog({
               onChange={(e) =>
                 setDraft((d) => ({ ...d, c: Number(e.target.value) / 100 }))
               }
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--color-muted)] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-foreground)] [&::-webkit-slider-thumb]:shadow-[0_1px_3px_oklch(0_0_0_/_0.30)] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[var(--color-foreground)]"
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--color-muted)] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-foreground)] [&::-webkit-slider-thumb]:shadow-[0_1px_3px_color-mix(in_oklab,var(--shadow-color)_30%,transparent)] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[var(--color-foreground)]"
               aria-label={t("appearance.custom.saturation")}
             />
           </div>
@@ -551,7 +551,7 @@ function CustomAccentDialog({
                 <code
                   className="rounded px-1.5 py-0.5 font-mono text-[10.5px] font-medium"
                   style={{
-                    background: `oklch(from ${swatch600} l c h / 0.10)`,
+                    background: `color-mix(in oklab, ${swatch600} 10%, transparent)`,
                     color: swatch600,
                   }}
                 >

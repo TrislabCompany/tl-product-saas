@@ -80,7 +80,7 @@ export function ForgotPasswordPage() {
           <div className="grid place-items-center">
             <span
               aria-hidden
-              className="grid size-14 place-items-center rounded-2xl bg-[oklch(from_var(--color-success)_l_c_h_/_0.10)] text-[var(--color-success)]"
+              className="grid size-14 place-items-center rounded-2xl bg-success/10 text-[var(--color-success)]"
             >
               <MailCheck className="size-6" />
             </span>
@@ -139,7 +139,7 @@ export function ForgotPasswordPage() {
                 {t("forgot.email")}
               </Label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                 <Input
                   id="reset-email"
                   type="email"
@@ -162,8 +162,8 @@ export function ForgotPasswordPage() {
                 role="alert"
                 className={cn(
                   "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-                  "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-                  "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+                  "border-destructive/30",
+                  "bg-destructive/6",
                   "text-[var(--color-destructive)]",
                 )}
               >

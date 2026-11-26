@@ -85,7 +85,7 @@ export function ImpersonationBanner() {
         "border-b px-4 py-3 sm:px-6",
       )}
       style={{
-        borderColor: `oklch(from ${tone} l c h / 0.28)`,
+        borderColor: `color-mix(in oklab, ${tone} 28%, transparent)`,
         backgroundColor: "var(--color-muted)",
       }}
     >
@@ -106,9 +106,9 @@ export function ImpersonationBanner() {
           aria-hidden
           className="grid h-8 w-8 shrink-0 place-items-center rounded-xl"
           style={{
-            backgroundColor: `oklch(from ${tone} l c h / 0.14)`,
+            backgroundColor: `color-mix(in oklab, ${tone} 14%, transparent)`,
             color: tone,
-            boxShadow: `inset 0 0 0 1px oklch(from ${tone} l c h / 0.32)`,
+            boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${tone} 32%, transparent)`,
           }}
         >
           <ShieldAlert className="h-3.5 w-3.5" />
@@ -169,7 +169,7 @@ export function ImpersonationBanner() {
         disabled={pending}
         className="shrink-0"
         style={{
-          borderColor: `oklch(from ${tone} l c h / 0.45)`,
+          borderColor: `color-mix(in oklab, ${tone} 45%, transparent)`,
           color: tone,
         }}
       >
@@ -201,9 +201,9 @@ function TenantChip({
         emphasis ? "font-semibold" : "font-medium",
       )}
       style={{
-        backgroundColor: `oklch(from ${tone} l c h / 0.12)`,
+        backgroundColor: `color-mix(in oklab, ${tone} 12%, transparent)`,
         color: tone,
-        boxShadow: `inset 0 0 0 1px oklch(from ${tone} l c h / 0.22)`,
+        boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${tone} 22%, transparent)`,
       }}
     >
       {label}

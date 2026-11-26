@@ -275,7 +275,7 @@ export function CategoriesPage() {
       {query.isError && (
         <div
           role="alert"
-          className="rounded-lg border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] px-3 py-2 text-sm text-[var(--color-destructive)]"
+          className="rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-[var(--color-destructive)]"
         >
           {describe(query.error)}
         </div>
@@ -610,7 +610,7 @@ function CategoryEditorDialog({
                     ) : (
                       <span
                         aria-hidden
-                        className="text-[10.5px] font-semibold uppercase tracking-wider text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]"
+                        className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground/60"
                       >
                         {t("row.root")}
                       </span>
@@ -635,8 +635,8 @@ function CategoryEditorDialog({
                 maxLength={1024}
                 className={cn(
                   "flex w-full rounded-lg border border-[var(--color-input)] bg-transparent px-3 py-2 text-sm shadow-xs",
-                  "placeholder:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]",
-                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]",
+                  "placeholder:text-muted-foreground/60",
+                  "focus-visible:border-[var(--color-ring)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 )}
                 placeholder={t("placeholder.categoryDescription")}
               />

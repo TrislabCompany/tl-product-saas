@@ -349,7 +349,7 @@ export function Composer({
           "relative rounded-xl border bg-[var(--color-background)] shadow-xs transition-all",
           "duration-[var(--duration-fast)] ease-[var(--ease-out-cubic)]",
           focused
-            ? "border-[var(--color-ring)] ring-[3px] ring-[oklch(from_var(--color-ring)_l_c_h_/_0.5)]"
+            ? "border-[var(--color-ring)] ring-[3px] ring-ring/50"
             : "border-[var(--color-input)]",
         )}
       >
@@ -595,7 +595,7 @@ function UploadingChip({
       className={cn(
         "mx-3 mt-3 flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2",
         isError
-          ? "border-l-[var(--color-destructive)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]"
+          ? "border-l-[var(--color-destructive)] bg-destructive/6"
           : "border-l-[var(--color-primary)] bg-[var(--color-muted)]",
       )}
     >

@@ -49,7 +49,7 @@ export function TenantChoiceStep({ email, tenants, onSubmit, onBack, submitting,
               className={cn(
                 "flex cursor-pointer items-center gap-3 rounded-lg border px-3.5 py-3 text-[13.5px] transition-colors",
                 tenant === option.id
-                  ? "border-[var(--color-primary)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.06)]"
+                  ? "border-[var(--color-primary)] bg-primary/6"
                   : "border-[var(--color-border)] hover:bg-[var(--color-muted)]",
               )}
             >
@@ -83,8 +83,8 @@ export function TenantChoiceStep({ email, tenants, onSubmit, onBack, submitting,
             role="alert"
             className={cn(
               "tl-enter flex items-start gap-2 rounded-lg border px-3 py-2 text-sm",
-              "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-              "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)]",
+              "border-destructive/30",
+              "bg-destructive/6",
               "text-[var(--color-destructive)]",
             )}
           >

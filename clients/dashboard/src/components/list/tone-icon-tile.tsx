@@ -68,8 +68,8 @@ export function ToneIconTile({
         className,
       )}
       style={{
-        backgroundColor: `oklch(from var(${v}) l c h / 0.10)`,
-        boxShadow: `inset 0 0 0 1px oklch(from var(${v}) l c h / 0.22)`,
+        backgroundColor: `color-mix(in oklab, var(${v}) 10%, transparent)`,
+        boxShadow: `inset 0 0 0 1px color-mix(in oklab, var(${v}) 22%, transparent)`,
         color: `var(${v})`,
       }}
     >

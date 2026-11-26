@@ -147,7 +147,7 @@ export function UserDetailPage() {
               icon={UserIcon}
               description={t("detail.identityCard.description")}
             >
-              <dl className="space-y-0 divide-y divide-[oklch(from_var(--color-border)_l_c_h_/_0.5)]">
+              <dl className="space-y-0 divide-y divide-border/50">
                 <DetailRow label={t("detail.row.userId")} mono>
                   {user.id ?? "—"}
                 </DetailRow>

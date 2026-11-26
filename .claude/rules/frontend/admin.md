@@ -34,7 +34,7 @@ Form layout primitives live in `src/components/list/` (`PageHeader`, `Field`, `F
 
 ## Theme
 
-Cool-cast neutrals (hue 240, small non-zero chroma — **not** chroma 0), a single fixed chartreuse "signal" accent (`--accent-signal` / `--signal-500`), Geist / Geist Mono fonts. Defined in `src/styles/globals.css`.
+The Trislab theme of `framework-ui` (dark slate, the orange accent, Inter), with the starter's additions in `src/styles/starter/theme.css` and the product's look in `src/styles/theme.css` ([docs/theme.md](../../../docs/theme.md)). `--color-accent-signal` is the primary colour. No colour anywhere else.
 
 ## Add-a-page deltas (on top of shared steps)
 

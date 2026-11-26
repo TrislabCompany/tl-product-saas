@@ -76,7 +76,7 @@ export function SettingsLayout() {
             <span>{t("title")}</span>
             <span
               aria-hidden
-              className="text-[oklch(from_var(--color-border-strong)_l_c_h_/_0.7)]"
+              className="text-border-strong/70"
             >
               ·
             </span>
@@ -93,14 +93,14 @@ export function SettingsLayout() {
         <nav aria-label={t("sectionsNav")}>
           {/* Desktop: vertical numbered list */}
           <div className="sticky top-6 hidden lg:block">
-            <p className="mb-4 pl-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]">
+            <p className="mb-4 pl-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/60">
               {t("sections")}
             </p>
             <ul className="relative space-y-px">
               {/* Faint vertical rail tying the numbers together */}
               <div
                 aria-hidden
-                className="absolute left-[14px] top-1 bottom-1 w-px bg-[oklch(from_var(--color-border)_l_c_h_/_0.6)]"
+                className="absolute left-[14px] top-1 bottom-1 w-px bg-border/60"
               />
               {tabs.map((tab, i) => {
                 const num = pad2(i + 1);
@@ -114,7 +114,7 @@ export function SettingsLayout() {
                           "group relative flex w-full items-start gap-3 rounded-lg pl-5 pr-3 py-3 text-left transition-all cursor-pointer",
                           isActive
                             ? "bg-[var(--color-card)] shadow-xs"
-                            : "hover:bg-[oklch(from_var(--color-muted)_l_c_h_/_0.4)]",
+                            : "hover:bg-muted/40",
                         )
                       }
                     >
@@ -131,7 +131,7 @@ export function SettingsLayout() {
                               "z-10 mt-0.5 bg-[var(--color-background)] px-1 font-display text-[11px] font-semibold leading-5 tabular-nums transition-colors",
                               isActive
                                 ? "text-[var(--color-primary)]"
-                                : "text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]",
+                                : "text-muted-foreground/50",
                             )}
                           >
                             {num}
@@ -147,7 +147,7 @@ export function SettingsLayout() {
                             >
                               {t(tab.labelKey)}
                             </span>
-                            <span className="mt-0.5 block truncate text-[11px] text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]">
+                            <span className="mt-0.5 block truncate text-[11px] text-muted-foreground/60">
                               {t(tab.hintKey)}
                             </span>
                           </span>
@@ -157,7 +157,7 @@ export function SettingsLayout() {
                               "mt-1 size-3.5 shrink-0 transition-all",
                               isActive
                                 ? "translate-x-0.5 text-[var(--color-primary)]"
-                                : "text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.3)] group-hover:text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]",
+                                : "text-muted-foreground/30 group-hover:text-muted-foreground/50",
                             )}
                           />
                         </>
@@ -236,10 +236,10 @@ export function SettingsSection({
       )}
     >
       {title && (
-        <div className="border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="border-b border-border/50 px-5 py-3">
           <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-foreground)]">
             {Icon && (
-              <Icon className="size-3.5 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+              <Icon className="size-3.5 text-muted-foreground/50" />
             )}
             {title}
           </h2>
@@ -252,7 +252,7 @@ export function SettingsSection({
       )}
       <div className="px-5 py-5">{children}</div>
       {footer && (
-        <div className="border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="border-t border-border/50 px-5 py-3">
           {footer}
         </div>
       )}

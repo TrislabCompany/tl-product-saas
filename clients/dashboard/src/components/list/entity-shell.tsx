@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { ToneIconTile, type ToneIconTileTone } from "./tone-icon-tile";
 
 // ───────────────────────────────────────────────────────────────────────
-//  EntityPageHeader — tone-tinted icon tile + Outfit title + count chip
+//  EntityPageHeader — tone-tinted icon tile + display-face title + count chip
 //  + description on the left, action buttons on the right.
 //  Matches the dentalOS patient-page header rhythm.
 // ───────────────────────────────────────────────────────────────────────
@@ -98,7 +98,7 @@ export function EntitySearch({
   const { t } = useTranslation();
   return (
     <div className="relative">
-      <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+      <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground/50" />
       <input
         type="text"
         placeholder={placeholder}
@@ -112,7 +112,7 @@ export function EntitySearch({
           "placeholder:text-[var(--color-muted-foreground)]",
           "shadow-xs",
           "transition-all duration-200",
-          "focus:border-[oklch(from_var(--color-ring)_l_c_h_/_0.30)] focus:ring-2 focus:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.10)]",
+          "focus:border-ring/30 focus:ring-2 focus:ring-ring/10",
         )}
       />
       {value && (
@@ -206,7 +206,7 @@ export function EntityPager({
           disabled={!hasPrev}
           onClick={onPrev}
           aria-label={t("list.prevPage")}
-          className="grid size-8 cursor-pointer place-items-center rounded-lg text-[var(--color-muted-foreground)] transition-colors hover:bg-[oklch(from_var(--color-muted)_l_c_h_/_0.5)] hover:text-[var(--color-foreground)] disabled:cursor-not-allowed disabled:opacity-30"
+          className="grid size-8 cursor-pointer place-items-center rounded-lg text-[var(--color-muted-foreground)] transition-colors hover:bg-muted/50 hover:text-[var(--color-foreground)] disabled:cursor-not-allowed disabled:opacity-30"
         >
           <ChevronLeft className="size-4" />
         </button>
@@ -215,7 +215,7 @@ export function EntityPager({
           disabled={!hasNext}
           onClick={onNext}
           aria-label={t("list.nextPage")}
-          className="grid size-8 cursor-pointer place-items-center rounded-lg text-[var(--color-muted-foreground)] transition-colors hover:bg-[oklch(from_var(--color-muted)_l_c_h_/_0.5)] hover:text-[var(--color-foreground)] disabled:cursor-not-allowed disabled:opacity-30"
+          className="grid size-8 cursor-pointer place-items-center rounded-lg text-[var(--color-muted-foreground)] transition-colors hover:bg-muted/50 hover:text-[var(--color-foreground)] disabled:cursor-not-allowed disabled:opacity-30"
         >
           <ChevronRight className="size-4" />
         </button>
@@ -225,7 +225,7 @@ export function EntityPager({
 }
 
 // ───────────────────────────────────────────────────────────────────────
-//  EntityEmpty — large icon + Outfit headline + body + action button.
+//  EntityEmpty — large icon + display-face headline + body + action button.
 //  Matches the dentalOS empty state shape.
 // ───────────────────────────────────────────────────────────────────────
 
@@ -243,7 +243,7 @@ export function EntityEmpty({
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
-        <Icon className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.4)]" />
+        <Icon className="size-6 text-muted-foreground/40" />
       </div>
       <h2 className="mb-1.5 font-display text-[17px] font-semibold text-[var(--color-foreground)]">
         {title}
@@ -300,7 +300,7 @@ export function EntityListHeader({
   return (
     <div
       className={cn(
-        "grid items-center gap-3 border-b border-[var(--color-border)] bg-[oklch(from_var(--color-muted)_l_c_h_/_0.4)] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]",
+        "grid items-center gap-3 border-b border-[var(--color-border)] bg-muted/40 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]",
         className,
       )}
     >
@@ -346,8 +346,8 @@ export function EntityListRow({
       tabIndex={interactive ? 0 : undefined}
       className={cn(
         "group grid items-center gap-3 px-5 py-3 transition-colors duration-100",
-        "hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)]",
-        !isLast && "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.3)]",
+        "hover:bg-accent/40",
+        !isLast && "border-b border-border/30",
         dim && "opacity-75",
         interactive && "cursor-pointer",
         className,
@@ -372,8 +372,8 @@ export const EntityMobileCard = React.forwardRef<
     className={cn(
       "block rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left",
       "shadow-xs",
-      "transition-colors hover:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.4)] active:bg-[oklch(from_var(--color-accent)_l_c_h_/_0.6)]",
-      "outline-none focus-visible:ring-[3px] focus-visible:ring-[oklch(from_var(--color-ring)_l_c_h_/_0.4)]",
+      "transition-colors hover:bg-accent/40 active:bg-accent/60",
+      "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40",
       dim && "opacity-75",
       className,
     )}
@@ -412,8 +412,8 @@ export function EntityInitialsAvatar({
       style={{ width: size, height: size }}
       className={cn(
         "grid shrink-0 place-items-center rounded-xl",
-        "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)]",
-        "ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)]",
+        "bg-primary/10",
+        "ring-1 ring-inset ring-primary/22",
         className,
       )}
     >
@@ -443,12 +443,12 @@ const STATUS_TONES: Record<EntityStatusTone, string> = {
   default:
     "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] border-transparent",
   success:
-    "bg-[oklch(from_var(--color-success)_l_c_h_/_0.10)] text-[var(--color-success)] border-[oklch(from_var(--color-success)_l_c_h_/_0.20)]",
+    "bg-success/10 text-[var(--color-success)] border-success/20",
   warning:
-    "bg-[oklch(from_var(--color-warning)_l_c_h_/_0.10)] text-[var(--color-warning)] border-[oklch(from_var(--color-warning)_l_c_h_/_0.20)]",
+    "bg-warning/10 text-[var(--color-warning)] border-warning/20",
   danger:
-    "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.10)] text-[var(--color-destructive)] border-[oklch(from_var(--color-destructive)_l_c_h_/_0.20)]",
-  info: "bg-[oklch(from_var(--color-info)_l_c_h_/_0.10)] text-[var(--color-info)] border-[oklch(from_var(--color-info)_l_c_h_/_0.20)]",
+    "bg-destructive/10 text-[var(--color-destructive)] border-destructive/20",
+  info: "bg-info/10 text-[var(--color-info)] border-info/20",
 };
 
 export function EntityStatusBadge({
@@ -527,7 +527,7 @@ export function EntityListLoading({
             className={cn(
               "grid items-center gap-3 px-5 py-3",
               desktopColumns,
-              i < rows - 1 && "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.3)]",
+              i < rows - 1 && "border-b border-border/30",
             )}
           >
             <div className="flex items-center gap-3">
@@ -549,7 +549,7 @@ function SkeletonBlock({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "animate-pulse bg-[oklch(from_var(--color-muted)_l_c_h_/_0.6)]",
+        "animate-pulse bg-muted/60",
         className,
       )}
     />

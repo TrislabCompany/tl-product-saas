@@ -21,7 +21,7 @@ import { useAuth } from "@/auth/use-auth";
  * token is still technically decodable, but nothing the impersonated identity
  * can do will work, so there is no shell to render. The single action clears
  * the dead session and returns to sign-in. Mirrors tenant-deactivated.tsx's
- * empty-state vocabulary: one muted icon tile, an Outfit headline, a soft body
+ * empty-state vocabulary: one muted icon tile, an display-face headline, a soft body
  * line, and a single primary affordance.
  */
 export function ImpersonationEndedPage() {
@@ -51,18 +51,18 @@ export function ImpersonationEndedPage() {
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div
           className="absolute -top-[25%] -left-[15%] h-[70vw] w-[70vw] rounded-full blur-[140px]"
-          style={{ backgroundColor: "oklch(from var(--color-primary) l c h / 0.05)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-primary) 5%, transparent)" }}
         />
         <div
           className="absolute -bottom-[20%] -right-[10%] h-[55vw] w-[55vw] rounded-full blur-[120px]"
-          style={{ backgroundColor: "oklch(from var(--color-saffron) l c h / 0.07)" }}
+          style={{ backgroundColor: "color-mix(in oklab, var(--color-saffron) 7%, transparent)" }}
         />
       </div>
 
       <div className="relative z-10 flex w-full max-w-[460px] flex-col items-center text-center tl-enter tl-enter-1">
         {/* Icon tile — same muted bg + size-14 rounded-2xl as the not-found page */}
         <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
-          <ShieldOff className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+          <ShieldOff className="size-6 text-muted-foreground/50" />
         </div>
 
         <h1 className="mb-2 font-display text-display-stat font-semibold tracking-tight text-[var(--color-foreground)]">
@@ -85,7 +85,7 @@ export function ImpersonationEndedPage() {
         {/* Dev-only diagnostic — the JwtBearer rejection reason. Hidden in prod
             (the server blanks it) and even when present is whispered, not shouted. */}
         {import.meta.env.DEV && reason && (
-          <p className="mt-6 max-w-[380px] font-mono text-[11px] leading-relaxed text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.6)]">
+          <p className="mt-6 max-w-[380px] font-mono text-[11px] leading-relaxed text-muted-foreground/60">
             {reason}
           </p>
         )}

@@ -43,6 +43,7 @@ Onboarding copies this repository into the product's repository at a template re
 | [docs/architecture.md](docs/architecture.md) | How the host is built |
 | [docs/modules.md](docs/modules.md) | The modules, the samples, adding and deleting one |
 | [docs/packages.md](docs/packages.md) | How the framework packages are used here |
+| [docs/theme.md](docs/theme.md) | The look of the front ends: the Trislab theme, the one file that restyles a product, a user's accent, the colour check |
 | [docs/configuration.md](docs/configuration.md) | The settings of the API |
 | [docs/local-ports.md](docs/local-ports.md) | Many products side by side: port blocks, the database, a shared Postgres, the Aspire dashboard |
 | [docs/deployment.md](docs/deployment.md) | Images, migrations, deploy and release |

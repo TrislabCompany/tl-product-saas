@@ -154,7 +154,7 @@ function Row({
     <li
       className={cn(
         "grid grid-cols-[auto_auto_1fr_auto] items-start gap-3 px-1 py-3.5 text-sm",
-        unread && "bg-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.03)]",
+        unread && "bg-accent-signal/3",
       )}
     >
       <span

@@ -59,7 +59,7 @@ export function AppearanceSettings() {
                   "transition-colors duration-[var(--duration-default)]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2",
                   active
-                    ? "border-[var(--color-accent-signal)] bg-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.08)]"
+                    ? "border-[var(--color-accent-signal)] bg-accent-signal/8"
                     : "border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-muted)]",
                 )}
               >
@@ -68,7 +68,7 @@ export function AppearanceSettings() {
                     className={cn(
                       "grid h-8 w-8 place-items-center rounded-md",
                       active
-                        ? "bg-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.12)] text-[var(--color-accent-signal)]"
+                        ? "bg-accent-signal/12 text-[var(--color-accent-signal)]"
                         : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
                     )}
                   >

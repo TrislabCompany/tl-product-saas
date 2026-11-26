@@ -94,8 +94,9 @@ Migrations and seed (the migrator, a separate step): `DATABASE_URL=... dotnet ru
 7. **Propagate `CancellationToken`** into every EF and IO call.
 8. **Every command handler and paginated query handler has a validator.** Enforced by `Architecture.Tests`.
 9. **Frontend:** pass per-call data through `mutate(arg)`, never through state the mutation callbacks close over. Every text is in both languages, from `@trislabcompany/framework-ui`.
-10. **Docs travel with the change**: a change to a setting, a module, an endpoint the front ends use or the way the product runs isn't done until `README.md` and `docs/` match it.
-11. **Tags `[module:<Name>]`** in code mark what `init-product` removes with a module. Keep them on the lines of a module's registration, seed and UI; a new line that belongs to a removable module gets the tag.
+10. **Colours only in a `theme.css`.** The front ends use the theme's variables; a product restyles itself in `clients/<app>/src/styles/theme.css`, and `scripts/test-clients.sh` fails on a raw colour ([docs/theme.md](docs/theme.md)).
+11. **Docs travel with the change**: a change to a setting, a module, an endpoint the front ends use or the way the product runs isn't done until `README.md` and `docs/` match it.
+12. **Tags `[module:<Name>]`** in code mark what `init-product` removes with a module. Keep them on the lines of a module's registration, seed and UI; a new line that belongs to a removable module gets the tag.
 
 ## Rules index
 

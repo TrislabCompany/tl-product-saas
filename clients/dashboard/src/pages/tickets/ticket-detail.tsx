@@ -337,8 +337,8 @@ function DescriptionSection({ ticket }: { ticket: TicketDto }) {
         <div
           className={cn(
             "mt-5 rounded-xl border px-4 py-3",
-            "border-[oklch(from_var(--color-success)_l_c_h_/_0.30)]",
-            "bg-[oklch(from_var(--color-success)_l_c_h_/_0.06)]",
+            "border-success/30",
+            "bg-success/6",
           )}
         >
           <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-success)]">
@@ -426,7 +426,7 @@ function CommentsSection({
         className={cn(
           "mt-5 rounded-xl border bg-[var(--color-card)]",
           "border-[var(--color-border)] p-3",
-          "transition-colors focus-within:border-[oklch(from_var(--color-primary)_l_c_h_/_0.4)]",
+          "transition-colors focus-within:border-primary/40",
         )}
       >
         <textarea
@@ -485,7 +485,7 @@ function CommentItem({
           "grid h-8 w-8 shrink-0 place-items-center rounded-full",
           "text-[11px] font-semibold",
           isSelf
-            ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.16)] text-[var(--color-primary)]"
+            ? "bg-primary/16 text-[var(--color-primary)]"
             : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
         )}
       >
@@ -496,7 +496,7 @@ function CommentItem({
           className={cn(
             "inline-block max-w-full rounded-xl border px-3.5 py-2.5 text-left",
             isSelf
-              ? "border-[oklch(from_var(--color-primary)_l_c_h_/_0.22)] bg-[oklch(from_var(--color-primary)_l_c_h_/_0.06)]"
+              ? "border-primary/22 bg-primary/6"
               : "border-[var(--color-border)] bg-[var(--color-card)]",
           )}
         >
@@ -659,7 +659,7 @@ function ResolveDialog({
           <DialogTitle className="flex items-center gap-2">
             <span
               aria-hidden
-              className="grid h-6 w-6 place-items-center rounded-md bg-[oklch(from_var(--color-success)_l_c_h_/_0.16)] text-[var(--color-success)]"
+              className="grid h-6 w-6 place-items-center rounded-md bg-success/16 text-[var(--color-success)]"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
             </span>
@@ -766,7 +766,7 @@ function AssignDialog({
           <DialogTitle className="flex items-center gap-2">
             <span
               aria-hidden
-              className="grid h-6 w-6 place-items-center rounded-md bg-[oklch(from_var(--color-primary)_l_c_h_/_0.16)] text-[var(--color-primary)]"
+              className="grid h-6 w-6 place-items-center rounded-md bg-primary/16 text-[var(--color-primary)]"
             >
               <UserCheck className="h-3.5 w-3.5" />
             </span>
@@ -865,8 +865,8 @@ function NotFoundPanel({ onBack }: { onBack: () => void }) {
         aria-hidden
         className={cn(
           "grid h-14 w-14 place-items-center rounded-2xl",
-          "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)]",
-          "ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)]",
+          "bg-primary/10",
+          "ring-1 ring-inset ring-primary/22",
         )}
       >
         <TicketIcon className="h-6 w-6 text-[var(--color-primary)]" />

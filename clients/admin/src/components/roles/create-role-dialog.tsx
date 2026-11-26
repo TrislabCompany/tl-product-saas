@@ -109,9 +109,9 @@ export function CreateRoleDialog({
             <span
               aria-hidden
               className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl
-                bg-[oklch(from_var(--color-primary)_l_c_h_/_0.12)]
+                bg-primary/12
                 text-[var(--color-primary)]
-                ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)]"
+                ring-1 ring-inset ring-primary/18"
             >
               <Shield className="h-[18px] w-[18px]" />
             </span>

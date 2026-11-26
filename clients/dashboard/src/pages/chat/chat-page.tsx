@@ -113,7 +113,7 @@ function EmptyState() {
     <div className="flex h-full items-center justify-center px-6">
       <div className="flex flex-col items-center text-center">
         <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-[var(--color-muted)]">
-          <MessageCircle className="size-6 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]" />
+          <MessageCircle className="size-6 text-muted-foreground/50" />
         </div>
         <h3 className="mb-1.5 font-display text-[17px] font-semibold text-[var(--color-foreground)]">
           {t("page.emptyTitle")}
@@ -264,7 +264,7 @@ function ActiveChannel({
       ) : (
         <header
           className={cn(
-            "flex h-12 shrink-0 items-center gap-2 border-b border-[var(--color-border)] bg-[oklch(from_var(--color-background)_l_c_h_/_0.8)] px-3 backdrop-blur-sm md:gap-3 md:px-4",
+            "flex h-12 shrink-0 items-center gap-2 border-b border-[var(--color-border)] bg-background/80 px-3 backdrop-blur-sm md:gap-3 md:px-4",
           )}
         >
           {/* Mobile back button — returns to the rail-only view. */}
@@ -279,7 +279,7 @@ function ActiveChannel({
           </button>
           <span
             aria-hidden
-            className="hidden size-7 shrink-0 place-items-center rounded-md bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] text-[var(--color-primary)] ring-1 ring-inset ring-[oklch(from_var(--color-primary)_l_c_h_/_0.22)] md:grid"
+            className="hidden size-7 shrink-0 place-items-center rounded-md bg-primary/10 text-[var(--color-primary)] ring-1 ring-inset ring-primary/22 md:grid"
           >
             <Icon className="size-3.5" />
           </span>

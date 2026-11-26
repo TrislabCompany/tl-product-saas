@@ -220,7 +220,7 @@ function Row({
     <li
       className={cn(
         "group/notif flex items-start gap-2.5 px-3 py-2.5 text-sm transition-colors",
-        unread && "bg-[oklch(from_var(--color-accent-signal)_l_c_h_/_0.04)]",
+        unread && "bg-accent-signal/4",
         "hover:bg-[var(--color-muted)]/40",
       )}
     >

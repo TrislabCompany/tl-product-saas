@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ToneIconTile, type ToneIconTileTone } from "./tone-icon-tile";
 
 // ───────────────────────────────────────────────────────────────────────
-//  EntityPageHeader — tone-tinted icon tile + Outfit title + count chip
+//  EntityPageHeader — tone-tinted icon tile + display-face title + count chip
 //  + description on the left, action buttons on the right.
 //  Replaces the dashboard-divergent FormShell page-title area with the
 //  unified header rhythm used across the dashboard app.

@@ -50,7 +50,7 @@ export function PageHero({
           {tenant && (
             <>
               <span aria-hidden className="h-px w-7 bg-[var(--color-border)]" />
-              <code className="rounded bg-[oklch(from_var(--color-primary)_l_c_h_/_0.10)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--color-primary)]">
+              <code className="rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-[var(--color-primary)]">
                 {tenant}
               </code>
             </>

@@ -229,7 +229,7 @@ export function FilePreviewDialog({ fileAssetId, initial, onClose, onDeleted }: 
                 size="sm"
                 variant="outline"
                 onClick={() => setConfirmingDelete(true)}
-                className="text-[var(--color-destructive)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)] hover:text-[var(--color-destructive)]"
+                className="text-[var(--color-destructive)] hover:bg-destructive/8 hover:text-[var(--color-destructive)]"
               >
                 <Trash2 className="size-3.5" />
                 {t("preview.delete")}
@@ -422,7 +422,7 @@ function MetadataPanel({
       {/* Visibility row — switch when the caller is the uploader, static label
           otherwise. Public state gets a small "visible to the tenant" hint so
           the consequence is clear before flipping. */}
-      <div className="flex items-start justify-between gap-3 border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] pb-3">
+      <div className="flex items-start justify-between gap-3 border-b border-border/50 pb-3">
         <div>
           <dt className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
             {t("preview.meta.visibility")}

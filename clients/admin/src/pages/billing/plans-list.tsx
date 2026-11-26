@@ -113,7 +113,7 @@ export function PlansListPage() {
         }
       >
         {query.isError && (
-          <div className="mb-4 rounded-md border border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)] bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.05)] px-4 py-3 text-sm text-[var(--color-destructive)]">
+          <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-[var(--color-destructive)]">
             {describe(query.error)}
           </div>
         )}

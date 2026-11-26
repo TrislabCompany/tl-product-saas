@@ -137,7 +137,7 @@ export function WebhookDetailPage() {
                     }
                   }}
                   disabled={remove.isPending}
-                  className="text-[var(--color-destructive)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)]"
+                  className="text-[var(--color-destructive)] hover:bg-destructive/8"
                 >
                   <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                   {remove.isPending ? t("detail.deleting") : t("detail.deleteSubscription")}

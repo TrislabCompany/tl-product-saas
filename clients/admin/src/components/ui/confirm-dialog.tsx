@@ -50,8 +50,8 @@ export function ConfirmDialog({
               className={cn(
                 "grid h-9 w-9 shrink-0 place-items-center rounded-xl ring-1 ring-inset",
                 destructive
-                  ? "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.12)] text-[var(--color-destructive)] ring-[oklch(from_var(--color-destructive)_l_c_h_/_0.18)]"
-                  : "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.12)] text-[var(--color-primary)] ring-[oklch(from_var(--color-primary)_l_c_h_/_0.18)]",
+                  ? "bg-destructive/12 text-[var(--color-destructive)] ring-destructive/18"
+                  : "bg-primary/12 text-[var(--color-primary)] ring-primary/18",
               )}
             >
               <AlertTriangle className="h-[18px] w-[18px]" />

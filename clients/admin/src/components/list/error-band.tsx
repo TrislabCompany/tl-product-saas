@@ -16,7 +16,7 @@ export function ErrorBand({ message, kind }: ErrorBandProps) {
   return (
     <div
       role="alert"
-      className="flex items-start gap-2.5 rounded-md border border-[var(--color-destructive)]/40 bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.08)] px-3.5 py-2.5 text-sm text-[var(--color-destructive)]"
+      className="flex items-start gap-2.5 rounded-md border border-[var(--color-destructive)]/40 bg-destructive/8 px-3.5 py-2.5 text-sm text-[var(--color-destructive)]"
     >
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
       <div className="min-w-0">

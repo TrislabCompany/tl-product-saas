@@ -482,7 +482,7 @@ function RoleToggleRow({
         "flex items-center justify-between gap-3 rounded-md border px-3 py-2",
         "transition-colors duration-[var(--duration-fast)]",
         selected
-          ? "border-[oklch(from_var(--color-primary)_l_c_h_/_0.30)] bg-[var(--color-primary-soft)]"
+          ? "border-primary/30 bg-[var(--color-primary-soft)]"
           : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-border-strong)]",
       )}
     >

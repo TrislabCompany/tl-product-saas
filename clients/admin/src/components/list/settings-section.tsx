@@ -39,12 +39,12 @@ export function SettingsSection({
       )}
     >
       {title && (
-        <div className="border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="border-b border-border/50 px-5 py-3">
           <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-foreground)]">
             {Icon && (
               <Icon
                 aria-hidden
-                className="size-3.5 text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.5)]"
+                className="size-3.5 text-muted-foreground/50"
               />
             )}
             {title}
@@ -58,7 +58,7 @@ export function SettingsSection({
       )}
       <div className="px-5 py-5">{children}</div>
       {footer && (
-        <div className="border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] px-5 py-3">
+        <div className="border-t border-border/50 px-5 py-3">
           {footer}
         </div>
       )}

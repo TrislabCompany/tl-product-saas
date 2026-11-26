@@ -18,13 +18,13 @@ const badgeVariants = cva(
         brand:
           "border-transparent bg-[var(--color-primary-soft)] text-[var(--color-primary)]",
         success:
-          "border-transparent bg-[oklch(from_var(--color-success)_l_c_h_/_0.14)] text-[var(--color-success)]",
+          "border-transparent bg-success/14 text-[var(--color-success)]",
         warning:
-          "border-transparent bg-[oklch(from_var(--color-warning)_l_c_h_/_0.16)] text-[var(--color-warning)]",
+          "border-transparent bg-warning/16 text-[var(--color-warning)]",
         info:
-          "border-transparent bg-[oklch(from_var(--color-info)_l_c_h_/_0.14)] text-[var(--color-info)]",
+          "border-transparent bg-info/14 text-[var(--color-info)]",
         danger:
-          "border-transparent bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.14)] text-[var(--color-destructive)]",
+          "border-transparent bg-destructive/14 text-[var(--color-destructive)]",
         outline:
           "border-[var(--color-border-strong)] bg-transparent text-[var(--color-muted-foreground)]",
       },

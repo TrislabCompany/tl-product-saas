@@ -22,9 +22,15 @@ const SHARED_FALLBACKS =
 
 export const fonts: FontOption[] = [
   {
+    id: "inter",
+    label: "Inter",
+    description: "The Trislab font. Default.",
+    family: `"Inter Variable", "Inter Fallback", ${SHARED_FALLBACKS}`,
+  },
+  {
     id: "geist",
     label: "Geist",
-    description: "Designed for screens. Default.",
+    description: "Designed for screens.",
     family: `'Geist', ${SHARED_FALLBACKS}`,
   },
   {
@@ -95,7 +101,7 @@ export const fonts: FontOption[] = [
   },
 ];
 
-export const DEFAULT_FONT = "figtree";
+export const DEFAULT_FONT = "inter";
 
 export type AccentOption = {
   id: string;
@@ -106,15 +112,18 @@ export type AccentOption = {
 };
 
 export const accents: AccentOption[] = [
-  { id: "rose",    label: "Rose",    description: "Editorial, warm-paper default.",  swatch: "oklch(0.575 0.232  13)" },
-  { id: "indigo",  label: "Indigo",  description: "Confident tech-forward chassis.", swatch: "oklch(0.555 0.220 268)" },
-  { id: "violet",  label: "Violet",  description: "Saturated, expressive.",          swatch: "oklch(0.555 0.220 305)" },
-  { id: "sky",     label: "Sky",     description: "Cool, calm, professional.",       swatch: "oklch(0.555 0.220 232)" },
-  { id: "emerald", label: "Emerald", description: "Fresh, success-leaning.",         swatch: "oklch(0.555 0.220 152)" },
-  { id: "amber",   label: "Amber",   description: "Warm, energetic.",                swatch: "oklch(0.620 0.180  76)" },
+  // The theme's own primary colour (Trislab orange, or the product's theme.css), captured on <html>
+  // before a chosen accent replaces --primary (styles/starter/theme.css).
+  { id: "theme",   label: "Default", description: "The product's own colour.", swatch: "var(--theme-primary)" },
+  { id: "rose",    label: "Rose",    description: "Editorial, warm.",  swatch: "oklch(0.575 0.232  13)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
+  { id: "indigo",  label: "Indigo",  description: "Confident tech-forward chassis.", swatch: "oklch(0.555 0.220 268)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
+  { id: "violet",  label: "Violet",  description: "Saturated, expressive.",          swatch: "oklch(0.555 0.220 305)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
+  { id: "sky",     label: "Sky",     description: "Cool, calm, professional.",       swatch: "oklch(0.555 0.220 232)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
+  { id: "emerald", label: "Emerald", description: "Fresh, success-leaning.",         swatch: "oklch(0.555 0.220 152)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
+  { id: "amber",   label: "Amber",   description: "Warm, energetic.",                swatch: "oklch(0.620 0.180  76)" }, // raw-color-allowed: the swatch of an accent palette, its --brand-600 in styles/starter/theme.css
 ];
 
-export const DEFAULT_ACCENT = "rose";
+export const DEFAULT_ACCENT = "theme";
 export const CUSTOM_ACCENT_ID = "custom";
 
 export const FONT_STORAGE_KEY = "tl.font";
@@ -162,9 +171,8 @@ export type CustomAccentSpec = {
 export const DEFAULT_CUSTOM_ACCENT: CustomAccentSpec = { h: 12, c: 1.0 };
 
 // ────────────────────────────────────────────────────────────────────────
-// Lazy fonts — the index.html boot only loads Figtree + Outfit +
-// JetBrains Mono so cold start stays cheap. The other nine selectable
-// families are fetched on demand the first time the user opens the
+// Lazy fonts — Inter, the default, is self-hosted (framework-ui's fonts.css). The
+// other selectable families are fetched on demand the first time the user opens the
 // Appearance settings (where their swatches need to render correctly).
 // Idempotent: a second call is a no-op.
 // ────────────────────────────────────────────────────────────────────────
@@ -175,10 +183,12 @@ const LAZY_FONTS_HREF =
     "family=DM+Sans:opsz,wght@9..40,100..1000",
     "family=Geist:wght@100..900",
     "family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700",
+    "family=Figtree:wght@300..900",
     "family=Inter+Tight:wght@100..900",
     "family=Lexend:wght@100..900",
     "family=Manrope:wght@200..800",
     "family=Onest:wght@100..900",
+    "family=Outfit:wght@100..900",
     "family=Plus+Jakarta+Sans:wght@200..800",
     "family=Roboto+Flex:opsz,wght@8..144,100..1000",
     "family=Sora:wght@100..800",
@@ -205,6 +215,6 @@ export function buildCustomBrandStops(
   const cScale = Math.max(0.4, Math.min(1.4, spec.c));
   return BRAND_LADDER.map(({ stop, l, c }) => ({
     var: `--brand-${stop}`,
-    value: `oklch(${l.toFixed(3)} ${(c * cScale).toFixed(3)} ${h.toFixed(0)})`,
+    value: `oklch(${l.toFixed(3)} ${(c * cScale).toFixed(3)} ${h.toFixed(0)})`, // raw-color-allowed: a custom accent's stops, computed from the hue the user picks
   }));
 }

@@ -371,7 +371,7 @@ function InfoRow({
       className={cn(
         "flex items-center justify-between gap-4 py-2.5",
         !isLast &&
-          "border-b border-[oklch(from_var(--color-border)_l_c_h_/_0.5)]",
+          "border-b border-border/50",
       )}
     >
       <span className="shrink-0 text-[11.5px] font-medium text-[var(--color-muted-foreground)]">
@@ -481,7 +481,7 @@ function ProvisioningPanel({
 
       {/* Error body (failed step detail) */}
       {errorBody && (
-        <pre className="max-h-44 overflow-auto rounded-lg border border-[var(--color-destructive)]/40 bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.06)] p-3.5 font-mono text-[11px] whitespace-pre-wrap text-[var(--color-destructive)]">
+        <pre className="max-h-44 overflow-auto rounded-lg border border-[var(--color-destructive)]/40 bg-destructive/6 p-3.5 font-mono text-[11px] whitespace-pre-wrap text-[var(--color-destructive)]">
           {errorBody}
         </pre>
       )}

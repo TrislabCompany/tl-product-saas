@@ -85,7 +85,7 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
             // diffuse glow. Sits behind the avatar via the wrapper's
             // own box-shadow (no stacking-context issues).
             "rounded-full",
-            "shadow-[0_0_0_4px_var(--color-primary-soft),0_8px_28px_-8px_oklch(from_var(--color-primary)_l_c_h_/_0.35)]",
+            "shadow-[0_0_0_4px_var(--color-primary-soft),0_8px_28px_-8px_color-mix(in_oklab,var(--color-primary)_35%,transparent)]",
           ],
           className,
         )}
@@ -95,7 +95,7 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
           className={cn(
             "brand-mark grid place-items-center overflow-hidden rounded-full",
             "font-semibold tracking-tight text-[var(--color-primary-foreground)]",
-            "shadow-[0_1px_0_oklch(1_0_0_/_0.22)_inset,0_4px_14px_-4px_oklch(from_var(--color-primary)_l_c_h_/_0.45)]",
+            "shadow-[0_1px_0_color-mix(in_oklab,var(--overlay-foreground)_22%,transparent)_inset,0_4px_14px_-4px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]",
             sizeClass[size],
           )}
         >

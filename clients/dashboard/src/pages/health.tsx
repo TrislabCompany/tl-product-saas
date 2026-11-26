@@ -266,7 +266,7 @@ export function HealthPage() {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// Hero panel — calm dentalOS surface. Outfit headline carries the
+// Hero panel — calm dentalOS surface. display-face headline carries the
 // overall status; a vitals row sits beneath it with stat values in mono
 // tabular numerals; a slim pip-bar history ribbon docks on the right
 // (lg+) or under the vitals row (sm). Background is a single soft tone-
@@ -308,7 +308,7 @@ function HeroPanel({
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          background: `radial-gradient(80% 60% at -5% -15%, oklch(from ${toneColor} l c h / 0.10), transparent 60%)`,
+          background: `radial-gradient(80% 60% at -5% -15%, color-mix(in oklab, ${toneColor} 10%, transparent), transparent 60%)`,
         }}
       />
 
@@ -327,7 +327,7 @@ function HeroPanel({
             </div>
           </div>
 
-          {/* Outfit display headline */}
+          {/* display-face display headline */}
           <h2 className="mt-4 font-display text-[26px] font-semibold leading-tight tracking-tight text-[var(--color-foreground)]">
             {copy.headline}
           </h2>
@@ -440,7 +440,7 @@ function HistoryPips({ ticks }: { ticks: Tick[] }) {
 // Dependencies — one card with collapsible rows. Each row is a horizontal
 // scan-line that opens to reveal details on click. Built in the same row-
 // based vocabulary as the new permissions editor so the two feel like
-// siblings: status pip + icon + name (Outfit) + latency (mono tabular)
+// siblings: status pip + icon + name (display-face) + latency (mono tabular)
 // + chevron, with hover/expanded states tinted by the row's status.
 // ────────────────────────────────────────────────────────────────────────
 
@@ -510,8 +510,8 @@ function DependencyRow({
           "group/depr flex w-full cursor-pointer items-center gap-4 px-5 py-3.5 text-left",
           "transition-colors duration-[var(--duration-fast)]",
           isExpanded
-            ? "bg-[oklch(from_var(--color-primary)_l_c_h_/_0.03)]"
-            : "hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.025)]",
+            ? "bg-primary/3"
+            : "hover:bg-primary/[2.5%]",
         )}
       >
         {/* Status pip — calm, no pulse */}
@@ -520,7 +520,7 @@ function DependencyRow({
           className="grid size-2 shrink-0 rounded-full ring-2"
           style={{
             backgroundColor: toneColor,
-            boxShadow: `0 0 0 3px oklch(from ${toneColor} l c h / 0.18)`,
+            boxShadow: `0 0 0 3px color-mix(in oklab, ${toneColor} 18%, transparent)`,
           }}
         />
 
@@ -529,9 +529,9 @@ function DependencyRow({
           aria-hidden
           className="grid size-8 shrink-0 place-items-center rounded-lg"
           style={{
-            backgroundColor: `oklch(from ${toneColor} l c h / 0.08)`,
+            backgroundColor: `color-mix(in oklab, ${toneColor} 8%, transparent)`,
             color: toneColor,
-            boxShadow: `inset 0 0 0 1px oklch(from ${toneColor} l c h / 0.18)`,
+            boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${toneColor} 18%, transparent)`,
           }}
         >
           <CheckIcon name={entry.name} className="size-3.5" />
@@ -550,7 +550,7 @@ function DependencyRow({
               {entry.description}
             </p>
           ) : (
-            <p className="mt-0.5 truncate text-[11.5px] italic text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+            <p className="mt-0.5 truncate text-[11.5px] italic text-muted-foreground/70">
               {t("noDescription")}
             </p>
           )}
@@ -585,7 +585,7 @@ function DependencyRow({
       </div>
 
       {isExpanded && (
-        <div className="border-t border-[oklch(from_var(--color-border)_l_c_h_/_0.5)] bg-[oklch(from_var(--color-secondary)_l_c_h_/_0.4)] px-5 py-5">
+        <div className="border-t border-border/50 bg-secondary/40 px-5 py-5">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
             {/* Latency budget */}
             <div>
@@ -617,11 +617,11 @@ function DependencyRow({
                 {t("detail")}
               </span>
               {detailEntries.length === 0 ? (
-                <p className="mt-2 text-[12px] italic text-[oklch(from_var(--color-muted-foreground)_l_c_h_/_0.7)]">
+                <p className="mt-2 text-[12px] italic text-muted-foreground/70">
                   {t("noDetails")}
                 </p>
               ) : (
-                <dl className="mt-2 divide-y divide-[oklch(from_var(--color-border)_l_c_h_/_0.5)] rounded-lg border border-[var(--color-border)] bg-[var(--color-card)]">
+                <dl className="mt-2 divide-y divide-border/50 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)]">
                   {detailEntries.slice(0, 6).map(([k, v]) => (
                     <div
                       key={k}
@@ -712,8 +712,8 @@ function ErrorPanel({ message }: { message?: string }) {
       role="alert"
       className={cn(
         "tl-enter flex items-start gap-3 rounded-xl border px-5 py-4",
-        "border-[oklch(from_var(--color-destructive)_l_c_h_/_0.30)]",
-        "bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.04)]",
+        "border-destructive/30",
+        "bg-destructive/4",
       )}
     >
       <ToneIconTile icon={CircleAlert} tone="destructive" size="md" />

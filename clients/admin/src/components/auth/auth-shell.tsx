@@ -56,7 +56,7 @@ export function AuthShell({
           aria-hidden
           style={{
             background:
-              "radial-gradient(48rem 32rem at 0% 0%, oklch(from var(--color-accent-signal) l c h / 0.18), transparent 65%)",
+              "radial-gradient(48rem 32rem at 0% 0%, color-mix(in oklab, var(--color-accent-signal) 18%, transparent), transparent 65%)",
           }}
         />
         <CornerTicks />
