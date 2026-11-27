@@ -4,15 +4,11 @@ import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
 
 const TENANT_ID = "acme";
 
-// RouteGuard on /tenants/:id requires Tenants.View. The branding card itself
-// makes ViewTheme / UpdateTheme calls; the server enforces permissions on
-// those calls, but in tests we mock the API so the in-app permissions list
-// only needs to satisfy the page-level RouteGuard. We grant the full
-// multitenancy permission set for simplicity.
+// The operator only reads inside a tenant (D-44): the card is a preview, and the tenant's Admins change their
+// branding in the dashboard. The page's RouteGuard needs Tenants.View; ViewTheme is what the read needs.
 const ROOT_PERMS = [
   "Permissions.Tenants.View",
   "Permissions.Tenants.ViewTheme",
-  "Permissions.Tenants.UpdateTheme",
 ];
 
 const TENANT = {
@@ -92,100 +88,71 @@ test.beforeEach(async ({ page }) => {
   );
   // Active grants list — not under test here, return empty.
   await mockJsonResponse(page, "**/api/v1/identity/impersonation/grants**", []);
+  await mockJsonResponse(page, "**/api/v1/identity/impersonation/requests?**", []);
 });
 
+const THEME_CUSTOM = {
+  ...THEME_DEFAULT,
+  lightPalette: { ...THEME_DEFAULT.lightPalette, primary: "#FF5500" },
+  brandAssets: { ...THEME_DEFAULT.brandAssets, logoUrl: "https://cdn.example.com/acme.svg" },
+  isDefault: false,
+};
+
 test.describe("tenant branding card", () => {
-  test("loads + renders the editor with default-palette badge", async ({ page }) => {
-    await mockJsonResponse(page, "**/api/v1/tenants/theme", THEME_DEFAULT);
-
-    await page.goto(`/tenants/${TENANT_ID}`);
-
-    // Wait for the branding card heading.
-    const branding = page.locator("section, div").filter({ hasText: "Branding" }).first();
-    await expect(branding).toBeVisible({ timeout: 10_000 });
-
-    // Default badge (server returned isDefault: true).
-    await expect(page.locator("text=/^default$/i").first()).toBeVisible();
-
-    // Both palette sections render.
-    await expect(page.getByText(/light palette/i)).toBeVisible();
-    await expect(page.getByText(/dark palette/i)).toBeVisible();
-
-    // Brand asset URL fields render.
-    await expect(page.getByLabel("Logo URL", { exact: true })).toBeVisible();
-    await expect(page.getByLabel("Logo URL (dark mode)")).toBeVisible();
-    await expect(page.getByLabel("Favicon URL")).toBeVisible();
-  });
-
-  test("Save button is disabled until the operator edits something", async ({ page }) => {
-    await mockJsonResponse(page, "**/api/v1/tenants/theme", THEME_DEFAULT);
-
-    await page.goto(`/tenants/${TENANT_ID}`);
-    const save = page.getByRole("button", { name: /save branding/i });
-    await expect(save).toBeVisible({ timeout: 10_000 });
-    await expect(save).toBeDisabled();
-
-    // Edit the logo URL via the visible textbox (avoids strict-mode
-    // collisions with the hidden color inputs).
-    await page.getByLabel("Logo URL", { exact: true }).fill("https://cdn.example.com/acme.svg");
-    await expect(save).toBeEnabled();
-    await expect(page.locator("text=/^unsaved$/i").first()).toBeVisible();
-  });
-
-  test("Save PUTs the edited theme with the tenant header", async ({ page }) => {
-    await mockJsonResponse(page, "**/api/v1/tenants/theme", THEME_DEFAULT);
-
-    await page.goto(`/tenants/${TENANT_ID}`);
-    await expect(page.getByLabel("Logo URL", { exact: true })).toBeVisible({ timeout: 10_000 });
-
-    await page.getByLabel("Logo URL", { exact: true }).fill("https://cdn.example.com/acme.svg");
-
-    const reqPromise = page.waitForRequest(
-      (r) =>
-        r.url().endsWith("/api/v1/tenants/theme") && r.method() === "PUT",
-      { timeout: 5_000 },
-    );
-    await page.getByRole("button", { name: /save branding/i }).click();
-    const req = await reqPromise;
-
-    expect(req.headers().tenant).toBe(TENANT_ID);
-    const body = JSON.parse(req.postData() ?? "{}");
-    expect(body.brandAssets.logoUrl).toBe("https://cdn.example.com/acme.svg");
-    expect(body.lightPalette).toMatchObject({ primary: "#2563EB" });
-  });
-
-  test("Reset POSTs to /theme/reset and shows a confirmation toast", async ({ page }) => {
-    await mockJsonResponse(page, "**/api/v1/tenants/theme", THEME_DEFAULT);
-    await mockJsonResponse(page, "**/api/v1/tenants/theme/reset", '""');
-
-    await page.goto(`/tenants/${TENANT_ID}`);
-    await expect(page.getByRole("button", { name: /reset (branding )?to defaults/i })).toBeVisible({
-      timeout: 10_000,
+  test("shows the theme read through the tenant header, with the default badge", async ({ page }) => {
+    const reads: string[] = [];
+    await page.route("**/api/v1/tenants/theme", async (route) => {
+      reads.push(route.request().headers().tenant ?? "");
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(THEME_DEFAULT) });
     });
 
-    const reqPromise = page.waitForRequest(
-      (r) =>
-        r.url().endsWith("/api/v1/tenants/theme/reset") && r.method() === "POST",
-      { timeout: 5_000 },
-    );
-    await page.getByRole("button", { name: /reset (branding )?to defaults/i }).click();
-    const req = await reqPromise;
-    expect(req.headers().tenant).toBe(TENANT_ID);
+    await page.goto(`/tenants/${TENANT_ID}`);
 
-    await expect(page.getByText(/branding reset to defaults/i)).toBeVisible();
+    await expect(page.getByText(/light palette/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/dark palette/i)).toBeVisible();
+    await expect(page.locator("text=/^default$/i").first()).toBeVisible();
+    await expect(page.locator("text=/^read-only$/i").first()).toBeVisible();
+    await expect(page.getByText("#2563EB").first()).toBeVisible();
+    expect(reads).toContain(TENANT_ID);
   });
 
-  test("surfaces a server error in the error band, not as a toast", async ({ page }) => {
+  test("shows a tenant's own colours and logo address", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/tenants/theme", THEME_CUSTOM);
+
+    await page.goto(`/tenants/${TENANT_ID}`);
+
+    await expect(page.getByText("#FF5500")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("https://cdn.example.com/acme.svg")).toBeVisible();
+    await expect(page.locator("text=/^default$/i")).toHaveCount(0);
+  });
+
+  test("offers no way to change it: no field, no save, no reset, and nothing is written", async ({ page }) => {
+    const writes: string[] = [];
+    await page.route("**/api/v1/tenants/theme**", async (route) => {
+      if (route.request().method() !== "GET") writes.push(`${route.request().method()} ${route.request().url()}`);
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(THEME_DEFAULT) });
+    });
+
+    await page.goto(`/tenants/${TENANT_ID}`);
+    const card = page.locator("section").filter({ hasText: /light palette/i });
+    await expect(card).toBeVisible({ timeout: 10_000 });
+
+    await expect(card.locator("input")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /save branding/i })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /reset/i })).toHaveCount(0);
+    await expect(card.getByText(/dashboard/i).first()).toBeVisible();
+    expect(writes).toEqual([]);
+  });
+
+  test("surfaces a server error in the error band", async ({ page }) => {
     await mockProblemDetails(page, "**/api/v1/tenants/theme", 403, {
       title: "Forbidden",
-      detail: "Tenant theme is read-only for this caller.",
+      detail: "Tenant theme is not visible to this caller.",
     });
 
     await page.goto(`/tenants/${TENANT_ID}`);
-    await expect(page.getByText(/read-only for this caller/i)).toBeVisible({
+    await expect(page.getByText(/not visible to this caller/i)).toBeVisible({
       timeout: 10_000,
     });
-    // No save button when the editor never loaded.
-    await expect(page.getByRole("button", { name: /save branding/i })).not.toBeVisible();
   });
 });

@@ -23,6 +23,8 @@ export const SHELL_PERMISSIONS = [
   "Permissions.Notifications.Inbox.View",
   "Permissions.Chat.Channels.View",
   "Permissions.Billing.View",
+  // The access requests notice (D-44): every user answers requests to impersonate them.
+  "Permissions.Impersonation.Respond",
 ];
 
 /**
@@ -59,6 +61,9 @@ export async function installShellMocks(page: Page): Promise<void> {
   // The tenants the account belongs to (the topbar's tenant switch): none listed means one tenant,
   // so the switch stays hidden. tests/auth/tenant-switch.spec.ts lists several.
   await mockJsonResponse(page, "**/api/v1/identity/profile/tenants", []);
+  // No request to impersonate the user, so the access requests notice stays hidden;
+  // tests/impersonation/access-requests.spec.ts lists some.
+  await mockJsonResponse(page, "**/api/v1/identity/impersonation/requests/mine", []);
 
   // Tenant status drives the global expiry/grace banner mounted in the
   // AppShell. Default to a healthy, far-future tenant so the banner stays

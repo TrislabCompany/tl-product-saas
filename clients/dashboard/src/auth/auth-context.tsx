@@ -55,11 +55,8 @@ export type AuthContextValue = {
   /** Re-fetch the permission set for the signed-in user (e.g. after a role change). */
   refreshPermissions: () => Promise<void>;
   /** Begin impersonating another user. Resolves once the new token is installed. */
-  beginImpersonation: (input: {
-    targetUserId: string;
-    targetTenantId: string;
-    reason?: string;
-  }) => Promise<void>;
+  /** Starts an approved impersonation request of the caller's (read-only, once). */
+  beginImpersonation: (input: { requestId: string }) => Promise<void>;
   /**
    * Stop impersonating. Restores the operator's dashboard session for an
    * intra-app impersonation, or signs out (→ /login) when there is no dashboard
@@ -295,7 +292,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const beginImpersonation = useCallback(
-    async (input: { targetUserId: string; targetTenantId: string; reason?: string }) => {
+    async (input: { requestId: string }) => {
       const response = await startImpersonation(input);
       // Swap the active token. queryClient.clear() drops cached queries
       // so the next render fetches with the new identity — otherwise

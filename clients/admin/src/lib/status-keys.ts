@@ -18,6 +18,14 @@ export const IMPERSONATION_STATUS_KEYS = {
   Expired: "status.expired",
 } as const satisfies Record<string, ParseKeys<"impersonation">>;
 
+export const IMPERSONATION_REQUEST_STATUS_KEYS = {
+  Pending: "requests.status.pending",
+  Approved: "requests.status.approved",
+  Denied: "requests.status.denied",
+  Used: "requests.status.used",
+  Expired: "requests.status.expired",
+} as const satisfies Record<string, ParseKeys<"impersonation">>;
+
 /** The key for a status, or undefined for one the server added after this build. */
 export function statusKey<K extends string>(keys: Readonly<Record<string, K>>, status: string): K | undefined {
   return Object.hasOwn(keys, status) ? keys[status] : undefined;

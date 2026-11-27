@@ -7,12 +7,10 @@ import {
   listImpersonationGrants,
   type ImpersonationGrantDto,
 } from "@/api/impersonation-grants";
-import type { UserDto } from "@/api/users";
 import { useAuth } from "@/auth/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SettingsSection } from "@/components/list";
-import { ImpersonateDialog } from "@/components/impersonation/impersonate-dialog";
 import { RevokeGrantDialog } from "@/components/impersonation/revoke-grant-dialog";
 import { IdentityPermissions } from "@/lib/permissions";
 
@@ -28,8 +26,6 @@ export function ActiveGrantsCard({ tenantId }: { tenantId: string }) {
   const { user } = useAuth();
   const canView = (user?.permissions ?? []).includes(IdentityPermissions.Impersonation.View);
   const canRevoke = (user?.permissions ?? []).includes(IdentityPermissions.Impersonation.Revoke);
-  const canImpersonate = (user?.permissions ?? []).includes(IdentityPermissions.Users.Impersonate);
-  const currentUserId = user?.id ?? null;
 
   const query = useQuery({
     queryKey: ["impersonation-grants", "tenant-active", tenantId],
@@ -44,20 +40,6 @@ export function ActiveGrantsCard({ tenantId }: { tenantId: string }) {
   });
 
   const [targetGrant, setTargetGrant] = useState<ImpersonationGrantDto | null>(null);
-  const [reopenGrant, setReopenGrant] = useState<ImpersonationGrantDto | null>(null);
-
-  // Minimal UserDto sufficient for ImpersonateDialog's ConfigureStep render.
-  const reopenPrefillUser: UserDto | undefined = reopenGrant
-    ? {
-        id: reopenGrant.impersonatedUserId,
-        userName: reopenGrant.impersonatedUserName ?? undefined,
-        firstName: null,
-        lastName: null,
-        email: null,
-        isActive: true,
-        emailConfirmed: true,
-      }
-    : undefined;
 
   // Quiet hide when there's nothing to show — busy operators don't need
   // an empty box on every tenant page.
@@ -79,13 +61,7 @@ export function ActiveGrantsCard({ tenantId }: { tenantId: string }) {
               key={g.id}
               grant={g}
               canRevoke={canRevoke}
-              canReopen={
-                canImpersonate &&
-                currentUserId !== null &&
-                g.actorUserId === currentUserId
-              }
               onRevoke={() => setTargetGrant(g)}
-              onReopen={() => setReopenGrant(g)}
             />
           ))}
         </ul>
@@ -94,14 +70,6 @@ export function ActiveGrantsCard({ tenantId }: { tenantId: string }) {
       <RevokeGrantDialog
         grant={targetGrant}
         onOpenChange={(open) => !open && setTargetGrant(null)}
-      />
-
-      <ImpersonateDialog
-        open={reopenGrant !== null}
-        onOpenChange={(open) => !open && setReopenGrant(null)}
-        tenantId={reopenGrant?.impersonatedTenantId ?? ""}
-        tenantName={reopenGrant?.impersonatedTenantId}
-        prefillUser={reopenPrefillUser}
       />
     </>
   );
@@ -114,15 +82,11 @@ export function ActiveGrantsCard({ tenantId }: { tenantId: string }) {
 function GrantRow({
   grant: g,
   canRevoke,
-  canReopen,
   onRevoke,
-  onReopen,
 }: {
   grant: ImpersonationGrantDto;
   canRevoke: boolean;
-  canReopen: boolean;
   onRevoke: () => void;
-  onReopen: () => void;
 }) {
   const { t } = useTranslation("impersonation");
   return (
@@ -160,32 +124,20 @@ function GrantRow({
       </div>
 
       {/* Row actions */}
-      <RowActions
-        canRevoke={canRevoke}
-        // Re-open: operator's own grant + still Active + has start perm.
-        // Closed-browser recovery path — issues a fresh token, leaves
-        // the original grant alive until natural expiry or revoke.
-        canReopen={canReopen}
-        onRevoke={onRevoke}
-        onReopen={onReopen}
-      />
+      <RowActions canRevoke={canRevoke} onRevoke={onRevoke} />
     </li>
   );
 }
 
 function RowActions({
   canRevoke,
-  canReopen,
   onRevoke,
-  onReopen,
 }: {
   canRevoke: boolean;
-  canReopen: boolean;
   onRevoke: () => void;
-  onReopen: () => void;
 }) {
   const { t } = useTranslation("impersonation");
-  if (!canRevoke && !canReopen) {
+  if (!canRevoke) {
     return (
       <Badge variant="muted" className="font-mono uppercase tracking-[0.14em]">
         <UserCog className="h-3 w-3" /> {t("card.viewOnly")}
@@ -193,23 +145,9 @@ function RowActions({
     );
   }
   return (
-    <div className="flex shrink-0 items-center gap-2">
-      {canReopen && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onReopen}
-          title={t("card.reopenTooltip")}
-        >
-          <UserCog className="mr-1 h-3.5 w-3.5" /> {t("reopen")}
-        </Button>
-      )}
-      {canRevoke && (
-        <Button variant="outline" size="sm" onClick={onRevoke}>
-          <ShieldOff className="mr-1 h-3.5 w-3.5" /> {t("revoke")}
-        </Button>
-      )}
-    </div>
+    <Button variant="outline" size="sm" onClick={onRevoke}>
+      <ShieldOff className="mr-1 h-3.5 w-3.5" /> {t("revoke")}
+    </Button>
   );
 }
 

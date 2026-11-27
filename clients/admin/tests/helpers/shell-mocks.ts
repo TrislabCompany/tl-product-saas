@@ -16,6 +16,7 @@ export const ADMIN_PERMS = [
   "Permissions.Users.Delete",
   "Permissions.Users.ManageRoles",
   "Permissions.Users.Impersonate",
+  "Permissions.Users.RestoreAdmin",
   "Permissions.Roles.View",
   "Permissions.Roles.Create",
   "Permissions.Roles.Update",

@@ -129,6 +129,37 @@ export async function adjustTenantValidity(id: string, validUpto: string): Promi
   });
 }
 
+export type RestoreAdminAccessOutcome = "RoleAssigned" | "Invited";
+
+export type RestoreAdminAccessResponse = {
+  outcome: RestoreAdminAccessOutcome;
+  /** How many of the tenant's active Admins were told by e-mail. */
+  adminsNotified: number;
+};
+
+/**
+ * Gives a tenant an Admin again, after the operator checked with the customer (D-44): an active member with the
+ * address becomes Admin, or the address is invited as Admin. Nothing else changes; the tenant's active Admins are
+ * e-mailed and the tenant's audit trail records it. Root operators only (IdentityPermissions.Users.RestoreAdmin).
+ */
+export async function restoreTenantAdminAccess(
+  id: string,
+  input: { email: string; reason: string; firstName?: string; lastName?: string },
+): Promise<RestoreAdminAccessResponse> {
+  return apiFetch<RestoreAdminAccessResponse>(
+    `/api/v1/identity/tenants/${encodeURIComponent(id)}/restore-admin`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        email: input.email,
+        reason: input.reason,
+        firstName: input.firstName || null,
+        lastName: input.lastName || null,
+      }),
+    },
+  );
+}
+
 export async function changeTenantActivation(id: string, isActive: boolean): Promise<TenantLifecycleResult> {
   return apiFetch<TenantLifecycleResult>(`/api/v1/tenants/${encodeURIComponent(id)}/activation`, {
     method: "POST",
@@ -194,53 +225,12 @@ export type TenantThemeDto = {
   isDefault: boolean;
 };
 
-export const DEFAULT_LIGHT_PALETTE: PaletteDto = {
-  primary: "#2563EB", // raw-color-allowed: the API's default tenant palette, data and not styling
-  secondary: "#0F172A", // raw-color-allowed: the API's default tenant palette, data and not styling
-  tertiary: "#6366F1", // raw-color-allowed: the API's default tenant palette, data and not styling
-  background: "#F8FAFC", // raw-color-allowed: the API's default tenant palette, data and not styling
-  surface: "#FFFFFF", // raw-color-allowed: the API's default tenant palette, data and not styling
-  error: "#DC2626", // raw-color-allowed: the API's default tenant palette, data and not styling
-  warning: "#F59E0B", // raw-color-allowed: the API's default tenant palette, data and not styling
-  success: "#16A34A", // raw-color-allowed: the API's default tenant palette, data and not styling
-  info: "#0284C7", // raw-color-allowed: the API's default tenant palette, data and not styling
-};
-
-export const DEFAULT_DARK_PALETTE: PaletteDto = {
-  primary: "#38BDF8", // raw-color-allowed: the API's default tenant palette, data and not styling
-  secondary: "#94A3B8", // raw-color-allowed: the API's default tenant palette, data and not styling
-  tertiary: "#818CF8", // raw-color-allowed: the API's default tenant palette, data and not styling
-  background: "#0B1220", // raw-color-allowed: the API's default tenant palette, data and not styling
-  surface: "#111827", // raw-color-allowed: the API's default tenant palette, data and not styling
-  error: "#F87171", // raw-color-allowed: the API's default tenant palette, data and not styling
-  warning: "#FBBF24", // raw-color-allowed: the API's default tenant palette, data and not styling
-  success: "#22C55E", // raw-color-allowed: the API's default tenant palette, data and not styling
-  info: "#38BDF8", // raw-color-allowed: the API's default tenant palette, data and not styling
-};
-
-/** Fetch a tenant's theme. Caller needs MultitenancyPermissions.Tenants.ViewTheme. */
+/** Fetch a tenant's theme, read through the `tenant` header. Caller needs MultitenancyPermissions.Tenants.ViewTheme. */
 export async function getTenantTheme(tenantId: string): Promise<TenantThemeDto> {
   return apiFetch<TenantThemeDto>(`/api/v1/tenants/theme`, {
     headers: { tenant: tenantId },
   });
 }
 
-/** Save a tenant's theme. Caller needs MultitenancyPermissions.Tenants.UpdateTheme. */
-export async function updateTenantTheme(
-  tenantId: string,
-  theme: TenantThemeDto,
-): Promise<void> {
-  await apiFetch<void>(`/api/v1/tenants/theme`, {
-    method: "PUT",
-    headers: { tenant: tenantId },
-    body: JSON.stringify(theme),
-  });
-}
-
-/** Reset a tenant's theme to framework defaults. */
-export async function resetTenantTheme(tenantId: string): Promise<void> {
-  await apiFetch<void>(`/api/v1/tenants/theme/reset`, {
-    method: "POST",
-    headers: { tenant: tenantId },
-  });
-}
+// No write: the platform operator only reads inside a tenant (D-44); the tenant's Admins edit their theme in the
+// dashboard.

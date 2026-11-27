@@ -1,12 +1,57 @@
 import { apiFetch } from "@/lib/api-client";
 
-export type StartImpersonationInput = {
+// Impersonation only reads and needs the user's approval (the framework's D-44 rule):
+//   1. the operator requests access to one user, with a reason (`requestImpersonation`);
+//   2. the user approves or denies it in the dashboard;
+//   3. the operator starts the approved request once (`startImpersonation`), which issues a
+//      short-lived, read-only token that the admin hands to the dashboard (lib/impersonation-handoff.ts).
+// The user can deny the request at any time, which also ends the impersonation it started.
+//
+// The admin never holds an impersonation session itself, so ending one from here is revoking its grant
+// (`revokeImpersonationGrant` in impersonation-grants.ts).
+
+/** The request's status as the API computes it; a status added after this build is shown raw. */
+export type ImpersonationRequestStatus = "Pending" | "Approved" | "Denied" | "Used" | "Expired";
+
+export type ImpersonationRequestDto = {
+  id: string;
+  actorUserId: string;
+  actorUserName?: string | null;
+  actorTenantId: string;
+  targetUserId: string;
+  targetUserName?: string | null;
+  targetTenantId: string;
+  reason: string;
+  requestedAtUtc: string;
+  expiresAtUtc: string;
+  answeredAtUtc?: string | null;
+  grantId?: string | null;
+  status: ImpersonationRequestStatus;
+};
+
+export type RequestImpersonationInput = {
   targetUserId: string;
   targetTenantId: string;
   reason: string;
-  /** 1..60 inclusive; null lets the server use its configured default. */
-  durationMinutes?: number;
 };
+
+/** Asks the user for access. A second open request for the same user is a 409. */
+export function requestImpersonation(input: RequestImpersonationInput): Promise<ImpersonationRequestDto> {
+  return apiFetch<ImpersonationRequestDto>(`/api/v1/identity/impersonation/requests`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+/** The caller's own requests, newest first. */
+export function listSentImpersonationRequests(
+  params: { status?: ImpersonationRequestStatus; take?: number } = {},
+): Promise<ImpersonationRequestDto[]> {
+  const q = new URLSearchParams();
+  if (params.status) q.set("Status", params.status);
+  q.set("Take", String(params.take ?? 100));
+  return apiFetch<ImpersonationRequestDto[]>(`/api/v1/identity/impersonation/requests?${q.toString()}`);
+}
 
 export type ImpersonationResponse = {
   accessToken: string;
@@ -18,46 +63,17 @@ export type ImpersonationResponse = {
 };
 
 /**
- * Issues a short-lived impersonation access token representing the target
- * user. The admin app never installs this token locally — it hands it off
- * to the dashboard via a URL hash so the dashboard can swap into the
- * impersonated session in a fresh tab.
- *
- * Note: the admin's apiFetch attaches the operator's current tenant header
- * by default, which the server uses for the cross-tenant authorization
- * check (root operators may impersonate any tenant; tenant admins only
- * their own). We do NOT override the tenant header here for that reason.
- *
- * ---
- * Why there is no `endImpersonation()` in this file (compare dashboard):
- *
- * The admin never holds an impersonation session — the impersonation
- * token lives in the dashboard tab the operator opened with the hash
- * handoff. So "ending impersonation" from the admin's perspective is
- * actually server-side REVOCATION of the grant, not a session swap.
- * That's covered by:
- *
- *   POST /api/v1/identity/impersonation/grants/{id}/revoke
- *
- * which is wired via `revokeImpersonationGrant` in impersonation-grants.ts
- * and rendered on the /impersonation page + the tenant-detail inline
- * active-grants card. After revoke, the JWT validation hook short-circuits
- * any further requests carrying that impersonation token via the
- * HybridCache-backed revocation lookup — the dashboard tab effectively
- * loses the session on its next API call.
- *
- * If the admin ever installs impersonation tokens locally (e.g. an
- * in-place "view as user" mode), this file should pick up the
- * `endImpersonation()` call from dashboard's identity.ts and wire it to
- * a "Stop impersonating" button in the topbar.
+ * Starts an approved request; each request starts once. `durationMinutes` is 1..60, and null lets the
+ * server use its default. A request that isn't approved, or was denied meanwhile, is a 403.
  */
-export function startImpersonation(input: StartImpersonationInput): Promise<ImpersonationResponse> {
+export function startImpersonation(input: {
+  requestId: string;
+  durationMinutes?: number;
+}): Promise<ImpersonationResponse> {
   return apiFetch<ImpersonationResponse>(`/api/v1/identity/impersonation/start`, {
     method: "POST",
     body: JSON.stringify({
-      targetUserId: input.targetUserId,
-      targetTenantId: input.targetTenantId,
-      reason: input.reason,
+      requestId: input.requestId,
       durationMinutes: input.durationMinutes ?? null,
     }),
   });

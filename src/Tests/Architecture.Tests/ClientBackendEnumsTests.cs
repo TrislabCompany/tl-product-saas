@@ -21,6 +21,7 @@ public class ClientBackendEnumsTests
     public static TheoryData<string, Type> Enums => new()
     {
         { "admin", typeof(ImpersonationGrantStatus) },
+        { "admin", typeof(ImpersonationRequestStatus) },
         { "admin", typeof(InvoiceStatus) }, // [module:SubscriptionsUsage]
         { "admin", typeof(TopupRequestStatus) }, // [module:SubscriptionsUsage]
         { "dashboard", typeof(InvoiceStatus) }, // [module:SubscriptionsUsage]

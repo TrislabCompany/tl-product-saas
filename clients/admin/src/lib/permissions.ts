@@ -20,6 +20,7 @@ export const IdentityPermissions = Object.freeze({
     Export: "Permissions.Users.Export",
     ManageRoles: "Permissions.Users.ManageRoles",
     Impersonate: "Permissions.Users.Impersonate",
+    RestoreAdmin: "Permissions.Users.RestoreAdmin",
   },
   UserRoles: {
     View: "Permissions.UserRoles.View",
@@ -44,6 +45,7 @@ export const IdentityPermissions = Object.freeze({
   Impersonation: {
     View: "Permissions.Impersonation.View",
     Revoke: "Permissions.Impersonation.Revoke",
+    Respond: "Permissions.Impersonation.Respond",
   },
 } as const);
 
@@ -124,6 +126,7 @@ export const PERMISSION_CATALOG: readonly PermissionGroup[] = [
       { name: IdentityPermissions.Users.Export, description: "Export users" },
       { name: IdentityPermissions.Users.ManageRoles, description: "Assign roles to users" },
       { name: IdentityPermissions.Users.Impersonate, description: "Impersonate another user" },
+      { name: IdentityPermissions.Users.RestoreAdmin, description: "Restore a tenant's admin access", root: true },
     ],
   },
   {
@@ -181,6 +184,7 @@ export const PERMISSION_CATALOG: readonly PermissionGroup[] = [
     entries: [
       { name: IdentityPermissions.Impersonation.View, description: "View impersonation grants" },
       { name: IdentityPermissions.Impersonation.Revoke, description: "Revoke active impersonation grants" },
+      { name: IdentityPermissions.Impersonation.Respond, description: "Answer requests to impersonate you", basic: true },
     ],
   },
   {
