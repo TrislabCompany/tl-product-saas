@@ -9,8 +9,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { queryClient } from "@/lib/query-client";
-import { AuthProvider } from "@/auth/auth-context";
-import { ThemeProvider, useTheme } from "@/components/theme/theme-provider";
+import { AuthProvider } from "@/auth/auth-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { CommandPaletteProvider } from "@/components/command-palette/command-palette";
 import { router } from "@/routes";
 

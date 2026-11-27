@@ -7,7 +7,7 @@
     "dev": "vite --port 5174",
     "build": "tsc -b && vite build",
     "preview": "vite preview --port 4174",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "check:colors": "framework-ui-check-colors src",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

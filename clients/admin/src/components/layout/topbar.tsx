@@ -39,7 +39,7 @@ import { useAuth } from "@/auth/use-auth";
 import i18n, { changeLanguage, SUPPORTED } from "@/i18n";
 import { getMyProfile, updateMyProfile } from "@/api/users";
 import { refreshAccessToken } from "@/lib/api-client";
-import { useTheme } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { cn } from "@/lib/cn";
 
 // ─────────────────────────────────────────────────────────────────────────────

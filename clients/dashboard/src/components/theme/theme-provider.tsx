@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -24,30 +22,8 @@ import {
   type CustomAccentSpec,
   type DensityMode,
 } from "@/components/theme/appearance-options";
+import { ThemeContext, type ResolvedTheme, type ThemeContextValue, type ThemeMode } from "@/components/theme/theme-context";
 
-export type ThemeMode = "light" | "dark" | "system";
-type ResolvedTheme = "light" | "dark";
-
-type ThemeContextValue = {
-  mode: ThemeMode;
-  resolved: ResolvedTheme;
-  setMode: (mode: ThemeMode) => void;
-  font: string;
-  setFont: (id: string) => void;
-  accent: string;
-  setAccent: (id: string) => void;
-  /** Currently configured custom accent spec — drives the live preview
-   *  in the appearance UI even when a preset is selected. */
-  customAccent: CustomAccentSpec;
-  setCustomAccent: (spec: CustomAccentSpec) => void;
-  density: DensityMode;
-  setDensity: (next: DensityMode) => void;
-  /** When true, forces reduced motion regardless of the OS setting. */
-  reducedMotion: boolean;
-  setReducedMotion: (next: boolean) => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
 const THEME_STORAGE_KEY = "tl.theme";
 const REDUCED_MOTION_STORAGE_KEY = "tl.reduce-motion";
 const ACCENT_CLASS_PREFIX = "accent-";
@@ -370,10 +346,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-}
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
 }

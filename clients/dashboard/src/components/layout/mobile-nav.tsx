@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -19,6 +17,7 @@ import {
 import { SidebarNavBody } from "@/components/layout/sidebar";
 import { findSectionForPath } from "@/components/layout/nav-data";
 import { cn } from "@/lib/cn";
+import { MobileNavContext, useMobileNav } from "@/components/layout/mobile-nav-context";
 
 /**
  * Mobile nav drawer.
@@ -34,19 +33,6 @@ import { cn } from "@/lib/cn";
  *     <MobileNavTrigger />    ← the hamburger button (place in topbar)
  *   </MobileNavProvider>
  */
-
-type MobileNavContextValue = {
-  open: boolean;
-  setOpen: (next: boolean) => void;
-};
-
-const MobileNavContext = createContext<MobileNavContextValue | null>(null);
-
-export function useMobileNav() {
-  const ctx = useContext(MobileNavContext);
-  if (!ctx) throw new Error("useMobileNav must be used within MobileNavProvider");
-  return ctx;
-}
 
 export function MobileNavProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);

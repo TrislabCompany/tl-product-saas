@@ -38,7 +38,9 @@ export default defineConfig(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11yRecommended,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // A file that exports a component exports only components: a context, a hook or a helper goes in
+    // its own .ts file (auth-context.ts beside auth-provider.tsx), or fast refresh reloads the page.
+    'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       // Project-specific deviations from jsx-a11y/recommended:
       // - autofocus is intentionally used on confirmation dialogs (sign-out)
       //   where the destructive action should be the default focus, and on

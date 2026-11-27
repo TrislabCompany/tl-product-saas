@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useTheme, type ThemeMode } from "@/components/theme/theme-provider";
+import { useTheme, type ThemeMode } from "@/components/theme/theme-context";
 import {
   accents,
   buildCustomBrandStops,

@@ -1,44 +1,11 @@
-import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { tokenStore } from "@/auth/token-store";
 import { decodeJwt, isTokenExpired, type JwtClaims } from "@/auth/jwt";
 import { issueToken, OperatorOnlyError } from "@/auth/api";
 import { refreshAccessToken } from "@/lib/api-client";
 import { getMyPermissions } from "@/api/users";
-
-export type AuthUser = {
-  id: string;
-  email?: string;
-  name?: string;
-  tenant?: string;
-  permissions: string[];
-};
-
-export type AuthContextValue = {
-  user: AuthUser | null;
-  isAuthenticated: boolean;
-  /**
-   * True while the provider resolves a stored session at boot — the access
-   * token was missing/expired but a refresh token was present, so a silent
-   * refresh is in flight. Routes render a loader (not the page, not a redirect)
-   * while this is true, so a stale token never flashes a protected surface.
-   */
-  isInitializing: boolean;
-  /**
-   * True once permissions have been fetched at least once for the current
-   * user (or no user is signed in). Route guards check this before rendering
-   * a 403 — without it, the first paint flashes "access denied" while the
-   * permissions request is still in flight.
-   */
-  permissionsHydrated: boolean;
-  login: (input: { email: string; password: string; twoFactorCode?: string }) => Promise<void>;
-  logout: () => void;
-  /** Re-fetch the permission set for the signed-in user. Call after a role
-   *  assignment changes for the current user. */
-  refreshPermissions: () => Promise<void>;
-};
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext, type AuthContextValue, type AuthUser } from "@/auth/auth-context";
 
 function claimsToUser(claims: JwtClaims | null, permissions: string[]): AuthUser | null {
   if (!claims?.sub) return null;

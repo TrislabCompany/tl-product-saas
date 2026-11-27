@@ -1,7 +1,7 @@
 import { Moon, Palette, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ParseKeys } from "i18next";
-import { useTheme } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { Button } from "@/components/ui/button";
 import { SettingsSection } from "@/components/list";
 import { cn } from "@/lib/cn";

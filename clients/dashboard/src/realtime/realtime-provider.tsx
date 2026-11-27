@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -11,6 +9,7 @@ import {
 import type { HubConnection } from "@microsoft/signalr";
 import { env } from "@/env";
 import { tokenStore } from "@/auth/token-store";
+import { RealtimeContext, type RealtimeContextValue, type RealtimeStatus } from "@/realtime/realtime-context";
 
 // SignalR is the heaviest single dep in the main shell (~37 KB gzip).
 // We import it dynamically inside the connect() flow so the bundle is
@@ -24,19 +23,7 @@ function loadSignalR(): Promise<SignalRModule> {
   return signalRPromise;
 }
 
-export type RealtimeStatus = "idle" | "connecting" | "connected" | "reconnecting" | "error";
-
 type Listener = (payload: unknown) => void;
-
-type RealtimeContextValue = {
-  status: RealtimeStatus;
-  /** Wire a handler for a server event. Returns an unsubscribe function. */
-  on: <T = unknown>(event: string, handler: (payload: T) => void) => () => void;
-  /** Invoke a hub method (e.g. `Typing(channelId)`). Fire-and-forget. */
-  invoke: (method: string, ...args: unknown[]) => Promise<void>;
-};
-
-const RealtimeContext = createContext<RealtimeContextValue | null>(null);
 
 /**
  * Opens a single shared SignalR connection to /api/v1/realtime/hub authenticated via
@@ -267,33 +254,4 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   );
 
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
-}
-
-export function useRealtime() {
-  const ctx = useContext(RealtimeContext);
-  if (!ctx) throw new Error("useRealtime must be used within RealtimeProvider");
-  return ctx;
-}
-
-/**
- * Typed subscription hook. The handler is automatically re-bound when it changes
- * via a ref so callers don't have to memoize.
- */
-export function useRealtimeEvent<T = unknown>(
-  event: string,
-  handler: (payload: T) => void,
-  deps: ReadonlyArray<unknown> = [],
-) {
-  const { on } = useRealtime();
-  const handlerRef = useRef(handler);
-  // Keep the latest handler in a ref so subscribers don't re-bind on every render.
-  useEffect(() => {
-    handlerRef.current = handler;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handler, ...deps]);
-
-  useEffect(() => {
-    const off = on<T>(event, (payload) => handlerRef.current(payload));
-    return off;
-  }, [event, on]);
 }

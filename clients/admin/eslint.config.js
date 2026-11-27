@@ -38,7 +38,9 @@ export default defineConfig(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11yRecommended,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // A file that exports a component exports only components: a context, a hook or a helper goes in
+    // its own .ts file (auth-context.ts beside auth-provider.tsx), or fast refresh reloads the page.
+    'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       // autofocus is intentional on dialog search inputs (impersonate / add-members)
       // and the login email field — the first field IS the dialog's purpose.
       'jsx-a11y/no-autofocus': 'off',

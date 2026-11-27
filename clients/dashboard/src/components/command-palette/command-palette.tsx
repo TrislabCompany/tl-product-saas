@@ -1,15 +1,14 @@
 import {
-  createContext,
   lazy,
   Suspense,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import { loadNamespaces } from "@/i18n";
+import { CommandPaletteContext, useCommandPalette, type CommandPaletteContextValue } from "@/components/command-palette/command-palette-context";
 
 /**
  * Command palette provider — owns open state + ⌘K / Ctrl+K listener,
@@ -24,20 +23,6 @@ const LazyCommandPaletteDialog = lazy(() =>
     ([mod]) => ({ default: mod.CommandPaletteDialog }),
   ),
 );
-
-type CommandPaletteContextValue = {
-  open: boolean;
-  setOpen: (next: boolean) => void;
-  toggle: () => void;
-};
-
-const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(null);
-
-export function useCommandPalette() {
-  const ctx = useContext(CommandPaletteContext);
-  if (!ctx) throw new Error("useCommandPalette must be used within CommandPaletteProvider");
-  return ctx;
-}
 
 /**
  * Owns open state + global keybinding. Mounted at the app root above
