@@ -18,7 +18,7 @@ import {
   Sun,
   UserRound,
 } from "lucide-react";
-import { useCommandPalette } from "@/components/command-palette/command-palette";
+import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { MobileNavTrigger } from "@/components/layout/mobile-nav";
 import { ChatUnreadBadge } from "@/components/notifications/chat-unread-badge"; // [module:Chat]
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -48,7 +48,7 @@ import { formatNumber } from "@/lib/list-helpers";
 import i18n, { changeLanguage, SUPPORTED } from "@/i18n";
 import { useAuth } from "@/auth/use-auth";
 import { useSseStatus } from "@/sse/sse-context";
-import { useTheme } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { cn } from "@/lib/cn";
 
 // ─────────────────────────────────────────────────────────────────────

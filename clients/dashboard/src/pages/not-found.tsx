@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, FileQuestion, Home, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCommandPalette } from "@/components/command-palette/command-palette";
+import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 
 /**
  * NotFoundPage — calm centered "page not found" card.

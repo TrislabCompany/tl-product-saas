@@ -5,9 +5,10 @@ import { Toaster } from "sonner";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info, Loader2 } from "lucide-react";
 import { queryClient } from "@/lib/query-client";
-import { AuthProvider } from "@/auth/auth-context";
-import { RealtimeProvider } from "@/realtime/realtime-context";
-import { ThemeProvider, useTheme } from "@/components/theme/theme-provider";
+import { AuthProvider } from "@/auth/auth-provider";
+import { RealtimeProvider } from "@/realtime/realtime-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { router } from "@/routes";
 
 export function App() {

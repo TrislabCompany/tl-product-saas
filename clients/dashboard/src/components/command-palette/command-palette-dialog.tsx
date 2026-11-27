@@ -36,7 +36,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/auth/use-auth";
-import { useTheme } from "@/components/theme/theme-provider";
+import { useTheme } from "@/components/theme/theme-context";
 import { accents } from "@/components/theme/appearance-options";
 import { ALL_TRASH_PERMISSIONS } from "@/lib/trash-permissions";
 import { cn } from "@/lib/cn";

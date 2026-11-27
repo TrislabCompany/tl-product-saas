@@ -9,8 +9,8 @@ import {
   MobileNavProvider,
   MobileNavRoot,
 } from "@/components/layout/mobile-nav";
-import { SseProvider } from "@/sse/sse-context";
-import { RealtimeProvider } from "@/realtime/realtime-context";
+import { SseProvider } from "@/sse/sse-provider";
+import { RealtimeProvider } from "@/realtime/realtime-provider";
 import { ChatGlobalNotifier } from "@/components/notifications/chat-global-notifier"; // [module:Chat]
 import { CommandPaletteRoot } from "@/components/command-palette/command-palette";
 import { InactivityGuard } from "@/components/auth/inactivity-guard";

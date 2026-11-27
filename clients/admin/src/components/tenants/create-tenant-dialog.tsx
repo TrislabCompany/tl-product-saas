@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -233,7 +233,6 @@ export function CreateTenantDialog({
     reset,
     setValue,
     getValues,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -249,10 +248,10 @@ export function CreateTenantDialog({
   });
 
   // Live values for the preview rail + smart-field wiring.
-  const name = watch("name");
-  const idValue = watch("id");
-  const adminEmail = watch("adminEmail");
-  const planKey = watch("planKey");
+  const name = useWatch({ control, name: "name" });
+  const idValue = useWatch({ control, name: "id" });
+  const adminEmail = useWatch({ control, name: "adminEmail" });
+  const planKey = useWatch({ control, name: "planKey" });
 
   const idValid = TENANT_ID_RE.test((idValue ?? "").trim());
   const idTouched = (idValue ?? "").trim().length > 0;

@@ -6,7 +6,7 @@ paths:
 
 # TypeScript coding standards
 
-Checked by: `tsc -b` with `strict`, `noUnusedLocals` and `noUnusedParameters` (`clients/*/tsconfig.app.json`, run by `npm run build`), and `npm run lint` (`clients/*/eslint.config.js`: typescript-eslint, react-hooks, jsx-a11y). The stack and the patterns of the app are in `frontend/shared.md`; this file is the code-level rules.
+Checked by: `tsc -b` with `strict`, `noUnusedLocals` and `noUnusedParameters` (`clients/*/tsconfig.app.json`, run by `npm run build`), and `npm run lint` (`clients/*/eslint.config.js`: typescript-eslint, react-hooks, react-refresh, jsx-a11y). The lint fails on any warning (`--max-warnings 0`), and `node scripts/affected-tests.mjs` runs it before every push, so a warning never reaches a PR. The stack and the patterns of the app are in `frontend/shared.md`; this file is the code-level rules.
 
 ## Types
 
@@ -18,6 +18,7 @@ Checked by: `tsc -b` with `strict`, `noUnusedLocals` and `noUnusedParameters` (`
 
 - Function components, **named exports** (no default exports; routes load them through `lazyNamed`).
 - One component per file, the file named after it in kebab-case (`user-list.tsx` exports `UserList`).
+- A `.tsx` file exports only components (`react-refresh/only-export-components`). A context object, its hook and its types go in a `.ts` file beside the provider (`auth-context.ts` and `auth-provider.tsx`); a `cva` variants object stays private to its component.
 - Props typed with a `type <Name>Props`. No prop drilling past two levels: lift to a query, a context or the URL.
 - Hooks follow the rules of hooks (lint-checked). Per-call data rides `mutate(arg)` (golden rule 9).
 
