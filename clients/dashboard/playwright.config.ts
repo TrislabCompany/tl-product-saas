@@ -19,6 +19,8 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./tests",
+  // One page load warms the dev server before the first test (tests/helpers/global-setup.ts).
+  globalSetup: "./tests/helpers/global-setup.ts",
   // Tests are deterministic (mocked APIs) so parallelism is safe and
   // dramatically faster. We still serialise within a file via test.serial
   // when state spans tests (e.g. password-reset multi-step flows).

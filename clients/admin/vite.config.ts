@@ -35,6 +35,11 @@ export default defineConfig(({ mode }) => {
       // The vendor chunk is ~560 KB minified (~175 KiB gzip) on purpose, see above.
       chunkSizeWarningLimit: 600,
     },
+    // Scan every source file for dependencies at start, not only the entry: a lazy route that imports a
+    // dependency the entry doesn't would otherwise make Vite bundle again and reload the page mid-test.
+    optimizeDeps: {
+      entries: ["index.html", "src/**/*.{ts,tsx}", "!src/**/*.{test,spec}.{ts,tsx}"],
+    },
     server: {
       port: 5173,
       strictPort: true,
