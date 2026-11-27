@@ -29,7 +29,7 @@ Change `src/styles/theme.css` of each app, and nothing else:
 
 - **A user's accent** (dashboard, Settings → Appearance): "Default" is the product's own colour. A palette (rose, indigo, violet, sky, emerald, amber) or a custom hue puts the class `accent-<id>` on `<html>`, and `starter/theme.css` replaces `--primary`, `--ring` and the first chart colour below `<body>`. The choice is kept in the browser (`tl.accent`).
 - **A user's font**: Inter by default; the others load from Google Fonts only when the user picks one.
-- **A tenant's branding** (`/api/v1/tenants/theme`): the palette and brand assets a tenant admin (dashboard, Settings → Branding) or an operator (admin, a tenant's page) edits. It is stored and shown as a preview; the palette's default values in `src/api/tenants.ts` are the API's, kept as data.
+- **A tenant's branding** (`/api/v1/tenants/theme`): the palette and brand assets a tenant's Admins edit in the dashboard (Settings → Branding). The admin app shows it read-only on a tenant's page, because the platform operator only reads inside a tenant. It is stored and shown as a preview; the palette's default values in the dashboard's `src/api/tenants.ts` are the API's, kept as data.
 
 ## The checks
 

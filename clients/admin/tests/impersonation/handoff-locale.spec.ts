@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { seedAuthedSession, TEST_USER } from "../helpers/auth-seed";
-import { installAdminShellMocks, ADMIN_PERMS } from "../helpers/shell-mocks";
+import { installAdminShellMocks, ADMIN_PERMS, paged } from "../helpers/shell-mocks";
 import { mockJsonResponse } from "../helpers/api-mocks";
 
 // The PRODUCER half of the cross-app impersonation handoff.
@@ -15,20 +15,29 @@ import { mockJsonResponse } from "../helpers/api-mocks";
 // window.open is stubbed rather than allowed to open a tab: the handoff URL is the thing
 // under test, and the real dashboard origin is not served in this suite.
 
-/** An Active grant whose actor IS the seeded operator — required for Re-open to render. */
-const OWN_ACTIVE_GRANT = {
-  id: "g-active-1",
-  jti: "jti-active-1",
+/** The operator's approved request: starting it is what hands the token to the dashboard. */
+const APPROVED_REQUEST = {
+  id: "req-1",
   actorUserId: TEST_USER.sub,
   actorUserName: "rootadmin",
   actorTenantId: "root",
-  impersonatedUserId: "u-target",
-  impersonatedUserName: "alice@acme.com",
-  impersonatedTenantId: "acme",
+  targetUserId: "u-target",
+  targetUserName: "alice@acme.com",
+  targetTenantId: "acme",
   reason: "Investigating a support ticket",
-  startedAtUtc: "2026-05-23T10:00:00Z",
-  expiresAtUtc: "2026-05-23T11:00:00Z",
-  status: "Active",
+  requestedAtUtc: "2026-05-23T10:00:00Z",
+  expiresAtUtc: "2026-05-24T10:00:00Z",
+  answeredAtUtc: "2026-05-23T10:05:00Z",
+  grantId: null,
+  status: "Approved",
+};
+
+const TENANT = {
+  id: "acme",
+  name: "Acme Corp",
+  adminEmail: "admin@acme.com",
+  isActive: true,
+  validUpto: "2027-01-01T00:00:00Z",
 };
 
 declare global {
@@ -40,7 +49,12 @@ declare global {
 test.beforeEach(async ({ page }) => {
   await seedAuthedSession(page, { ...TEST_USER, permissions: [...ADMIN_PERMS] });
   await installAdminShellMocks(page);
-  await mockJsonResponse(page, "**/api/v1/identity/impersonation/grants*", [OWN_ACTIVE_GRANT]);
+  await mockJsonResponse(page, "**/api/v1/identity/impersonation/grants*", []);
+  await mockJsonResponse(page, "**/api/v1/identity/impersonation/requests?**", [APPROVED_REQUEST]);
+  await mockJsonResponse(page, "**/api/v1/tenants/theme", { lightPalette: {}, darkPalette: {}, brandAssets: {}, isDefault: true });
+  await mockJsonResponse(page, "**/api/v1/identity/users/search**", paged([]));
+  await mockJsonResponse(page, "**/api/v1/tenants/acme/status", TENANT);
+  await mockJsonResponse(page, "**/api/v1/tenants/acme/provisioning", null);
 
   await page.route("**/api/v1/identity/impersonation/start", async (route) => {
     await route.fulfill({
@@ -62,22 +76,11 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-/**
- * Drives Re-open → reason → start. Re-open pre-fills the user so the picker step is
- * skipped, which keeps this focused on the handoff instead of the search flow.
- */
-async function startImpersonationViaReopen(
-  page: import("@playwright/test").Page,
-  labels: { reopen: string; reason: string; start: string },
-) {
+/** Starts the approved request from the tenant page's access requests card. */
+async function startApprovedRequest(page: import("@playwright/test").Page, startLabel: string) {
   const main = page.getByRole("main");
   await expect(main.getByText("alice@acme.com", { exact: true })).toBeVisible({ timeout: 10_000 });
-
-  await main.getByRole("button", { name: labels.reopen }).first().click();
-
-  const dialog = page.getByRole("dialog");
-  await dialog.getByLabel(labels.reason).fill("Customer ticket 4821");
-  await dialog.getByRole("button", { name: labels.start }).click();
+  await main.getByRole("button", { name: startLabel }).click();
 }
 
 function handoffParams(url: string): URLSearchParams {
@@ -91,13 +94,9 @@ test.describe("impersonation handoff carries the operator locale", () => {
   test("sends the operator's selected language, not the deployment default", async ({ page }) => {
     // `?culture=` is first in the detection order (lookupQuerystring: "culture"), so this
     // boots the app in Slovenian without touching localStorage.
-    await page.goto("/impersonation?culture=sl-SI");
+    await page.goto("/tenants/acme?culture=sl-SI");
 
-    await startImpersonationViaReopen(page, {
-      reopen: "Znova odpri",
-      reason: "Razlog",
-      start: "Začni prevzem identitete za 15 min",
-    });
+    await startApprovedRequest(page, "Začni samo branje");
 
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     const opened = (await page.evaluate(() => window.__openedUrls![0]))!;
@@ -111,13 +110,9 @@ test.describe("impersonation handoff carries the operator locale", () => {
   });
 
   test("sends en-US when the operator is reading in English", async ({ page }) => {
-    await page.goto("/impersonation?culture=en-US");
+    await page.goto("/tenants/acme?culture=en-US");
 
-    await startImpersonationViaReopen(page, {
-      reopen: "Re-open",
-      reason: "Reason",
-      start: "Start 15-min impersonation",
-    });
+    await startApprovedRequest(page, "Start read-only");
 
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     const opened = (await page.evaluate(() => window.__openedUrls![0]))!;

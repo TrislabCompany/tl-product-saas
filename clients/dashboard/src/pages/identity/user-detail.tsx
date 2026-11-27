@@ -34,6 +34,8 @@ import {
   getUserById,
   getUserRoles,
   getUserSessionsAdmin,
+  listSentImpersonationRequests,
+  requestImpersonation,
   resendUserConfirmationEmail,
   toggleUserStatus,
   type AdminUserSessionDto,
@@ -87,12 +89,21 @@ export function UserDetailPage() {
   const { userId = "" } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user: actor, beginImpersonation } = useAuth();
+  const { user: actor, beginImpersonation, permissionsHydrated } = useAuth();
   const [dialog, setDialog] = useState<DialogState>({ mode: "closed" });
   const [impersonationReason, setImpersonationReason] = useState("");
   const [pending, setPending] = useState<Map<string, boolean>>(new Map());
 
   const canImpersonate = (actor?.permissions ?? []).includes("Permissions.Users.Impersonate");
+  // The actor's own requests to impersonate: one for this user decides the header action (D-44).
+  const sentRequestsQuery = useQuery({
+    queryKey: ["impersonation-requests", "sent"],
+    queryFn: () => listSentImpersonationRequests(),
+    enabled: permissionsHydrated && canImpersonate && userId !== actor?.id,
+  });
+  const openRequest = (sentRequestsQuery.data ?? []).find(
+    (r) => r.targetUserId === userId && (r.status === "Pending" || r.status === "Approved"),
+  );
   const canViewSessions = (actor?.permissions ?? []).includes("Permissions.Sessions.ViewAll");
   const canRevokeSessions = (actor?.permissions ?? []).includes("Permissions.Sessions.RevokeAll");
   const canConfirmEmail = (actor?.permissions ?? []).includes("Permissions.Users.ConfirmEmail");
@@ -245,27 +256,34 @@ export function UserDetailPage() {
     onError: (err) => toast.error(t("sessions.revokeAllFailed"), { description: describe(err) }),
   });
 
-  // Impersonation
-  const impersonate = useMutation({
-    mutationFn: () => {
-      if (!user?.id) throw new Error("Missing user id");
+  // Impersonation: ask the user first, start once they approved (D-44). It only reads.
+  const requestAccess = useMutation({
+    mutationFn: ({ targetUserId, reason }: { targetUserId: string; reason: string }) => {
       if (!actor?.tenant) throw new Error("No tenant on current session");
-      return beginImpersonation({
-        targetUserId: user.id,
-        targetTenantId: actor.tenant,
-        reason: impersonationReason.trim() || undefined,
-      });
+      return requestImpersonation({ targetUserId, targetTenantId: actor.tenant, reason });
     },
+    onSuccess: () => {
+      toast.success(t("impersonate.requested"), { description: t("impersonate.requestedDesc") });
+      setDialog({ mode: "closed" });
+      setImpersonationReason("");
+      void queryClient.invalidateQueries({ queryKey: ["impersonation-requests", "sent"] });
+    },
+    onError: (err) => {
+      toast.error(t("impersonate.requestFailed"), { description: describe(err) });
+    },
+  });
+
+  const impersonate = useMutation({
+    mutationFn: ({ requestId }: { requestId: string }) => beginImpersonation({ requestId }),
     onSuccess: () => {
       toast.success(t("impersonate.started"), {
         description: t("impersonate.startedDesc"),
       });
-      setDialog({ mode: "closed" });
-      setImpersonationReason("");
       navigate("/", { replace: true });
     },
     onError: (err) => {
       toast.error(t("impersonate.failed"), { description: describe(err) });
+      void queryClient.invalidateQueries({ queryKey: ["impersonation-requests", "sent"] });
     },
   });
 
@@ -341,16 +359,33 @@ export function UserDetailPage() {
         actions={
           <>
             {canImpersonate && user.id !== actor?.id && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setDialog({ mode: "impersonate" })}
-                disabled={!user.isActive}
-                title={!user.isActive ? t("actions.impersonateDisabledTitle") : undefined}
-                className="gap-1.5"
-              >
-                <UserCog className="h-3.5 w-3.5" /> {t("actions.impersonate")}
-              </Button>
+              openRequest?.status === "Approved" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => impersonate.mutate({ requestId: openRequest.id })}
+                  disabled={impersonate.isPending || !user.isActive}
+                  className="gap-1.5"
+                >
+                  <UserCog className="h-3.5 w-3.5" />
+                  {impersonate.isPending ? t("impersonate.starting") : t("actions.impersonateStart")}
+                </Button>
+              ) : openRequest?.status === "Pending" ? (
+                <Button variant="outline" size="sm" disabled className="gap-1.5">
+                  <UserCog className="h-3.5 w-3.5" /> {t("actions.impersonatePending")}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDialog({ mode: "impersonate" })}
+                  disabled={!user.isActive}
+                  title={!user.isActive ? t("actions.impersonateDisabledTitle") : undefined}
+                  className="gap-1.5"
+                >
+                  <UserCog className="h-3.5 w-3.5" /> {t("actions.impersonate")}
+                </Button>
+              )
             )}
             {/* Confirming is the owner's, through the e-mailed link: an administrator can only resend it. */}
             {canConfirmEmail && !user.emailConfirmed && (
@@ -637,7 +672,7 @@ export function UserDetailPage() {
                 value={impersonationReason}
                 onChange={(e) => setImpersonationReason(e.target.value)}
                 placeholder={t("impersonate.reasonPlaceholder")}
-                maxLength={256}
+                maxLength={500}
                 className={cn(
                   "mt-1.5 flex h-9 w-full rounded-md border border-[var(--color-input)]",
                   "bg-transparent px-3 py-1 text-sm shadow-sm",
@@ -649,20 +684,20 @@ export function UserDetailPage() {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={impersonate.isPending}>
+              <Button type="button" variant="outline" disabled={requestAccess.isPending}>
                 {t("cancel")}
               </Button>
             </DialogClose>
             <Button
-              onClick={() => impersonate.mutate()}
-              disabled={impersonate.isPending}
+              onClick={() => requestAccess.mutate({ targetUserId: userId, reason: impersonationReason.trim() })}
+              disabled={requestAccess.isPending || impersonationReason.trim().length < 4}
               className={cn(
                 "gap-1.5",
                 "bg-[var(--color-warning)] text-[var(--color-warning-foreground,white)] hover:opacity-90",
               )}
             >
               <ShieldAlert className="h-3.5 w-3.5" />
-              {impersonate.isPending ? t("impersonate.starting") : t("impersonate.start")}
+              {requestAccess.isPending ? t("impersonate.requesting") : t("impersonate.request")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -30,7 +30,9 @@ A query that mounts outside its own nav-gated page (topbar badges, overview card
 
 ## Impersonation
 
-`token-store.ts` has `beginImpersonation` / `endImpersonationWithFreshTokens` / `restoreStashedActor` that stash the operator's tokens under `tl.dashboard.impersonation.*`. `AuthProvider` exposes `beginImpersonation`/`stopImpersonation` and derives `ImpersonationInfo` from `act_sub` / `act_tenant` / `act_name` claims. Admin triggers the handoff one-way via its `dashboardUrl`.
+`token-store.ts` has `beginImpersonation` / `endImpersonationWithFreshTokens` / `restoreStashedActor` that stash the operator's tokens under `tl.dashboard.impersonation.*`. `AuthProvider` exposes `beginImpersonation({ requestId })`/`stopImpersonation` and derives `ImpersonationInfo` from `act_sub` / `act_tenant` / `act_name` claims. Admin triggers the handoff one-way via its `dashboardUrl`.
+
+Impersonation only reads and needs the user's approval (D-44): the framework refuses every write of an impersonation token except ending it (403 `Identity.ImpersonationReadOnly`), and the banner says so. A user's page requests access with a reason and, once the user approved, starts it (`pages/identity/user-detail.tsx`). `AccessRequestsNotice` (`components/layout/`, under the top bar) shows every request to impersonate the signed-in user (`GET /identity/impersonation/requests/mine`, `Impersonation.Respond`, a Basic grant): approve, deny, or take an approval back, which also ends the impersonation it started. It is hidden while impersonating.
 
 ## Performance
 

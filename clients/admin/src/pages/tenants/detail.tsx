@@ -18,16 +18,19 @@ import {
   RefreshCw,
   ServerCrash,
   UserCog,
+  UserPlus,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/auth/use-auth";
 import { ImpersonateDialog } from "@/components/impersonation/impersonate-dialog";
+import { AccessRequestsCard } from "@/components/impersonation/access-requests-card";
 import { ActiveGrantsCard } from "@/components/impersonation/active-grants-card";
 import { TenantBrandingCard } from "@/components/tenants/tenant-branding-card";
 import { TenantMembersCard } from "@/components/tenants/tenant-members-card";
 import { RenewTenantDialog } from "@/components/tenants/renew-tenant-dialog";
 import { AdjustValidityDialog } from "@/components/tenants/adjust-validity-dialog";
+import { RestoreAdminDialog } from "@/components/tenants/restore-admin-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { IdentityPermissions, MultitenancyPermissions } from "@/lib/permissions";
 import {
@@ -60,8 +63,11 @@ export function TenantDetailPage() {
   const [renewOpen, setRenewOpen] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const [activationConfirmOpen, setActivationConfirmOpen] = useState(false);
+  const [restoreAdminOpen, setRestoreAdminOpen] = useState(false);
   const permissions = currentUser?.permissions ?? [];
   const canImpersonate = permissions.includes(IdentityPermissions.Users.Impersonate);
+  // The one write the operator makes inside a tenant (D-44): an Admin again, the tenant's Admins told.
+  const canRestoreAdmin = permissions.includes(IdentityPermissions.Users.RestoreAdmin);
   // Renew / change plan + adjust validity are root-operator subscription actions.
   const canManageSubscription = permissions.includes(
     MultitenancyPermissions.Tenants.UpgradeSubscription,
@@ -203,6 +209,17 @@ export function TenantDetailPage() {
                     {t("detail.actions.impersonate")}
                   </Button>
                 )}
+                {canRestoreAdmin && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setRestoreAdminOpen(true)}
+                    className="shrink-0"
+                    title={t("detail.actions.restoreAdminHint")}
+                  >
+                    <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                    {t("detail.actions.restoreAdmin")}
+                  </Button>
+                )}
                 {canManageSubscription && (
                   <Button
                     variant="outline"
@@ -250,6 +267,15 @@ export function TenantDetailPage() {
             tenantName={tenant.name}
           />
 
+          {canRestoreAdmin && (
+            <RestoreAdminDialog
+              open={restoreAdminOpen}
+              onOpenChange={setRestoreAdminOpen}
+              tenantId={tenant.id}
+              tenantName={tenant.name}
+            />
+          )}
+
           {canManageSubscription && (
             <RenewTenantDialog
               open={renewOpen}
@@ -285,6 +311,8 @@ export function TenantDetailPage() {
             onConfirm={() => activationMutation.mutate(!tenant.isActive)}
           />
           )}
+
+          <AccessRequestsCard tenantId={tenant.id} />
 
           <ActiveGrantsCard tenantId={tenant.id} />
 

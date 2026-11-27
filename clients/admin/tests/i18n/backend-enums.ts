@@ -3,6 +3,7 @@
 // Architecture.Tests (ClientBackendEnumsTests) fails when a line differs from the real enum and prints the line to use.
 export const BACKEND_ENUMS: Record<string, readonly string[]> = {
   ImpersonationGrantStatus: ["Active", "Ended", "Revoked", "Expired"],
+  ImpersonationRequestStatus: ["Pending", "Approved", "Denied", "Used", "Expired"],
   InvoiceStatus: ["Draft", "Issued", "Paid", "Void"],
   TopupRequestStatus: ["Pending", "Invoiced", "Completed", "Rejected", "Cancelled"],
 };

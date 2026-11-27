@@ -91,4 +91,16 @@ test.describe("impersonation grants list", () => {
     // canRevoke needs Impersonation.Revoke (granted) + status Active.
     await expect(main.getByRole("button", { name: /revoke/i }).first()).toBeVisible();
   });
+
+  test("an active grant can't be re-opened: a new session needs a new approved request", async ({ page }) => {
+    await mockJsonResponse(page, "**/api/v1/identity/impersonation/grants*", [
+      { ...ACTIVE_GRANT, actorUserId: TEST_USER.sub },
+    ]);
+
+    await page.goto("/impersonation");
+
+    const main = page.getByRole("main");
+    await expect(main.getByText("alice@acme.com", { exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(main.getByRole("button", { name: /re-open/i })).toHaveCount(0);
+  });
 });

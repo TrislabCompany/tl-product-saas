@@ -9,7 +9,6 @@ import {
   type ImpersonationGrantDto,
   type ImpersonationGrantStatus,
 } from "@/api/impersonation-grants";
-import type { UserDto } from "@/api/users";
 import { useAuth } from "@/auth/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,6 @@ import {
 } from "@/components/list";
 import { Select } from "@/components/ui/select";
 import { EmptyState } from "@/components/empty-state";
-import { ImpersonateDialog } from "@/components/impersonation/impersonate-dialog";
 import { RevokeGrantDialog } from "@/components/impersonation/revoke-grant-dialog";
 import { IdentityPermissions } from "@/lib/permissions";
 import { IMPERSONATION_STATUS_KEYS, statusKey } from "@/lib/status-keys";
@@ -44,12 +42,9 @@ export function ImpersonationListPage() {
   const { t } = useTranslation("impersonation");
   const { user } = useAuth();
   const canRevoke = (user?.permissions ?? []).includes(IdentityPermissions.Impersonation.Revoke);
-  const canImpersonate = (user?.permissions ?? []).includes(IdentityPermissions.Users.Impersonate);
-  const currentUserId = user?.id ?? null;
 
   const [status, setStatus] = useState<ImpersonationGrantStatus | "">("Active");
   const [targetGrant, setTargetGrant] = useState<ImpersonationGrantDto | null>(null);
-  const [reopenGrant, setReopenGrant] = useState<ImpersonationGrantDto | null>(null);
 
   // One poll fetches all grants; the filtered list AND the KPI counts are both
   // derived client-side, so we don't run two overlapping take:200 polls.
@@ -152,20 +147,7 @@ export function ImpersonationListPage() {
               key={g.id}
               grant={g}
               canRevoke={canRevoke && g.status === "Active"}
-              // Re-open is only meaningful when:
-              //   • the grant is still Active server-side (token not revoked / expired)
-              //   • the caller is the original actor (this is the "I closed my
-              //     browser tab" recovery path — not a way to hijack someone
-              //     else's session)
-              //   • the caller still has Users.Impersonate (revocation guard)
-              canReopen={
-                canImpersonate &&
-                g.status === "Active" &&
-                currentUserId !== null &&
-                g.actorUserId === currentUserId
-              }
               onRevoke={() => setTargetGrant(g)}
-              onReopen={() => setReopenGrant(g)}
             />
           ))}
         </ul>
@@ -175,70 +157,18 @@ export function ImpersonationListPage() {
         grant={targetGrant}
         onOpenChange={(open) => !open && setTargetGrant(null)}
       />
-
-      <ReopenDialog
-        grant={reopenGrant}
-        onOpenChange={(open) => !open && setReopenGrant(null)}
-      />
     </div>
-  );
-}
-
-/**
- * ReopenDialog — adapter around ImpersonateDialog that pre-fills the
- * tenant + user from an existing Active grant. The dialog still requires
- * a fresh reason + duration; we don't reuse the prior grant's values
- * because the operator is starting a NEW audit-trail entry (the old
- * grant stays active until it expires or is revoked).
- *
- * UserDto is constructed locally from grant fields rather than fetched
- * by id — the dialog only needs (id, display name) for its picker step,
- * and the grant already carries both.
- */
-function ReopenDialog({
-  grant,
-  onOpenChange,
-}: {
-  grant: ImpersonationGrantDto | null;
-  onOpenChange: (open: boolean) => void;
-}) {
-  // The dialog's PickStep is skipped when prefillUser is provided; we
-  // synthesize a minimal record sufficient for the ConfigureStep render.
-  const prefillUser: UserDto | undefined = grant
-    ? {
-        id: grant.impersonatedUserId,
-        userName: grant.impersonatedUserName ?? undefined,
-        firstName: null,
-        lastName: null,
-        email: null,
-        isActive: true,
-        emailConfirmed: true,
-      }
-    : undefined;
-
-  return (
-    <ImpersonateDialog
-      open={grant !== null}
-      onOpenChange={onOpenChange}
-      tenantId={grant?.impersonatedTenantId ?? ""}
-      tenantName={grant?.impersonatedTenantId}
-      prefillUser={prefillUser}
-    />
   );
 }
 
 function GrantRow({
   grant,
   canRevoke,
-  canReopen,
   onRevoke,
-  onReopen,
 }: {
   grant: ImpersonationGrantDto;
   canRevoke: boolean;
-  canReopen: boolean;
   onRevoke: () => void;
-  onReopen: () => void;
 }) {
   const { t } = useTranslation("impersonation");
   const [open, setOpen] = useState(false);
@@ -281,22 +211,12 @@ function GrantRow({
         </div>
         <StatusBadge status={grant.status} />
         <div className="flex shrink-0 items-center gap-2">
-          {canReopen && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onReopen}
-              title={t("reopenTitle")}
-            >
-              <UserCog className="mr-1 h-3.5 w-3.5" /> {t("reopen")}
-            </Button>
-          )}
           {canRevoke ? (
             <Button variant="outline" size="sm" onClick={onRevoke}>
               <ShieldOff className="mr-1 h-3.5 w-3.5" /> {t("revoke")}
             </Button>
           ) : (
-            !canReopen && <span aria-hidden />
+            <span aria-hidden />
           )}
         </div>
       </div>

@@ -443,14 +443,77 @@ export type EndImpersonationResponse = {
   accessTokenExpiresAt: string;
 };
 
-export async function startImpersonation(input: {
+// Impersonation only reads and needs the user's approval (the framework's D-44 rule): the actor requests access
+// with a reason, the user approves or denies it here, and only an approved request starts, once. The user can
+// deny it at any time, which also ends the impersonation it started.
+
+/** The request's status as the API computes it; a status added after this build is shown raw. */
+export type ImpersonationRequestStatus = "Pending" | "Approved" | "Denied" | "Used" | "Expired";
+
+export type ImpersonationRequestDto = {
+  id: string;
+  actorUserId: string;
+  actorUserName?: string | null;
+  actorTenantId: string;
+  targetUserId: string;
+  targetUserName?: string | null;
+  targetTenantId: string;
+  reason: string;
+  requestedAtUtc: string;
+  expiresAtUtc: string;
+  answeredAtUtc?: string | null;
+  grantId?: string | null;
+  status: ImpersonationRequestStatus;
+};
+
+const IMPERSONATION = "/api/v1/identity/impersonation";
+
+/** Asks a user for read-only access. A second open request for the same user is a 409. */
+export async function requestImpersonation(input: {
   targetUserId: string;
   targetTenantId: string;
-  reason?: string;
-}): Promise<ImpersonationResponse> {
-  return apiFetch<ImpersonationResponse>(`/api/v1/identity/impersonation/start`, {
+  reason: string;
+}): Promise<ImpersonationRequestDto> {
+  return apiFetch<ImpersonationRequestDto>(`${IMPERSONATION}/requests`, {
     method: "POST",
     body: JSON.stringify(input),
+  });
+}
+
+/** The caller's own requests, newest first. Needs Users.Impersonate. */
+export async function listSentImpersonationRequests(take = 100): Promise<ImpersonationRequestDto[]> {
+  return apiFetch<ImpersonationRequestDto[]>(`${IMPERSONATION}/requests?Take=${take}`);
+}
+
+/**
+ * Requests to impersonate the caller that still need an answer, and approved or used ones the caller can still
+ * take back. Needs Impersonation.Respond, which every user has.
+ */
+export async function getMyImpersonationRequests(): Promise<ImpersonationRequestDto[]> {
+  return apiFetch<ImpersonationRequestDto[]>(`${IMPERSONATION}/requests/mine`);
+}
+
+export async function approveImpersonationRequest(id: string): Promise<ImpersonationRequestDto> {
+  return apiFetch<ImpersonationRequestDto>(`${IMPERSONATION}/requests/${encodeURIComponent(id)}/approve`, {
+    method: "POST",
+  });
+}
+
+/** Denies a request, or takes an approval back; an impersonation it started ends. */
+export async function denyImpersonationRequest(id: string): Promise<ImpersonationRequestDto> {
+  return apiFetch<ImpersonationRequestDto>(`${IMPERSONATION}/requests/${encodeURIComponent(id)}/deny`, {
+    method: "POST",
+  });
+}
+
+/** Starts an approved request, once. A request that isn't approved, or was denied meanwhile, is a 403. */
+export async function startImpersonation(input: {
+  requestId: string;
+  durationMinutes?: number;
+}): Promise<ImpersonationResponse> {
+  return apiFetch<ImpersonationResponse>(`${IMPERSONATION}/start`, {
+    method: "POST",
+    body: JSON.stringify({ requestId: input.requestId, durationMinutes: input.durationMinutes ?? null }),
   });
 }
 

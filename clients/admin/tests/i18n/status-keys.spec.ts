@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { BACKEND_ENUMS } from "./backend-enums";
-import { IMPERSONATION_STATUS_KEYS, INVOICE_STATUS_KEYS, statusKey } from "../../src/lib/status-keys";
+import {
+  IMPERSONATION_REQUEST_STATUS_KEYS,
+  IMPERSONATION_STATUS_KEYS,
+  INVOICE_STATUS_KEYS,
+  statusKey,
+} from "../../src/lib/status-keys";
 
 // Several labels build their catalog key from a value the API sends: `status.${status}`. Catalog
 // parity cannot see those — both locales can be missing the same key and still match — so a status
@@ -49,6 +54,12 @@ const CASES = [
     ns: "impersonation",
     enumName: "ImpersonationGrantStatus",
     key: mapped(IMPERSONATION_STATUS_KEYS),
+  },
+  {
+    label: "impersonation requests",
+    ns: "impersonation",
+    enumName: "ImpersonationRequestStatus",
+    key: mapped(IMPERSONATION_REQUEST_STATUS_KEYS),
   },
 ];
 

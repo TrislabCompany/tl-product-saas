@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQuery, keepPreviousData } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Check, Search, ShieldAlert, UserCog } from "lucide-react";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { ArrowLeft, ArrowRight, Search, Send, ShieldAlert, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { searchUsers, type UserDto } from "@/api/users";
-import { startImpersonation, type ImpersonationResponse } from "@/api/impersonation";
+import { requestImpersonation, type ImpersonationRequestDto } from "@/api/impersonation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import { Monogram } from "@/components/monogram";
 import { ApiRequestError } from "@/lib/api-client";
-import { env } from "@/env";
-import i18n from "@/i18n";
 import { cn } from "@/lib/cn";
 import type { TFunction } from "i18next";
 
@@ -35,22 +33,14 @@ type Props = {
   prefillUser?: UserDto;
 };
 
-type DurationOption = { minutes: number; label: string };
-const DURATION_OPTIONS: DurationOption[] = [
-  { minutes: 10, label: "10 min" },
-  { minutes: 15, label: "15 min" },
-  { minutes: 30, label: "30 min" },
-];
-
 /**
- * ImpersonateDialog — two-step modal flow:
+ * ImpersonateDialog — asks a user for read-only access, in two steps:
  *   1. Pick a user inside the target tenant (skipped if `prefillUser` is set)
- *   2. Enter reason + pick session duration → start
+ *   2. Enter the reason → request access
  *
- * On success, opens the dashboard origin in a NEW TAB with the impersonation
- * token in the URL hash. The dashboard's bootstrap reads the hash, installs
- * the token, and strips it from the URL before any render. Hash params are
- * never sent to the server and don't leak via referrer/HTTP logs.
+ * The user approves or denies the request in the dashboard. Once approved, the
+ * operator starts it from the access requests card (AccessRequestsCard), which
+ * opens the dashboard with a read-only token.
  */
 export function ImpersonateDialog({
   open,
@@ -268,25 +258,24 @@ function ConfigureStep({
   onDone: () => void;
 }) {
   const { t } = useTranslation("impersonation");
+  const queryClient = useQueryClient();
   const [reason, setReason] = useState("");
-  const [minutes, setMinutes] = useState<number>(15);
 
   const trimmedReason = reason.trim();
   const reasonValid = trimmedReason.length >= 4;
 
-  const mutation = useMutation<ImpersonationResponse, Error, void>({
-    mutationFn: () =>
-      startImpersonation({
+  const mutation = useMutation<ImpersonationRequestDto, Error, { reason: string }>({
+    mutationFn: ({ reason }) =>
+      requestImpersonation({
         targetUserId: user.id,
         targetTenantId: tenantId,
-        reason: trimmedReason,
-        durationMinutes: minutes,
+        reason,
       }),
-    onSuccess: (response) => {
-      handoffToDashboard(response, tenantId);
-      toast.success(t("dialog.toast.started", { minutes }), {
-        description: t("dialog.toast.startedDesc", { name: labelFor(user, t) }),
+    onSuccess: () => {
+      toast.success(t("dialog.toast.requested"), {
+        description: t("dialog.toast.requestedDesc", { name: labelFor(user, t) }),
       });
+      void queryClient.invalidateQueries({ queryKey: ["impersonation-requests"] });
       onDone();
     },
     onError: (err) => {
@@ -302,34 +291,6 @@ function ConfigureStep({
     <>
       <DialogBody className="space-y-5">
         <SelectedUserCard user={user} tenantId={tenantId} tenantName={tenantName} />
-
-        <fieldset className="space-y-2">
-          <legend className="meta text-[var(--color-muted-foreground)]">{t("dialog.configure.duration")}</legend>
-          <div className="grid grid-cols-3 gap-2">
-            {DURATION_OPTIONS.map((opt) => {
-              const active = minutes === opt.minutes;
-              return (
-                <button
-                  key={opt.minutes}
-                  type="button"
-                  onClick={() => setMinutes(opt.minutes)}
-                  aria-pressed={active}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5 rounded-md border px-3 py-2 transition-colors",
-                    active
-                      ? "border-[var(--color-accent-signal)] bg-[var(--color-accent-signal)]/10 text-[var(--color-foreground)]"
-                      : "border-[var(--color-border)] hover:bg-[var(--color-muted)]/60",
-                  )}
-                >
-                  <span className="font-display text-lg font-semibold tabular-nums">
-                    {opt.minutes}
-                  </span>
-                  <span className="meta text-[var(--color-muted-foreground)]">{t("dialog.configure.minutes")}</span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
 
         <div className="space-y-1.5">
           <label
@@ -388,13 +349,13 @@ function ConfigureStep({
         <Button
           variant="signal"
           disabled={!reasonValid || mutation.isPending}
-          onClick={() => mutation.mutate()}
+          onClick={() => mutation.mutate({ reason: trimmedReason })}
         >
           {mutation.isPending ? (
-            t("dialog.configure.issuing")
+            t("dialog.configure.requesting")
           ) : (
             <>
-              <Check className="mr-1 h-3.5 w-3.5" /> {t("dialog.configure.start", { minutes })}
+              <Send className="mr-1 h-3.5 w-3.5" /> {t("dialog.configure.request")}
             </>
           )}
         </Button>
@@ -440,38 +401,6 @@ function SelectedUserCard({
       </div>
     </div>
   );
-}
-
-// ─── Handoff helper ─────────────────────────────────────────────────────
-
-/**
- * Open the dashboard in a new tab with the impersonation token in the URL
- * hash. Hash params don't get sent to servers and aren't logged in HTTP
- * referrers, so this is safer than a query-string handoff. The dashboard's
- * bootstrap reads the hash, calls tokenStore.beginImpersonation, then
- * history.replaceState() to strip the hash before any render.
- *
- * `expiresAt` is included so the dashboard can show a countdown.
- *
- * `locale` carries the OPERATOR's language across the origin boundary. The
- * server deliberately strips the target's `locale` claim so the operator keeps
- * reading in their own language (StartImpersonationCommandHandler), but the
- * dashboard usually runs on a different origin and therefore cannot read this
- * app's persisted language (`tl.admin.lng`). Without this parameter the API culture falls
- * through to the dashboard's own detected locale, so the shell would be in the
- * operator's language while API errors came back in another.
- */
-function handoffToDashboard(response: ImpersonationResponse, tenantId: string) {
-  const params = new URLSearchParams();
-  params.set("token", response.accessToken);
-  params.set("tenant", tenantId);
-  params.set("expiresAt", response.accessTokenExpiresAt);
-  params.set("locale", i18n.resolvedLanguage ?? "en-US");
-  const url = `${env.dashboardUrl}/#impersonate?${params.toString()}`;
-  // noopener+noreferrer so the opened tab can't navigate this one and the
-  // referrer header is suppressed entirely (defense in depth — the hash
-  // wouldn't be in the referrer anyway, but the rest of this URL would be).
-  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 function labelFor(user: UserDto, t: TFn): string {
