@@ -92,9 +92,11 @@ Every string a user reads goes through `t()`; English and Slovenian ship today. 
 ## Testing (Playwright, route-mocked)
 
 - `playwright.config.ts`: `testDir: ./tests`, chromium, auto-boots `npm run dev`, no real backend.
+- **Cold start:** `globalSetup` (`tests/helpers/global-setup.ts`) loads `/login` once before any test, and `vite.config.ts` `optimizeDeps.entries` scans every `src/**/*.{ts,tsx}` up front. Vite bundles the dependencies once, not mid-test when a lazy route first asks for one. Keep both apps' copies the same.
 - Tests in `tests/{area}/{name}.spec.ts`; helpers in `tests/helpers/`.
 - **JWT seeding:** `seedAuthedSession(page, TEST_USER)` builds a fake JWT and `addInitScript`-writes `tl.{app}.*` to localStorage before React boots (server isn't called, so signature is junk).
-- **Route mocking:** `mockJsonResponse(page, urlGlob, body)` / `mockProblemDetails(...)`. `installShellMocks(page)` stubs every call `AppShell` fires and **aborts** SSE/SignalR. Playwright matches most-recently-registered first → broad shell mocks in `beforeEach`, page-specific mocks after (they win).
+- **Route mocking:** `mockJsonResponse(page, urlGlob, body)` / `mockProblemDetails(...)`. `installShellMocks(page)` stubs every call `AppShell` fires and **aborts** SSE/SignalR. Playwright matches most-recently-registered first → broad shell mocks in `beforeEach`, page-specific mocks after (they win). `installShellMocks` first installs `mockUnmatchedApi`, a route on the browser context that answers any `/api/` call no test mocked with a 404 problem ("No test mock for METHOD path"). A page route always wins over it. A spec without the shell mocks (sign-in, password reset) can call `mockUnmatchedApi(page)` itself; the auth specs don't yet, so their unmocked calls reach the Vite proxy.
+- **Shortcuts attached in an effect** (the command palette's Ctrl+K) may miss the first press: press inside `expect(...).toPass()` (`openPalette` in `clients/dashboard/tests/i18n/command-palette.spec.ts`).
 - `beforeEach`: `seedAuthedSession(page, TEST_USER)` → `installShellMocks(page)`.
 
 ## Add a page/feature (shared steps)

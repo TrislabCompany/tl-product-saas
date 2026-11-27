@@ -1,5 +1,5 @@
 import type { Page, Route } from "@playwright/test";
-import { mockJsonResponse } from "./api-mocks";
+import { mockJsonResponse, mockUnmatchedApi } from "./api-mocks";
 
 /**
  * A profile body that satisfies the topbar avatar + settings/profile read.
@@ -38,6 +38,7 @@ export const SHELL_PERMISSIONS = [
  * these defaults (e.g. a chat spec can return real channels).
  */
 export async function installShellMocks(page: Page): Promise<void> {
+  await mockUnmatchedApi(page);
   // Long-lived realtime transports — abort so they neither keep the network
   // busy nor spew reconnect noise. The shell simply shows an "offline" dot.
   await page.route("**/api/v1/sse/**", (r: Route) => r.abort());
